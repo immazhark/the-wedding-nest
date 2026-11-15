@@ -17,7 +17,9 @@ export const SITE = {
  * Indexing stays off for every build until an approved production launch sets
  * PUBLIC_ALLOW_INDEXING=true in the production build environment.
  */
-export const ALLOW_INDEXING = import.meta.env?.PUBLIC_ALLOW_INDEXING === "true";
+export const ALLOW_INDEXING =
+  (import.meta.env?.PUBLIC_ALLOW_INDEXING ??
+    (typeof process !== "undefined" ? process.env["PUBLIC_ALLOW_INDEXING"] : undefined)) === "true";
 
 export function pageTitle(page?: string): string {
   return page ? `${page} · ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;

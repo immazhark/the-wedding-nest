@@ -1,6 +1,7 @@
 /**
  * Optional local draft of *non-sensitive* selections so a visitor can resume.
- * Contact details, notes and consent are never included, and drafts expire.
+ * Contact details, venue/location, notes and consent are never included (free text can
+ * identify a person or home address), and drafts expire.
  */
 import {
   BUDGETS,
@@ -19,16 +20,16 @@ export const DRAFT_STORAGE_KEY = "twn:enquiry-draft";
 
 type DraftData = Pick<
   EnquiryState,
-  "occasions" | "scope" | "services" | "styles" | "date" | "guestCount" | "location" | "budget"
+  "occasions" | "scope" | "services" | "styles" | "date" | "guestCount" | "budget"
 >;
 export type Draft = { v: 1; savedAt: number; data: DraftData };
 
 export function toDraft(s: EnquiryState, now: number): Draft {
-  const { occasions, scope, services, styles, date, guestCount, location, budget } = s;
+  const { occasions, scope, services, styles, date, guestCount, budget } = s;
   return {
     v: 1,
     savedAt: now,
-    data: { occasions, scope, services, styles, date, guestCount, location, budget },
+    data: { occasions, scope, services, styles, date, guestCount, budget },
   };
 }
 
@@ -62,6 +63,5 @@ export function restoreDraft(raw: unknown, now: number): EnquiryState | null {
       typeof data.guestCount === "string" && isValidGuestCount(data.guestCount)
         ? data.guestCount
         : "",
-    location: typeof data.location === "string" ? data.location.slice(0, 160) : "",
   };
 }

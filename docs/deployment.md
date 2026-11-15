@@ -1,6 +1,16 @@
 # Deployment — Cloudflare Workers Static Assets
 
-**Status (M0):** configuration committed (`wrangler.jsonc`, `public/_headers`); **not yet deployed**. The Claude Code Cloud container cannot reach the Cloudflare API (its outbound proxy returns 403) and holds no Cloudflare login, so the first deployment link must be made by the owner in the Cloudflare dashboard.
+**Status (15 Nov 2026):** the owner connected Cloudflare Workers Builds; `main` builds and deploys to the workers.dev preview (owner-reported success). Earlier branch builds failed first on a missing `package.json` (`main` had no app before PR #3) and then on the non-production-branch build setting. **Runtime is not yet verified by an agent**: this cloud session cannot reach the Cloudflare API or `*.workers.dev` (proxy 403).
+
+### Verifying the live preview
+
+Run the full suite against the deployed URL (pages, routing, axe, responsive, live headers):
+
+```bash
+PLAYWRIGHT_BASE_URL=https://the-wedding-nest.<account-subdomain>.workers.dev npm run test:e2e
+```
+
+In a Claude Code Cloud session this needs that exact host allowed in the environment's network settings.
 
 ## Chosen approach: Cloudflare Workers Builds (GitHub integration)
 
@@ -29,10 +39,10 @@ Result: `main` deploys to `the-wedding-nest.<account-subdomain>.workers.dev`; ea
 
 - Every build ships `X-Robots-Tag: noindex, nofollow`, `<meta name="robots" content="noindex, nofollow">` and a disallow-all `robots.txt`.
 - noindex is **not access control**. If previews must be private, add Cloudflare Access to the workers.dev / preview hostnames (owner decision).
-- Production launch (later, with owner approval): set `PUBLIC_ALLOW_INDEXING=true` for the production build only, replace `public/robots.txt` and the `X-Robots-Tag` header, add a sitemap, then attach the custom domain.
+- Production launch (later, owner-gated): set `PUBLIC_ALLOW_INDEXING=true` as a build variable for the production build only. That single switch changes `<meta name="robots">`, the generated `robots.txt` and removes `X-Robots-Tag` together (unit tested in `tests/unit/seo-files.test.ts`). Add a sitemap and attach the custom domain in the same release.
 
 ## Security headers
 
 - `astro.config.mjs` → `security.csp: true` generates a hash-based CSP `<meta>` for scripts and styles on each page. No inline `style=""` attributes are used (the CSP would block them).
-- `public/_headers` adds `frame-ancestors 'none'`, `nosniff`, referrer and permissions policies, COOP, and immutable caching for hashed `/_astro/*` assets.
+- `_headers` is generated at build time by `src/lib/site/seo-files.ts` (via the integration in `astro.config.mjs`): `frame-ancestors 'none'`, `nosniff`, referrer and permissions policies, COOP, immutable caching for hashed `/_astro/*` assets, plus `X-Robots-Tag` while not indexable.
 - HSTS stays off (see the decisions log) until the live site and redirects are verified.

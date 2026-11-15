@@ -1,3 +1,0 @@
-# Preview phase: indexing is disabled until the owner approves production launch.
-User-agent: *
-Disallow: /

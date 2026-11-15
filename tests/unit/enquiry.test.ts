@@ -180,6 +180,21 @@ describe("local draft (privacy)", () => {
     expect(json).not.toMatch(/"(name|phone|notes|consent)"/);
   });
 
+  it("never includes free-text location, even when one was entered", () => {
+    const draft = toDraft({ ...complete(), location: "12 Example Lane, Banjara Hills" }, 0);
+    const json = JSON.stringify(draft);
+    expect(json).not.toContain("Example Lane");
+    expect(json).not.toMatch(/"location"/);
+  });
+
+  it("ignores a location smuggled into an old draft", () => {
+    const restored = restoreDraft(
+      { v: 1, savedAt: 0, data: { occasions: ["nikah"], location: "Home address" } },
+      10,
+    );
+    expect(restored?.location).toBe("");
+  });
+
   it("restores non-sensitive selections and expires old drafts", () => {
     const draft = toDraft(complete(), 1_000);
     const restored = restoreDraft(JSON.parse(JSON.stringify(draft)), 1_000 + 60_000);

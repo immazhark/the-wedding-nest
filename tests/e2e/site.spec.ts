@@ -116,6 +116,41 @@ test.describe("mobile navigation", () => {
     }
   });
 
+  test("sticky header stays pinned after scrolling; menu opens directly beneath it", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.mouse.wheel(0, 1800);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(1000);
+    const header = page.locator("[data-site-header]");
+    const hb = (await header.boundingBox())!;
+    expect(Math.abs(hb.y)).toBeLessThanOrEqual(1);
+
+    await page.getByRole("button", { name: "Menu" }).click();
+    // Wait for the slide-in transition to settle before measuring.
+    await expect
+      .poll(async () => {
+        const nb = (await page.getByRole("navigation", { name: "Primary" }).boundingBox())!;
+        return Math.abs(nb.y - (hb.y + hb.height));
+      })
+      .toBeLessThanOrEqual(2);
+    expect(await page.evaluate(() => getComputedStyle(document.body).overflow)).toBe("hidden");
+  });
+
+  test("anchor targets are not hidden behind the sticky header", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page
+      .getByRole("navigation", { name: "Primary" })
+      .getByRole("link", { name: "Occasions" })
+      .click();
+    await expect(page).toHaveURL(/#occasions$/);
+    const header = (await page.locator("[data-site-header]").boundingBox())!;
+    await expect
+      .poll(async () => (await page.locator("#occasions-title").boundingBox())!.y)
+      .toBeGreaterThanOrEqual(header.y + header.height);
+  });
+
   test("closes after choosing a link", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Menu" }).click();
@@ -141,8 +176,36 @@ test.describe("desktop navigation", () => {
   });
 });
 
+test("robots.txt and X-Robots-Tag are in preview (noindex) mode", async ({ request, baseURL }) => {
+  const robots = await (await request.get("/robots.txt")).text();
+  expect(robots).toMatch(/Disallow: \/\s*$/m);
+  if (baseURL?.startsWith("http://localhost")) {
+    // astro preview doesn't apply _headers; check the generated file instead.
+    const { readFile } = await import("node:fs/promises");
+    expect(await readFile("dist/_headers", "utf8")).toContain("X-Robots-Tag: noindex, nofollow");
+  } else {
+    const res = await request.get("/");
+    expect(res.headers()["x-robots-tag"]).toBe("noindex, nofollow");
+    expect(res.headers()["content-security-policy"]).toContain("frame-ancestors 'none'");
+    expect(res.headers()["x-content-type-options"]).toBe("nosniff");
+  }
+});
+
 test("unknown routes return the 404 page", async ({ page }) => {
   const res = await page.goto("/does-not-exist/");
   expect(res?.status()).toBe(404);
   await expect(page.locator("h1")).toContainText("wandered off");
+});
+
+test("sticky header background is fully opaque so content never shows through", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const alpha = await page.evaluate(() => {
+    const bg = getComputedStyle(document.querySelector("[data-site-header]")!).backgroundColor;
+    const m = bg.match(/rgba?\(([^)]+)\)/)!;
+    const parts = m[1]!.split(",").map((x) => x.trim());
+    return parts.length === 4 ? Number(parts[3]) : 1;
+  });
+  expect(alpha).toBe(1);
 });
