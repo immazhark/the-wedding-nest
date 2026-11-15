@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 import { emptyEnquiry, type EnquiryState } from "../../src/lib/enquiry/schema";
-import { FIELD_STAGE, fieldMessage, submitEnquiry } from "../../src/lib/enquiry/submit";
+import {
+  FIELD_STAGE,
+  fieldMessage,
+  submitEnquiry,
+  SUBMIT_TIMEOUT_MS,
+} from "../../src/lib/enquiry/submit";
 
 const state = (): EnquiryState => ({
   ...emptyEnquiry(),
@@ -22,6 +27,69 @@ const respond = (status: number, body: unknown) =>
   );
 
 describe("submitEnquiry", () => {
+  it("keeps malformed responses retryable instead of crashing the planner", async () => {
+    for (const body of [null, [], "bad", { id: "" }, { id: "   " }]) {
+      expect(await submitEnquiry(state(), "t", KEY, respond(201, body) as never)).toEqual({
+        kind: "retryable",
+      });
+    }
+    for (const errors of [
+      {},
+      [],
+      null,
+      { unknown: "invalid" },
+      { phone: "unexpected" },
+      { phone: "invalid", unknown: "invalid" },
+    ]) {
+      expect(await submitEnquiry(state(), "t", KEY, respond(422, { errors }) as never)).toEqual({
+        kind: "retryable",
+      });
+    }
+  });
+
+  it("aborts a stalled request so the visitor can retry", async () => {
+    vi.useFakeTimers();
+    try {
+      let signal: AbortSignal | undefined;
+      const stalled = vi.fn(
+        (_url: string, init: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            signal = init.signal as AbortSignal;
+            signal.addEventListener("abort", () =>
+              reject(new DOMException("Timed out", "AbortError")),
+            );
+          }),
+      );
+      const pending = submitEnquiry(state(), "t", KEY, stalled as never);
+      await vi.advanceTimersByTimeAsync(SUBMIT_TIMEOUT_MS);
+      expect(await pending).toEqual({ kind: "retryable" });
+      expect(signal?.aborted).toBe(true);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("keeps the timeout active while reading a stalled response body", async () => {
+    vi.useFakeTimers();
+    try {
+      const stalledBody = vi.fn(async (_url: string, init: RequestInit) => ({
+        json: () =>
+          new Promise((_resolve, reject) => {
+            init.signal!.addEventListener("abort", () =>
+              reject(new DOMException("Timed out", "AbortError")),
+            );
+          }),
+      }));
+      const pending = submitEnquiry(state(), "t", KEY, stalledBody as never);
+      await vi.advanceTimersByTimeAsync(SUBMIT_TIMEOUT_MS);
+      expect(await pending).toEqual({ kind: "retryable" });
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("posts JSON with the idempotency key and Turnstile token", async () => {
     const fetch = respond(201, { id: "abc" });
     await submitEnquiry(state(), "tok", KEY, fetch as unknown as typeof globalThis.fetch);

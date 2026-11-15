@@ -31,6 +31,36 @@ export const MAX_BODY_BYTES = 16 * 1024;
 const SITEVERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** Enforce the byte limit while consuming the stream, before buffering or decoding it. */
+async function readBody(request: Request): Promise<string | null> {
+  if (!request.body) return "";
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_BODY_BYTES) {
+        // A cancellation failure must not turn an oversized body into an accepted one.
+        await reader.cancel().catch(() => {});
+        return null;
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(bytes);
+}
+
 const json = (status: number, body: unknown, headers: Record<string, string> = {}) =>
   Response.json(body, {
     status,
@@ -52,17 +82,24 @@ export async function handleEnquiry(
   if (env.ENQUIRIES_ENABLED !== "true") return fail(503, "enquiries_disabled");
   if (!env.DB || !env.TURNSTILE_SECRET || !env.ALLOWED_ORIGINS) return fail(503, "not_configured");
 
-  const origins = env.ALLOWED_ORIGINS.split(",").map((o) => o.trim());
-  if (!origins.includes(request.headers.get("origin") ?? "")) return fail(403, "forbidden_origin");
+  const origins = env.ALLOWED_ORIGINS.split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+  const origin = request.headers.get("origin");
+  if (!origin || !origins.includes(origin)) return fail(403, "forbidden_origin");
 
   if (!(request.headers.get("content-type") ?? "").toLowerCase().startsWith("application/json"))
     return fail(415, "unsupported_media_type");
 
   const declared = Number(request.headers.get("content-length") ?? "0");
   if (declared > MAX_BODY_BYTES) return fail(413, "payload_too_large");
-  const raw = await request.text();
-  if (new TextEncoder().encode(raw).byteLength > MAX_BODY_BYTES)
-    return fail(413, "payload_too_large");
+  let raw: string | null;
+  try {
+    raw = await readBody(request);
+  } catch {
+    return fail(400, "invalid_body");
+  }
+  if (raw === null) return fail(413, "payload_too_large");
 
   let body: unknown;
   try {
@@ -77,8 +114,12 @@ export async function handleEnquiry(
 
   const ip = request.headers.get("cf-connecting-ip") ?? "";
   if (env.ENQUIRY_RATE_LIMITER) {
-    const { success } = await env.ENQUIRY_RATE_LIMITER.limit({ key: ip || "unknown" });
-    if (!success) return fail(429, "rate_limited", { "retry-after": "60" });
+    try {
+      const { success } = await env.ENQUIRY_RATE_LIMITER.limit({ key: ip || "unknown" });
+      if (!success) return fail(429, "rate_limited", { "retry-after": "60" });
+    } catch {
+      return fail(503, "rate_limit_unavailable");
+    }
   }
 
   const db = env.DB;
@@ -141,8 +182,9 @@ export async function handleEnquiry(
         .prepare("SELECT id FROM enquiries WHERE idempotency_key = ?1")
         .bind(key)
         .first<{ id: string }>();
+      if (!row) return fail(503, "storage_unavailable");
       deps.log({ event: "enquiry", outcome: "duplicate", status: 200 });
-      return json(200, { id: row?.id ?? id });
+      return json(200, { id: row.id });
     }
   } catch {
     return fail(503, "storage_unavailable");
