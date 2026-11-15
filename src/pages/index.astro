@@ -1,0 +1,190 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ArchFrame from "../components/ArchFrame.astro";
+import { OCCASIONS, SERVICES, STAGES } from "../lib/enquiry/schema";
+
+// DRAFT COPY — pending owner approval. No claims about prices, clients, awards or guarantees.
+const coreServices = SERVICES.filter((s) => !("onlyFor" in s));
+const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
+---
+
+<BaseLayout>
+  <!-- Hero -->
+  <section class="relative overflow-hidden" aria-labelledby="hero-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-12 pb-20 md:pt-16 md:pb-28 grid gap-12 md:grid-cols-12 md:items-center">
+      <div class="md:col-span-7 lg:col-span-7 relative z-10">
+        <p class="eyebrow text-brass-deep reveal [--i:0]">
+          Weddings &amp; celebrations · Hyderabad
+        </p>
+        <h1 id="hero-title" class="mt-6 text-[length:var(--text-display)] reveal [--i:1]">
+          Every celebration, <em class="italic text-brass-deep font-[300]">thoughtfully</em>{" "}
+          composed.
+        </h1>
+        <p class="mt-8 max-w-xl text-[length:var(--text-lede)] text-charcoal reveal [--i:2]">
+          From Nikah and Walima to Mehndi, receptions and milestone gatherings — tell us what you
+          are planning, whether you need a single service or the whole occasion shaped end to end.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5 reveal [--i:3]">
+          <a href="/plan-your-event/" class="btn btn-solid">
+            Plan your event{" "}
+            <span class="arrow" aria-hidden="true">
+              →
+            </span>
+          </a>
+          <a href="#services" class="link-underline text-[0.9375rem] font-medium">
+            Explore services
+          </a>
+        </div>
+      </div>
+
+      <div class="md:col-span-5">
+        <div class="relative ml-auto w-[78%] md:w-full md:max-w-[52vh]">
+          <ArchFrame
+            label="Reserved for an approved TWN wedding photograph"
+            class="aspect-[3/4] w-full reveal [--i:2]"
+          />
+          <ArchFrame
+            label="Detail image"
+            class="hidden sm:block absolute -left-[22%] -bottom-10 aspect-[3/4] w-[42%] border-[6px] border-ivory rounded-t-full reveal [--i:4]"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section id="services" class="bg-paper border-y border-ink/10" aria-labelledby="services-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-32">
+      <div class="grid gap-10 md:grid-cols-12">
+        <div class="md:col-span-4">
+          <p class="eyebrow text-brass-deep">Services</p>
+          <h2 id="services-title" class="mt-5 text-[length:var(--text-headline)]">
+            Two ways <em class="italic font-[300]">to begin.</em>
+          </h2>
+        </div>
+        <div class="md:col-span-8 grid gap-14 sm:grid-cols-2 md:pt-3">
+          <article>
+            <p class="font-display text-brass-deep text-5xl font-[300]" aria-hidden="true">
+              01
+            </p>
+            <h3 class="mt-6 text-[length:var(--text-title)]">The whole occasion</h3>
+            <span class="rule mt-6"></span>
+            <p class="mt-6 text-charcoal">
+              One team to shape the concept, coordinate the details and look after your guests —
+              from the first conversation to the final farewell.
+            </p>
+          </article>
+          <article>
+            <p class="font-display text-brass-deep text-5xl font-[300]" aria-hidden="true">
+              02
+            </p>
+            <h3 class="mt-6 text-[length:var(--text-title)]">Specific services</h3>
+            <span class="rule mt-6"></span>
+            <p class="mt-6 text-charcoal">Ask about one part, or a few, of your celebration:</p>
+            <ul class="mt-4 grid gap-x-6 gap-y-2 text-[0.9375rem] text-charcoal">
+              {coreServices.map((s) => (
+                <li class="flex gap-3">
+                  <span class="mt-[0.7em] h-px w-3 shrink-0 bg-brass" aria-hidden="true" />
+                  {s.label}
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
+      </div>
+      <p class="mt-16 md:ml-[33.333%] text-sm text-muted max-w-xl">
+        What is possible depends on your date, venue and guest list — we will talk it through with
+        you personally before anything is agreed.
+      </p>
+    </div>
+  </section>
+
+  <!-- Occasions -->
+  <section id="occasions" aria-labelledby="occasions-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-32">
+      <p class="eyebrow text-brass-deep">Occasions</p>
+      <h2 id="occasions-title" class="mt-5 max-w-3xl text-[length:var(--text-headline)]">
+        Rooted in Hyderabad’s wedding traditions, <em class="italic font-[300]">open to every</em>{" "}
+        celebration.
+      </h2>
+      <ul class="mt-16 border-t border-ink/15" role="list">
+        {weddingOccasions.map((o, i) => (
+          <li class="occasion-row group grid grid-cols-[3rem_1fr] md:grid-cols-[6rem_1fr_auto] items-baseline border-b border-ink/15 py-5 md:py-6">
+            <span class="eyebrow text-muted" aria-hidden="true">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <span class="font-display text-[clamp(2rem,1.4rem+3vw,4.5rem)] leading-none font-[320] transition-transform duration-500 ease-[var(--ease-editorial)] md:group-hover:translate-x-3">
+              {o.label}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p class="mt-10 max-w-2xl text-[length:var(--text-lede)] text-charcoal">
+        And birthdays, anniversaries, corporate evenings and private gatherings — planned with the
+        same care for families and hosts from every community.
+      </p>
+    </div>
+  </section>
+
+  <!-- Approach / planner preview -->
+  <section id="approach" class="on-dark bg-kohl text-ivory" aria-labelledby="approach-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-32 grid gap-16 md:grid-cols-12 md:items-center">
+      <div class="md:col-span-7">
+        <p class="eyebrow text-sand">Plan your event</p>
+        <h2 id="approach-title" class="mt-5 text-[length:var(--text-headline)]">
+          Five considered steps{" "}
+          <em class="italic text-brass font-[300]">to a first conversation.</em>
+        </h2>
+        <ol class="mt-14 space-y-0 border-t border-ivory/15">
+          {STAGES.map((stage, i) => (
+            <li class="grid grid-cols-[3.5rem_1fr] gap-4 border-b border-ivory/15 py-5">
+              <span class="font-display text-2xl text-brass font-[300]" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span>
+                <span class="block text-lg font-medium">{stage.title}</span>
+                <span class="block text-sand">{stage.prompt}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+        <a href="/plan-your-event/" class="btn btn-light mt-12">
+          Begin planning{" "}
+          <span class="arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+      </div>
+      <div class="md:col-span-5">
+        <ArchFrame
+          tone="dark"
+          label="Reserved for approved décor or venue photography"
+          class="aspect-[4/5] w-full max-w-md mx-auto"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Work (photo-ready, honest) -->
+  <section aria-labelledby="work-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-32">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="eyebrow text-brass-deep">Our work</p>
+          <h2 id="work-title" class="mt-5 text-[length:var(--text-headline)]">
+            Real celebrations, <em class="italic font-[300]">shared with permission.</em>
+          </h2>
+        </div>
+        <p class="max-w-sm text-muted">
+          Project stories will be published here once photographs and families’ permissions are
+          confirmed.
+        </p>
+      </div>
+      <div class="mt-16 grid gap-8 sm:grid-cols-3 sm:items-end">
+        <ArchFrame label="Project story to come" class="aspect-[3/4]" />
+        <ArchFrame label="Project story to come" class="aspect-[3/5] sm:-mb-10" />
+        <ArchFrame label="Project story to come" class="aspect-[3/4]" />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

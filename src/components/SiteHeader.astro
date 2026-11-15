@@ -1,0 +1,172 @@
+---
+import Wordmark from "./Wordmark.astro";
+import { NAV } from "../lib/site/config";
+
+const current = Astro.url.pathname;
+---
+
+<header class="site-header sticky top-0 z-50 border-b border-ink/10" data-site-header>
+  <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 h-[4.5rem] flex items-center justify-between gap-6">
+    <a href="/" class="shrink-0">
+      <Wordmark />
+    </a>
+
+    <button
+      type="button"
+      class="hidden items-center gap-3 min-h-11 px-1 eyebrow text-ink"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      data-menu-toggle
+    >
+      <span data-menu-label>Menu</span>
+      <span aria-hidden="true" class="relative block w-6 h-3">
+        <span class="menu-bar absolute left-0 top-0 h-px w-6 bg-current"></span>
+        <span class="menu-bar absolute left-0 bottom-0 h-px w-6 bg-current"></span>
+      </span>
+    </button>
+
+    <nav
+      id="site-menu"
+      aria-label="Primary"
+      class="site-menu md:static md:flex md:bg-transparent"
+      data-menu
+    >
+      <ul class="flex flex-col md:flex-row md:items-center gap-1 md:gap-9">
+        {NAV.map((item) => {
+          const isCta = item.href.startsWith("/plan");
+          return (
+            <li>
+              <a
+                href={item.href}
+                aria-current={current === item.href ? "page" : undefined}
+                class:list={[
+                  isCta
+                    ? "btn btn-solid md:min-h-10 md:px-5 md:py-2 md:text-[0.72rem]"
+                    : "link-underline md:text-[0.9375rem] text-charcoal hover:text-ink",
+                  "nav-link",
+                ]}
+              >
+                {item.label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  /* Blur lives on a pseudo-element: backdrop-filter on the header itself would become the
+     containing block for the fixed mobile menu and collapse it to the header's height. */
+  .site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: color-mix(in srgb, var(--color-ivory) 90%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  /* Without JS the menu stays visible in-flow on mobile; with JS it becomes an overlay. */
+  @media (max-width: 47.99rem) {
+    .site-menu {
+      padding: 0 1rem 1rem;
+    }
+    :global(html.js) .site-menu {
+      position: fixed;
+      inset: var(--menu-top, 4.5rem) 0 0 0;
+      background: var(--color-ivory);
+      padding: 2rem 1.25rem;
+      overflow-y: auto;
+      visibility: hidden;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition:
+        opacity 0.4s var(--ease-editorial),
+        transform 0.4s var(--ease-editorial),
+        visibility 0s linear 0.4s;
+    }
+    :global(html.js) .site-menu[data-open] {
+      visibility: visible;
+      opacity: 1;
+      transform: none;
+      transition-delay: 0s;
+    }
+    .site-menu :global(.nav-link:not(.btn)) {
+      display: block;
+      padding: 0.85rem 0;
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 330;
+      border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+    }
+    .site-menu :global(.btn) {
+      margin-top: 1.75rem;
+    }
+    :global(html:not(.js)) .site-menu :global(.nav-link:not(.btn)) {
+      font-size: 1.25rem;
+      padding: 0.5rem 0;
+    }
+  }
+  :global(html.js) [data-menu-toggle] {
+    display: inline-flex;
+  }
+  @media (min-width: 48rem) {
+    :global(html.js) [data-menu-toggle] {
+      display: none;
+    }
+  }
+  .menu-bar {
+    transition: transform 0.35s var(--ease-editorial);
+  }
+  [aria-expanded="true"] .menu-bar:first-child {
+    transform: translateY(5.5px) rotate(45deg);
+  }
+  [aria-expanded="true"] .menu-bar:last-child {
+    transform: translateY(-5.5px) rotate(-45deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .menu-bar,
+    :global(html.js) .site-menu {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+  const menu = document.querySelector<HTMLElement>("[data-menu]");
+  const label = toggle?.querySelector<HTMLElement>("[data-menu-label]");
+  const mobile = window.matchMedia("(max-width: 47.99rem)");
+
+  function setOpen(open: boolean, restoreFocus = false) {
+    if (!toggle || !menu) return;
+    // Header bottom moves with the preview notice / scroll position; CSSOM writes are CSP-safe.
+    const header = document.querySelector<HTMLElement>("[data-site-header]");
+    if (open && header)
+      menu.style.setProperty("--menu-top", `${header.getBoundingClientRect().bottom}px`);
+    toggle.setAttribute("aria-expanded", String(open));
+    if (label) label.textContent = open ? "Close" : "Menu";
+    menu.toggleAttribute("data-open", open);
+    menu.toggleAttribute("inert", mobile.matches && !open);
+    document.body.style.overflow = open ? "hidden" : "";
+    if (open) menu.querySelector<HTMLElement>("a")?.focus();
+    else if (restoreFocus) toggle.focus();
+  }
+
+  if (toggle && menu) {
+    setOpen(false);
+    toggle.addEventListener("click", () =>
+      setOpen(toggle.getAttribute("aria-expanded") !== "true"),
+    );
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && toggle.getAttribute("aria-expanded") === "true")
+        setOpen(false, true);
+    });
+    menu.addEventListener("click", (e) => {
+      if ((e.target as HTMLElement).closest("a")) setOpen(false);
+    });
+    mobile.addEventListener("change", () => setOpen(false));
+  }
+</script>

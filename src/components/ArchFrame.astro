@@ -1,0 +1,59 @@
+---
+/**
+ * Arched media frame (nod to Qutb Shahi arches). Until approved TWN photography exists it
+ * renders an original geometric jaali pattern with an explicit "photograph to come" label —
+ * never stock or AI imagery presented as real work.
+ */
+interface Props {
+  label: string;
+  tone?: "light" | "dark";
+  class?: string;
+}
+const { label, tone = "light", class: className = "" } = Astro.props;
+const id = `jaali-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<figure class:list={["arch-frame relative", className]}>
+  <div
+    class:list={[
+      "arch relative h-full w-full overflow-hidden",
+      tone === "dark" ? "bg-kohl-soft text-brass" : "bg-stone text-brass-deep",
+    ]}
+  >
+    <svg class="absolute inset-0 h-full w-full opacity-20" aria-hidden="true" focusable="false">
+      <defs>
+        <pattern id={id} width="56" height="56" patternUnits="userSpaceOnUse">
+          <g fill="none" stroke="currentColor" stroke-width="0.8">
+            <rect x="14" y="14" width="28" height="28"></rect>
+            <rect x="14" y="14" width="28" height="28" transform="rotate(45 28 28)"></rect>
+            <circle cx="28" cy="28" r="5"></circle>
+            <path d="M0 0 L14 14 M56 0 L42 14 M0 56 L14 42 M56 56 L42 42"></path>
+          </g>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill={`url(#${id})`}></rect>
+    </svg>
+    <div class="arch-inner absolute inset-3 sm:inset-4 border border-current/40"></div>
+    <figcaption
+      class:list={[
+        "absolute inset-x-0 bottom-0 px-6 pb-7 pt-16 text-center",
+        tone === "dark"
+          ? "bg-gradient-to-t from-kohl-soft to-transparent text-sand"
+          : "bg-gradient-to-t from-stone to-transparent text-muted",
+      ]}
+    >
+      <span class="eyebrow block text-[0.65rem]">Photograph to come</span>
+      <span class="mt-1 block text-sm">{label}</span>
+    </figcaption>
+  </div>
+</figure>
+
+<style>
+  .arch,
+  .arch-inner {
+    border-radius: 999px 999px 0 0;
+  }
+  .arch-inner {
+    border-radius: 999px 999px 0 0;
+  }
+</style>
