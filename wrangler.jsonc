@@ -30,8 +30,8 @@
     "staging": {
       "name": "the-wedding-nest-staging",
       "vars": {
-        "ENQUIRIES_ENABLED": "false",
-        "ALLOWED_ORIGINS": "",
+        "ENQUIRIES_ENABLED": "true",
+        "ALLOWED_ORIGINS": "https://the-wedding-nest-staging.mazharkhan-it.workers.dev",
       },
       "d1_databases": [
         {
