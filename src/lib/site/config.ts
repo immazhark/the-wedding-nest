@@ -21,6 +21,16 @@ export const ALLOW_INDEXING =
   (import.meta.env?.PUBLIC_ALLOW_INDEXING ??
     (typeof process !== "undefined" ? process.env["PUBLIC_ALLOW_INDEXING"] : undefined)) === "true";
 
+const env = (name: string): string | undefined =>
+  (import.meta.env?.[name] as string | undefined) ??
+  (typeof process !== "undefined" ? process.env[name] : undefined);
+
+/** Live enquiry submission. Owner-gated: production builds leave this off. */
+export const ENQUIRIES = {
+  enabled: env("PUBLIC_ENQUIRIES_ENABLED") === "true",
+  turnstileSiteKey: env("PUBLIC_TURNSTILE_SITE_KEY") ?? "",
+} as const;
+
 export function pageTitle(page?: string): string {
   return page ? `${page} · ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
 }

@@ -31,6 +31,8 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - name: Build submission-enabled variant (test key; for planner submit tests only)
+        run: npm run build:submit
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
       - name: End-to-end, accessibility and navigation tests

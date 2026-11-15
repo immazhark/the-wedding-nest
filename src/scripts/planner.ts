@@ -13,8 +13,38 @@ import {
 import { nextStage, previousStage, stageError } from "../lib/enquiry/flow";
 import { DRAFT_STORAGE_KEY, restoreDraft, toDraft } from "../lib/enquiry/draft";
 import { summarise } from "../lib/enquiry/summary";
+import { FIELD_STAGE, fieldMessage, submitEnquiry } from "../lib/enquiry/submit";
 
-type Panel = StageId | "review";
+type TurnstileApi = {
+  render(el: HTMLElement, opts: Record<string, unknown>): string;
+  reset(id?: string): void;
+};
+declare global {
+  interface Window {
+    turnstile?: TurnstileApi;
+  }
+}
+
+let turnstileLoading: Promise<TurnstileApi> | null = null;
+/** Loads Cloudflare Turnstile only when a visitor reaches the review step with sending on. */
+function loadTurnstile(): Promise<TurnstileApi> {
+  turnstileLoading ??= new Promise((resolve, reject) => {
+    if (window.turnstile) return resolve(window.turnstile);
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.async = true;
+    script.onload = () =>
+      window.turnstile ? resolve(window.turnstile) : reject(new Error("turnstile"));
+    script.onerror = () => {
+      turnstileLoading = null;
+      reject(new Error("turnstile"));
+    };
+    document.head.append(script);
+  });
+  return turnstileLoading;
+}
+
+type Panel = StageId | "review" | "sent";
 
 const values = (fd: FormData, name: string) => fd.getAll(name).map(String);
 
@@ -102,7 +132,105 @@ export function initPlanner(form: HTMLFormElement) {
   const summaryEl = form.querySelector<HTMLElement>("[data-summary]")!;
   const stepCount = root.querySelector<HTMLElement>("[data-step-count]");
   const progressBar = root.querySelector<HTMLElement>("[data-progress-bar]");
+  const resetBtn = form.querySelector<HTMLButtonElement>("[data-reset]")!;
   let current: Panel = "occasion";
+  const sending = form.dataset["submit"] === "on" ? initSending() : null;
+
+  /** Live submission (only when the build enables it). */
+  function initSending() {
+    const sendBtn = form.querySelector<HTMLButtonElement>("[data-send]")!;
+    const sendLabel = form.querySelector<HTMLElement>("[data-send-label]")!;
+    const status = form.querySelector<HTMLElement>("[data-send-status]")!;
+    const widgetEl = form.querySelector<HTMLElement>("[data-turnstile]")!;
+    const reference = form.querySelector<HTMLElement>("[data-reference]")!;
+    const sitekey = form.dataset["sitekey"] ?? "";
+    let key: string | null = null; // one key per reviewed payload: retries reuse it
+    let token = "";
+    let widgetId: string | undefined;
+    let busy = false;
+
+    const resetCheck = () => {
+      token = "";
+      if (widgetId !== undefined) window.turnstile?.reset(widgetId);
+    };
+
+    sendBtn.addEventListener("click", async () => {
+      if (busy) return;
+      if (!token) {
+        status.textContent = "Please wait for the quick check above to finish, then send.";
+        return;
+      }
+      busy = true;
+      sendBtn.disabled = true;
+      sendLabel.textContent = "Sending…";
+      status.textContent = "";
+      key ??= crypto.randomUUID();
+      const result = await submitEnquiry(readState(form), token, key);
+      busy = false;
+      sendBtn.disabled = false;
+      sendLabel.textContent = "Send enquiry";
+      switch (result.kind) {
+        case "accepted":
+          storage.clear();
+          reference.textContent = result.id.slice(0, 8).toUpperCase();
+          show("sent");
+          return;
+        case "invalid": {
+          const [field, code] = Object.entries(result.errors)[0] as [
+            keyof EnquiryState,
+            NonNullable<(typeof result.errors)[keyof EnquiryState]>,
+          ];
+          key = null; // the payload will change
+          show(FIELD_STAGE[field]);
+          errorEl.textContent = fieldMessage(field, code);
+          return;
+        }
+        case "verification":
+          resetCheck();
+          status.textContent = "The quick check expired. Please let it finish again, then send.";
+          return;
+        case "retryable":
+          resetCheck();
+          status.textContent =
+            "We couldn’t send your enquiry just now. Your answers are still here — please try again in a moment.";
+          return;
+        case "rejected":
+          status.textContent =
+            "Something went wrong with this enquiry. Please message us on Instagram @twn.events instead.";
+          return;
+      }
+    });
+
+    return {
+      async enterReview() {
+        status.textContent = "";
+        try {
+          const ts = await loadTurnstile();
+          if (widgetId === undefined) {
+            widgetId = ts.render(widgetEl, {
+              sitekey,
+              theme: "light",
+              callback: (t: string) => {
+                token = t;
+                status.textContent = "";
+              },
+              "expired-callback": () => (token = ""),
+              "error-callback": () => {
+                token = "";
+                status.textContent = "The quick check couldn’t load. Please refresh the page.";
+              },
+            });
+          }
+        } catch {
+          status.textContent =
+            "The quick check couldn’t load. Check your connection, or message us on Instagram @twn.events.";
+        }
+      },
+      leaveReview() {
+        key = null;
+      },
+    };
+  }
 
   function syncConditional() {
     const s = readState(form);
@@ -138,10 +266,17 @@ export function initPlanner(form: HTMLFormElement) {
         order.indexOf(panel) < order.indexOf(current) ? "back" : "forward";
     current = panel;
     panels.forEach((p) => (p.hidden = p.dataset["stage"] !== panel));
-    const index = panel === "review" ? STAGES.length : STAGES.findIndex((s) => s.id === panel);
+    const index =
+      panel === "review" || panel === "sent"
+        ? STAGES.length
+        : STAGES.findIndex((s) => s.id === panel);
     if (stepCount)
       stepCount.textContent =
-        panel === "review" ? "Review" : `Step ${index + 1} of ${STAGES.length}`;
+        panel === "sent"
+          ? "Sent"
+          : panel === "review"
+            ? "Review"
+            : `Step ${index + 1} of ${STAGES.length}`;
     // CSSOM writes are allowed by the CSP (inline style attributes in markup are not).
     progressBar?.style.setProperty(
       "width",
@@ -152,12 +287,17 @@ export function initPlanner(form: HTMLFormElement) {
       if (i === index) item.setAttribute("aria-current", "step");
       else item.removeAttribute("aria-current");
     });
-    backBtn.hidden = panel === "occasion";
-    nextBtn.hidden = panel === "review";
+    backBtn.hidden = panel === "occasion" || panel === "sent";
+    nextBtn.hidden = panel === "review" || panel === "sent";
+    resetBtn.hidden = panel === "sent";
+    resetBtn.closest<HTMLElement>(".planner-nav")!.hidden = panel === "sent";
     nextLabel.textContent = panel === "contact" ? "Review" : "Continue";
     errorEl.textContent = "";
     form.querySelectorAll("[aria-invalid]").forEach((el) => el.removeAttribute("aria-invalid"));
-    if (panel === "review") renderSummary();
+    if (panel === "review") {
+      renderSummary();
+      sending?.enterReview();
+    } else sending?.leaveReview();
     if (focus) {
       const heading = panels
         .find((p) => p.dataset["stage"] === panel)
@@ -192,8 +332,8 @@ export function initPlanner(form: HTMLFormElement) {
   errorEl.id = "planner-error-msg";
 
   form.addEventListener("submit", (e) => {
-    e.preventDefault(); // never submits: no backend yet
-    if (current === "review") return;
+    e.preventDefault(); // stages advance in place; sending (if enabled) has its own button
+    if (current === "review" || current === "sent") return;
     const s = readState(form);
     const error = stageError(current, s);
     if (error) {
@@ -205,6 +345,7 @@ export function initPlanner(form: HTMLFormElement) {
   });
 
   backBtn.addEventListener("click", () => {
+    if (current === "sent") return;
     if (current === "review") return show("contact");
     const prev = previousStage(current);
     if (prev) show(prev);
@@ -213,12 +354,17 @@ export function initPlanner(form: HTMLFormElement) {
   form.addEventListener("change", () => {
     syncConditional();
     storage.save(readState(form));
-    if (errorEl.textContent && !stageError(current as StageId, readState(form)))
+    if (
+      current !== "review" &&
+      current !== "sent" &&
+      errorEl.textContent &&
+      !stageError(current, readState(form))
+    )
       errorEl.textContent = "";
   });
   form.addEventListener("input", () => storage.save(readState(form)));
 
-  form.querySelector("[data-reset]")?.addEventListener("click", () => {
+  resetBtn.addEventListener("click", () => {
     storage.clear();
     form.reset();
     applyState(form, emptyEnquiry());

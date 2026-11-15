@@ -7,6 +7,9 @@ import { headersFile, robotsTxt } from "./src/lib/site/seo-files.ts";
 // One switch for robots.txt, X-Robots-Tag and <meta name="robots"> (set as a real build
 // environment variable, e.g. in Workers Builds settings, only for the approved production build).
 const indexable = process.env.PUBLIC_ALLOW_INDEXING === "true";
+// Live enquiry submission (owner-gated). Off unless explicitly enabled for a build.
+const enquiries = process.env.PUBLIC_ENQUIRIES_ENABLED === "true";
+const TURNSTILE = "https://challenges.cloudflare.com";
 
 /** @type {import("astro").AstroIntegration} */
 const seoFiles = {
@@ -23,6 +26,8 @@ const seoFiles = {
 export default defineConfig({
   site: "https://theweddingnest.in",
   output: "static",
+  // Lets CI build a second, submission-enabled variant side by side (dist-submit).
+  outDir: process.env.ASTRO_OUT_DIR ?? "./dist",
   trailingSlash: "ignore",
   build: {
     format: "directory",
@@ -33,7 +38,12 @@ export default defineConfig({
     syntaxHighlight: false,
   },
   security: {
-    csp: true,
+    csp: enquiries
+      ? {
+          scriptDirective: { resources: ["'self'", TURNSTILE] },
+          directives: [`frame-src ${TURNSTILE}`],
+        }
+      : true,
   },
   integrations: [seoFiles],
   vite: {

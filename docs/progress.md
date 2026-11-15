@@ -8,7 +8,7 @@ Current state first; history at the end. Update after every meaningful merge.
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Site                         | Astro 7 + strict TS + Tailwind 4 static site: homepage, `/plan-your-event/` planner, 404. Creative pass 1 (PR pending owner visual approval) recomposes the homepage per docs/creative-excellence-standards.md. Proposed design, not an approved brand. |
 | Planner                      | 5 stages + review, occasion-based branching, explicit consent. **Does not send**. Disclosure before step 1 asks visitors not to enter real contact details. Local draft keeps only occasion/service/style/date/guest-count/budget (7 days); never name, phone, venue/location or notes. |
-| Enquiry backend              | `POST /api/enquiry` Worker implemented and tested (D1 + outbox, server-side Turnstile, idempotency, shared validation). **Off in production**; staging env defined, DB not yet created. Planner not wired. See docs/enquiry-api.md.                                                      |
+| Enquiry backend              | `POST /api/enquiry` Worker implemented and tested (D1 + outbox, server-side Turnstile, idempotency, shared validation). **Off in production**; staging env defined, DB not yet created. Planner Send step wired behind `PUBLIC_ENQUIRIES_ENABLED` (off in production). See docs/enquiry-api.md.                                                      |
 | Indexing                     | Off everywhere. `PUBLIC_ALLOW_INDEXING=true` (production build only, owner-gated) flips meta robots, generated `robots.txt` and `X-Robots-Tag` together.                                                                                                                                  |
 | CI                           | GitHub Actions `verify`: format, astro check, unit, build, Playwright + axe on desktop/mobile against the static build **and** the local Workers runtime (`wrangler dev`: routing, live headers, API off).                                                                                 |
 | Cloudflare                   | Workers Builds connected by the owner; latest `main` build reported successful by the owner. Runtime **not yet verified by an agent**: `*.workers.dev` is blocked by this cloud session's network policy. See docs/deployment.md.                                                         |
@@ -20,6 +20,7 @@ Current state first; history at the end. Update after every meaningful merge.
 - #1 tooling foundation · #2 handover docs
 - #3 (c492537) M0 foundation + planner UI
 - #4 (d63c44b) standing merge authorisation recorded in CLAUDE.md
+- #6 (1e29a88) enquiry API · #7 (8502f6e) creative pass 1 + official logo (owner-approved)
 - #5 (9c3a863) review follow-up: planner disclosure, draft privacy (no location), unified SEO switch, solid sticky header, live-URL test mode, docs reconciled
 - Enquiry API PR (this one): Worker + D1 migration + staging env + runtime tests in CI
 
@@ -28,7 +29,7 @@ Current state first; history at the end. Update after every meaningful merge.
 0. Owner visual review of creative pass 1 (screenshots in `docs/review/creative-pass-1/`). Photography: see docs/photography-brief.md.
 
 1. Verify the deployed Worker URL: run `PLAYWRIGHT_BASE_URL=<url> npm run test:e2e` from an environment that can reach it (needs the exact `*.workers.dev` host allowed, or run by the owner's reviewer).
-2. Staging: create the D1 database + Turnstile test keys (Cloudflare access needed), deploy `--env staging`, then wire the planner to the API behind a flag.
+2. Staging: create the D1 database + Turnstile widget (Cloudflare access needed), deploy `--env staging` with `PUBLIC_ENQUIRIES_ENABLED=true`, test end to end; production stays off until the owner approves.
 3. Owner review: design direction, planner copy/options, budget bands, privacy wording.
 
 ## Tooling verified (first cloud session)
