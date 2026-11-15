@@ -21,6 +21,10 @@ Cloudflare builds directly from GitHub, so no Cloudflare API token is stored in 
 
 Result: `main` deploys to `the-wedding-nest.<account-subdomain>.workers.dev`; each PR branch gets a versioned preview URL.
 
+## Node version
+
+`.nvmrc` pins **Node 24.18.0**, which Workers Builds preinstalls (its image ships 22.23.2 and 24.18.0; Astro 7 needs >=22.23.4, so 22.23.2 fails). GitHub CI reads the same file. If a build log ever shows a Node mismatch, set `NODE_VERSION` in the Workers Builds settings to match `.nvmrc`.
+
 ## Indexing and access
 
 - Every build ships `X-Robots-Tag: noindex, nofollow`, `<meta name="robots" content="noindex, nofollow">` and a disallow-all `robots.txt`.
