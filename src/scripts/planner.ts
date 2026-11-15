@@ -1,7 +1,7 @@
 /**
  * Plan Your Event — client controller. All rules live in src/lib/enquiry (unit tested);
  * this file only maps the form to EnquiryState, steps between panels and stores a
- * non-sensitive draft. Nothing is sent anywhere: the secure backend does not exist yet.
+ * non-sensitive draft. Submission is enabled only by the explicit build-time gate.
  */
 import {
   STAGES,
@@ -162,12 +162,18 @@ export function initPlanner(form: HTMLFormElement) {
       }
       busy = true;
       sendBtn.disabled = true;
+      backBtn.disabled = true;
+      resetBtn.disabled = true;
+      form.setAttribute("aria-busy", "true");
       sendLabel.textContent = "Sending…";
       status.textContent = "";
       key ??= crypto.randomUUID();
       const result = await submitEnquiry(readState(form), token, key);
       busy = false;
       sendBtn.disabled = false;
+      backBtn.disabled = false;
+      resetBtn.disabled = false;
+      form.removeAttribute("aria-busy");
       sendLabel.textContent = "Send enquiry";
       switch (result.kind) {
         case "accepted":

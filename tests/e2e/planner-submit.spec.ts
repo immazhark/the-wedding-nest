@@ -33,6 +33,32 @@ async function setup(page: Page, responder: (n: number) => { status: number; bod
 
 const next = (page: Page) => page.getByRole("button", { name: /^(Continue|Review)/ }).click();
 
+test("navigation and reset stay locked until a pending send finishes", async ({ page }) => {
+  await setup(page, () => ({ status: 201, body: { id: "accepted123" } }));
+  let finish: (() => void) | undefined;
+  await page.route("**/api/enquiry", async (route) => {
+    await new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    await route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({ error: "storage_unavailable" }),
+    });
+  });
+  await toReview(page);
+  await page.getByRole("button", { name: "Send enquiry" }).click();
+  await expect(page.locator("[data-back]")).toBeDisabled();
+  await expect(page.locator("[data-reset]")).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Sending…" })).toBeDisabled();
+  await expect.poll(() => Boolean(finish)).toBe(true);
+  finish!();
+  await expect(page.getByRole("status")).toContainText("couldn’t send");
+  await expect(page.locator("[data-back]")).toBeEnabled();
+  await expect(page.locator("[data-reset]")).toBeEnabled();
+  await expect(page.locator("[data-summary]")).toContainText("Sample Person");
+});
+
 async function toReview(page: Page) {
   await page.getByRole("checkbox", { name: "Walima" }).check();
   await next(page);

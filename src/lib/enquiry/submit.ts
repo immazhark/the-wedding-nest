@@ -12,44 +12,70 @@ export type SubmitResult =
   | { kind: "retryable" }
   | { kind: "rejected" };
 
+export const SUBMIT_TIMEOUT_MS = 15_000;
+const ERROR_CODES: readonly ErrorCode[] = [
+  "required",
+  "invalid",
+  "too_long",
+  "not_available_for_occasion",
+  "consent_required",
+];
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
 export async function submitEnquiry(
   enquiry: EnquiryState,
   turnstileToken: string,
   idempotencyKey: string,
   fetchFn: typeof fetch = fetch,
 ): Promise<SubmitResult> {
-  let res: Response;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), SUBMIT_TIMEOUT_MS);
   try {
-    res = await fetchFn("/api/enquiry", {
+    const res = await fetchFn("/api/enquiry", {
       method: "POST",
       headers: { "content-type": "application/json", "idempotency-key": idempotencyKey },
       body: JSON.stringify({ turnstileToken, enquiry }),
       credentials: "same-origin",
+      signal: controller.signal,
     });
+    let body: unknown;
+    try {
+      body = await res.json();
+    } catch {
+      return { kind: "retryable" };
+    }
+    if (!isRecord(body)) return { kind: "retryable" };
+    if (res.ok) {
+      return typeof body["id"] === "string" && body["id"].trim().length > 0
+        ? { kind: "accepted", id: body["id"] }
+        : { kind: "retryable" };
+    }
+    if (res.status === 422) {
+      const errors = body["errors"];
+      if (!isRecord(errors)) return { kind: "retryable" };
+      const entries = Object.entries(errors);
+      if (
+        entries.length === 0 ||
+        !entries.every(
+          ([field, code]) =>
+            Object.hasOwn(FIELD_STAGE, field) &&
+            typeof code === "string" &&
+            ERROR_CODES.includes(code as ErrorCode),
+        )
+      )
+        return { kind: "retryable" };
+      return { kind: "invalid", errors: errors as Partial<Record<keyof EnquiryState, ErrorCode>> };
+    }
+    if (res.status === 403 && body["error"] === "verification_failed")
+      return { kind: "verification" };
+    if (res.status === 429 || res.status >= 500) return { kind: "retryable" };
+    return { kind: "rejected" };
   } catch {
     return { kind: "retryable" };
+  } finally {
+    clearTimeout(timeout);
   }
-  let body: Record<string, unknown> = {};
-  try {
-    body = (await res.json()) as Record<string, unknown>;
-  } catch {
-    /* non-JSON body: handled by status below */
-  }
-  if (res.ok) {
-    return typeof body["id"] === "string"
-      ? { kind: "accepted", id: body["id"] }
-      : { kind: "retryable" };
-  }
-  if (res.status === 422 && body["errors"] && typeof body["errors"] === "object") {
-    return {
-      kind: "invalid",
-      errors: body["errors"] as Partial<Record<keyof EnquiryState, ErrorCode>>,
-    };
-  }
-  if (res.status === 403 && body["error"] === "verification_failed")
-    return { kind: "verification" };
-  if (res.status === 429 || res.status >= 500) return { kind: "retryable" };
-  return { kind: "rejected" };
 }
 
 /** Which planner stage holds each field, so the visitor is taken straight to the fix. */

@@ -120,6 +120,71 @@ beforeEach(() => {
 });
 
 describe("POST /api/enquiry", () => {
+  it("rejects a missing Origin even when the allow-list has empty entries", async () => {
+    env.ALLOWED_ORIGINS = `${ORIGIN}, `;
+    const req = request(ok());
+    req.headers.delete("origin");
+    expect((await call(req)).status).toBe(403);
+    expect(turnstile).not.toHaveBeenCalled();
+  });
+
+  it("stops consuming an oversized stream without Content-Length", async () => {
+    let reads = 0;
+    let cancelled = false;
+    const stream = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        reads++;
+        controller.enqueue(new Uint8Array(9000));
+        if (reads === 5) controller.close();
+      },
+      cancel() {
+        cancelled = true;
+      },
+    });
+    const req = new Request(request(ok()), {
+      body: stream,
+      duplex: "half",
+    } as RequestInit);
+    expect((await call(req)).status).toBe(413);
+    expect(cancelled).toBe(true);
+    expect(reads).toBeLessThanOrEqual(3);
+    expect(turnstile).not.toHaveBeenCalled();
+  });
+
+  it("returns a safe error when the request body stream fails", async () => {
+    const req = new Request(request(ok()), {
+      body: new ReadableStream({
+        start(controller) {
+          controller.error(new Error("private transport detail"));
+        },
+      }),
+      duplex: "half",
+    } as RequestInit);
+    const res = await call(req);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "invalid_body" });
+  });
+
+  it("returns a retryable response when the rate limiter is unavailable", async () => {
+    env.ENQUIRY_RATE_LIMITER = {
+      limit: async () => {
+        throw new Error("private limiter detail");
+      },
+    };
+    const res = await call(request(ok()));
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({ error: "rate_limit_unavailable" });
+    expect(turnstile).not.toHaveBeenCalled();
+  });
+
+  it("never acknowledges an insert conflict if the stored row cannot be found", async () => {
+    db.batch = async () => [{ meta: { changes: 0 } }];
+    const res = await call(request(ok()));
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({ error: "storage_unavailable" });
+    expect(db.enquiries.size).toBe(0);
+  });
+
   it("stores a valid enquiry and its outbox event atomically, returning 201 with an id only", async () => {
     const res = await call(request(ok()));
     expect(res.status).toBe(201);

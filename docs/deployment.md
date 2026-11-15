@@ -1,6 +1,6 @@
 # Deployment — Cloudflare Workers Static Assets
 
-**Status (15 Nov 2026):** the owner connected Cloudflare Workers Builds; `main` builds and deploys to the workers.dev preview (owner-reported success). Earlier branch builds failed first on a missing `package.json` (`main` had no app before PR #3) and then on the non-production-branch build setting. **Runtime is not yet verified by an agent**: this cloud session cannot reach the Cloudflare API or `*.workers.dev` (proxy 403).
+**Status (16 Nov 2026):** GitHub check records confirm Workers Builds success for main `da53d1a` (build `679c64ee-1488-4ac7-baba-1d24c4dc0f03`, deployed version `09b174eb-b24d-4f7c-beb2-4a70f208527d`) and CI verify success. PR #8 comments confirm non-production branch builds have failed across #4–#8; a working preview deployment is not established by main build success. The exact workers.dev hostname and authenticated Cloudflare management capability are unavailable in the takeover session, so deployed browser behavior remains unverified. Domain, indexing and live enquiry gates remain unchanged.
 
 ### Verifying the live preview
 
