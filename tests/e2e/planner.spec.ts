@@ -15,6 +15,7 @@ async function completeToContact(page: Page) {
   await page.getByRole("radio", { name: "I have a date" }).check();
   await page.getByLabel("Event date").fill("2027-02-14");
   await page.getByLabel(/Approximate guests/).fill("250");
+  await page.getByLabel(/Venue or area/).fill("Sample Venue Road");
   await next(page);
 }
 
@@ -46,9 +47,21 @@ test("walks through all five stages to a review, without sending anything", asyn
   await expect(summary).toContainText("Specific services: Mehndi artist");
   await expect(summary).toContainText("14 February 2027");
   await expect(summary).toContainText("Not shared");
-  await expect(page.getByText(/nothing has been sent or stored/)).toBeVisible();
+  await expect(page.getByText(/so nothing has been sent/)).toBeVisible();
   await expect(page.getByRole("button", { name: /send/i })).toHaveCount(0);
   expect(requests).toEqual([]);
+});
+
+test("discloses before the first step that sending is off and real details shouldn't be entered", async ({
+  page,
+}) => {
+  const disclosure = page.locator("#planner-disclosure");
+  await expect(disclosure).toBeVisible();
+  await expect(disclosure).toContainText("enquiries can’t be sent yet");
+  await expect(disclosure).toContainText("don’t enter real contact details");
+  const disclosureBox = await disclosure.boundingBox();
+  const firstQuestion = await heading(page).boundingBox();
+  expect(disclosureBox!.y).toBeLessThan(firstQuestion!.y);
 });
 
 test("blocks progress with an announced message until required answers are given", async ({
@@ -100,6 +113,8 @@ test("keeps choices after reload but never stores contact details", async ({ pag
   expect(draft).toContain("mehndi");
   expect(draft).not.toContain("Test Visitor");
   expect(draft).not.toContain("9876543210");
+  expect(draft).not.toContain("location");
+  expect(draft).not.toContain("Sample Venue");
 
   await page.reload();
   await expect(page.getByRole("checkbox", { name: "Mehndi" })).toBeChecked();

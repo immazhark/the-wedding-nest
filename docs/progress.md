@@ -1,48 +1,39 @@
-# Project progress — updated 15 November 2026 (M0)
+# Project progress — updated 15 November 2026
 
-## Verified in GitHub
-- Private repository immazhark/the-wedding-nest exists and uses main.
-- Initial README commit b99839ba845882c1b1f8721ab453a85675ef400a completed.
-- **PR #1 merged**: Claude Code and Codex tooling foundation, squash commit acc17ca9cf335e00a8a6869bf3a8b080d9faccd5.
-- Project instructions, .claude/settings.json, 3 Claude project skills and corresponding Codex skills have been committed.
-- Complete business/UX/architecture/SEO handover and cloud kickoff prompt are being added in the current docs PR.
-- Domain/DNSSEC/edge certificate activation supported by earlier owner screenshots; some TLS toggles subsequently owner-confirmed.
+Current state first; history at the end. Update after every meaningful merge.
 
-## Configured, not verified in a Claude Code Cloud runtime
-- Superpowers and Impeccable external plugins in .claude/settings.json (declarations alone do not prove installation).
-- Whether each cloud session discovers all three project skills, and any marketplace/trust prompts.
+## Current state of `main`
 
-## M0 + M2 planner UI — merged to `main` via PR #3 (squash c492537, 15 Nov 2026)
-- Astro 7 + strict TypeScript + Tailwind 4 static site with real `package-lock.json`.
-- Base layout (metadata, canonical, robots noindex, skip link, visible design-preview notice), accessible header with mobile menu, footer.
-- Design-preview homepage (proposed editorial direction, honest "photograph to come" frames), Plan Your Event information page (no form), 404.
-- Typed 5-stage enquiry question tree, branching, server-grade validation and privacy-safe draft — unit tested.
-- Vitest unit tests, Playwright e2e (desktop + mobile) incl. axe WCAG 2.2 AA, link, CSP-console, overflow and nav tests.
-- GitHub Actions CI workflow (format, check, unit, build, e2e). Its first run on GitHub is the evidence; local cloud runs pass.
-- `wrangler.jsonc` + `public/_headers`; deployment blocked on one owner action (docs/deployment.md).
+| Area                         | State                                                                                                                                                                                                                                                                                     |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Site                         | Astro 7 + strict TS + Tailwind 4 static site: homepage (design preview), `/plan-your-event/` planner, 404. Proposed editorial design, not an approved brand.                                                                                                                                |
+| Planner                      | 5 stages + review, occasion-based branching, explicit consent. **Does not send**. Disclosure before step 1 asks visitors not to enter real contact details. Local draft keeps only occasion/service/style/date/guest-count/budget (7 days); never name, phone, venue/location or notes. |
+| Enquiry backend              | Not built. Validation (`src/lib/enquiry/validate.ts`) is ready for server reuse. Next PR.                                                                                                                                                                                                 |
+| Indexing                     | Off everywhere. `PUBLIC_ALLOW_INDEXING=true` (production build only, owner-gated) flips meta robots, generated `robots.txt` and `X-Robots-Tag` together.                                                                                                                                  |
+| CI                           | GitHub Actions `verify` (format, astro check, unit, build, Playwright + axe on desktop/mobile) — green on `main`.                                                                                                                                                                         |
+| Cloudflare                   | Workers Builds connected by the owner; latest `main` build reported successful by the owner. Runtime **not yet verified by an agent**: `*.workers.dev` is blocked by this cloud session's network policy. See docs/deployment.md.                                                         |
+| Domain `theweddingnest.in`   | Not attached (owner-gated).                                                                                                                                                                                                                                                              |
+| Business content and media   | None approved yet; placeholders are labelled.                                                                                                                                                                                                                                            |
 
-## M2 (part 1) — interactive Plan Your Event planner (merged in PR #3)
-- `/plan-your-event/` is now a working 5-stage planner + review step: native checkbox/radio tiles, occasion-based service branching, optional style/budget, editable guest count, explicit consent, separate optional marketing consent.
-- **Sends nothing**: no backend yet; the review step says so plainly. Name/phone/notes live only in the open page; the localStorage draft holds non-sensitive choices only (7-day expiry, "Start again" clears it).
-- Tests: unit (stage messages, summary) + Playwright planner flows on desktop and mobile (branching, validation, keyboard, reload/draft privacy, no non-GET requests, axe per stage).
-- Screenshots: `docs/review/m2/`.
-- Next: owner review of planner copy/options; then Worker `POST /api/enquiry` + D1 + Turnstile in a staging environment (separate PR, using `validateEnquiry` server-side).
+## Merged PRs
 
-## Verified tooling in the first Claude Code Cloud session (15 Nov 2026)
-- Superpowers: **loaded** (session-start hook ran; `superpowers:*` skills listed and used).
-- Impeccable: **not loaded**. Its marketplace is not registered in this container and github.com/pbakaus is blocked by the session's outbound proxy (403). Needs install via the Claude Code plugin manager or an environment allowing that host.
-- Project skills `twn-design-review`, `twn-enquiry-security`, `twn-release-review`: **discovered** and listed by the cloud session.
-- Cloudflare API and Cloudflare MCP: unreachable from the container (proxy 403); no deployment possible from the agent.
+- #1 tooling foundation · #2 handover docs
+- #3 (c492537) M0 foundation + planner UI
+- #4 (d63c44b) standing merge authorisation recorded in CLAUDE.md
+- Review follow-up (this PR): planner disclosure, draft privacy (no location), unified SEO switch, solid sticky header, live-URL test mode, docs reconciled
 
-## Not yet implemented or verified
-- Cloudflare Workers preview deployment (needs owner dashboard action) and its URL.
-- Authentic, owner-approved visual portfolio content.
-- Guided enquiry UI, secure Worker API, Turnstile, D1 and actual lead notification delivery.
-- Public production website, Search Console setup or real visitor performance metrics.
+## Next
 
-## Next engineering action
-1. Start a single-repository Claude Code Cloud session for this repo.
-2. Read CLAUDE.md, docs/full-project-handover.md and docs/claude-code-kickoff-v5.md.
-3. Verify tools/skills as possible without blocking work, scaffold Astro/TypeScript/Tailwind on a feature branch, install dependencies, run checks and submit PR.
-4. Establish CI/Cloudflare previews; iterate on bespoke photography-ready design and typed enquiry canvas. Do not attach production domain before owner approval.
-5. Record verified outcome and links here after each meaningful merge.
+1. Verify the deployed Worker URL: run `PLAYWRIGHT_BASE_URL=<url> npm run test:e2e` from an environment that can reach it (needs the exact `*.workers.dev` host allowed, or run by the owner's reviewer).
+2. Worker `POST /api/enquiry` + D1 + server-side Turnstile, test-first, staging-only bindings; live submission stays owner-gated.
+3. Owner review: design direction, planner copy/options, budget bands, privacy wording.
+
+## Tooling verified (first cloud session)
+
+- Superpowers loaded; the three `twn-*` project skills discovered.
+- Impeccable not loaded (marketplace unregistered; github.com/pbakaus blocked by proxy). rtk pilot blocked (crates.io/GitHub 403). Not blocking.
+- Cloudflare API/MCP and `*.workers.dev` unreachable from the container.
+
+## History
+
+- 15 Nov 2026: repository, README (b99839b), tooling PR #1 (acc17ca), handover docs PR #2, domain on Cloudflare DNS with DNSSEC (owner-confirmed).

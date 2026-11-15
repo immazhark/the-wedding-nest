@@ -57,16 +57,10 @@ const current = Astro.url.pathname;
 </header>
 
 <style>
-  /* Blur lives on a pseudo-element: backdrop-filter on the header itself would become the
-     containing block for the fixed mobile menu and collapse it to the header's height. */
-  .site-header::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: color-mix(in srgb, var(--color-ivory) 90%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+  /* Solid background: a translucent/blurred header let body text ghost through on mobile.
+     (Never put backdrop-filter on the header itself — it would trap the fixed mobile menu.) */
+  .site-header {
+    background: var(--color-ivory);
   }
   /* Without JS the menu stays visible in-flow on mobile; with JS it becomes an overlay. */
   @media (max-width: 47.99rem) {
