@@ -19,6 +19,11 @@
   // submission is owner-gated and needs a production D1 + secret + retention policy first.
   "vars": { "ENQUIRIES_ENABLED": "false" },
 
+  // Branch previews are isolated from production and cannot accept enquiries.
+  "previews": {
+    "vars": { "ENQUIRIES_ENABLED": "false" },
+  },
+
   "env": {
     // Isolated staging: its own Worker name, its own D1 database, test data only.
     // Deploy: npx wrangler deploy --env staging (after creating the DB; see docs/enquiry-api.md).
@@ -32,8 +37,8 @@
         {
           "binding": "DB",
           "database_name": "twn-enquiries-staging",
-          // Replace with the id printed by `wrangler d1 create twn-enquiries-staging`.
-          "database_id": "00000000-0000-0000-0000-000000000000",
+          // Isolated test database; schema applied through the Cloudflare API.
+          "database_id": "7a2c8b44-f24d-48e6-ba95-56aa039d60e8",
           "migrations_dir": "migrations",
         },
       ],
