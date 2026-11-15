@@ -1,5 +1,5 @@
 ---
-import Wordmark from "./Wordmark.astro";
+import lockup from "../assets/brand/twn-lockup-ivory.svg?url";
 import { NAV, SITE } from "../lib/site/config";
 const year = new Date().getFullYear();
 ---
@@ -8,7 +8,14 @@ const year = new Date().getFullYear();
   <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-20 pb-10">
     <div class="grid gap-14 md:grid-cols-12">
       <div class="md:col-span-5">
-        <Wordmark class="[&_em]:text-brass [&_.eyebrow]:text-sand" />
+        <img
+          src={lockup}
+          alt="The Wedding Nest — Where Tradition Meets Elegance"
+          width="210"
+          height="195"
+          loading="lazy"
+          class="h-auto w-[190px] sm:w-[210px]"
+        />
         <p class="mt-6 max-w-sm text-sand">
           Weddings and celebrations, planned and styled in {SITE.region}.
         </p>

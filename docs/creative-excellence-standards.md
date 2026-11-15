@@ -19,6 +19,7 @@ An original, ultra-premium editorial experience for a Hyderabad wedding and even
 - **Palette:** ivory/paper/stone grounds, ink text, kohl for deep sections; brass is an accent (≤ a few touches per view), never a fill.
 - **Type:** Fraunces (display, optical sizes, light weights; italic for at most one accent per section) + Instrument Sans (text/UI). Compose line breaks deliberately (`<br>` / balanced wrapping); display size serves hierarchy, not volume.
 - **Composition:** 12-column editorial grid, intentional asymmetry, overlap and layering where it tells the story; generous but purposeful whitespace; mobile gets its own composition, not a squeezed desktop.
+- **Logo:** official TWN logo per docs/brand-assets.md (single-colour on the site). Its tagline is brand property and appears only inside the lockup.
 - **Signature motif:** the Qutb Shahi arch + jaali appears **once per page at most**, where it means "threshold / invitation" (the planner invitation). Photographs are otherwise framed by their own aspect ratio.
 - **Photography leads.** Layouts adapt to the real image (portrait, landscape, panorama, detail), never one forced crop. See docs/photography-brief.md.
 

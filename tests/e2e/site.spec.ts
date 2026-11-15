@@ -253,3 +253,13 @@ test("photo placeholders are labelled honestly and never use stock imagery", asy
     expect(label).toContain("Photograph to come");
   }
 });
+
+test("official logo is used in the header and footer with accessible names", async ({ page }) => {
+  await page.goto("/");
+  const homeLink = page.locator("[data-site-header] a[href='/']").first();
+  await expect(homeLink.locator("svg title")).toHaveText("The Wedding Nest");
+  await expect(homeLink).toHaveAccessibleName(/The Wedding Nest/);
+  await expect(page.locator("footer img[alt^='The Wedding Nest']")).toHaveCount(1);
+  expect((await page.request.get("/favicon.svg")).status()).toBe(200);
+  expect((await page.request.get("/apple-touch-icon.png")).status()).toBe(200);
+});
