@@ -10,7 +10,8 @@ import {
   STYLES,
 } from "../../lib/enquiry/schema";
 import { LIMITS } from "../../lib/enquiry/validate";
-import { SITE } from "../../lib/site/config";
+import { ENQUIRIES, SITE } from "../../lib/site/config";
+const sending = ENQUIRIES.enabled;
 
 // DRAFT COPY — labels, privacy wording and budget bands need owner approval.
 const weddings = OCCASIONS.filter((o) => o.group === "wedding");
@@ -29,25 +30,27 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
     </p>
   </noscript>
 
-  <div id="planner-disclosure" class="disclosure" role="note" aria-labelledby="disclosure-title">
-    <p id="disclosure-title" class="eyebrow text-brass-deep">
-      Preview — enquiries can’t be sent yet
-    </p>
-    <p class="mt-3 text-charcoal">
-      You’re welcome to explore the planner, but please{" "}
-      <strong>don’t enter real contact details</strong>: this preview can’t send them to The Wedding
-      Nest. To get in touch now, message
-      <a href={SITE.instagram} class="underline decoration-brass underline-offset-4">
-        @twn.events
-      </a>
-      on Instagram.
-    </p>
-    <p class="mt-2 text-sm text-muted">
-      Your occasion, service, style, date, guest-count and budget choices are kept in this browser
-      for 7 days so you can return to them. Your name, number, venue and notes are never saved, and
-      nothing leaves your device.
-    </p>
-  </div>
+  {!sending && (
+    <div id="planner-disclosure" class="disclosure" role="note" aria-labelledby="disclosure-title">
+      <p id="disclosure-title" class="eyebrow text-brass-deep">
+        Preview — enquiries can’t be sent yet
+      </p>
+      <p class="mt-3 text-charcoal">
+        You’re welcome to explore the planner, but please{" "}
+        <strong>don’t enter real contact details</strong>: this preview can’t send them to The
+        Wedding Nest. To get in touch now, message
+        <a href={SITE.instagram} class="underline decoration-brass underline-offset-4">
+          @twn.events
+        </a>
+        on Instagram.
+      </p>
+      <p class="mt-2 text-sm text-muted">
+        Your occasion, service, style, date, guest-count and budget choices are kept in this browser
+        for 7 days so you can return to them. Your name, number, venue and notes are never saved,
+        and nothing leaves your device.
+      </p>
+    </div>
+  )}
 
   <div class="js-only mt-12 grid gap-10 lg:grid-cols-12">
     <!-- Progress -->
@@ -70,7 +73,14 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
       </ol>
     </nav>
 
-    <form class="lg:col-span-8" novalidate data-planner-form aria-describedby="planner-disclosure">
+    <form
+      class="lg:col-span-8"
+      novalidate
+      data-planner-form
+      aria-describedby={sending ? undefined : "planner-disclosure"}
+      data-submit={sending ? "on" : "off"}
+      data-sitekey={sending ? ENQUIRIES.turnstileSiteKey : undefined}
+    >
       <!-- 1. Occasion -->
       <fieldset class="stage" data-stage="occasion">
         <legend class="stage-legend">
@@ -236,10 +246,12 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
             How should we reach you?
           </h2>
         </legend>
-        <p class="stage-intro mb-6" data-contact-preview-note>
-          Preview: sample details are fine here — this form can’t send yet, and what you type is not
-          saved.
-        </p>
+        {!sending && (
+          <p class="stage-intro mb-6" data-contact-preview-note>
+            Preview: sample details are fine here — this form can’t send yet, and what you type is
+            not saved.
+          </p>
+        )}
         <div class="grid gap-6 sm:grid-cols-2">
           <div class="field">
             <label for="pl-name" class="field-label">
@@ -303,21 +315,58 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
           Review your plan
         </h2>
         <dl class="summary mt-8" data-summary></dl>
-        <div class="notice mt-10" role="note">
-          <p class="eyebrow text-brass-deep">Preview only</p>
-          <p class="mt-3 text-charcoal">
-            Sending isn’t switched on yet, so nothing has been sent. Only your non-personal choices
-            are kept in this browser; “Start again” clears them. Once secure enquiries open, this is
-            where you’ll send your plan to The Wedding Nest.
-          </p>
-          <p class="mt-3 text-charcoal">
-            For now, you can reach the team on{" "}
-            <a href={SITE.instagram} class="underline decoration-brass underline-offset-4">
-              Instagram @twn.events
-            </a>
-          </p>
-        </div>
+        {sending ? (
+          <div class="send-panel mt-10" data-send-panel>
+            <p class="text-[0.9375rem] text-charcoal">
+              We use your name and number only to reply to this enquiry. A quick automatic check
+              confirms you’re a person before it’s sent.
+            </p>
+            <div class="mt-5 min-h-[65px]" data-turnstile />
+            <button type="button" class="btn btn-solid mt-6" data-send>
+              <span data-send-label>Send enquiry</span>
+              <span class="arrow" aria-hidden="true">
+                →
+              </span>
+            </button>
+            <p
+              class="mt-4 min-h-6 text-[0.9375rem]"
+              role="status"
+              aria-live="polite"
+              data-send-status
+            />
+          </div>
+        ) : (
+          <div class="notice mt-10" role="note">
+            <p class="eyebrow text-brass-deep">Preview only</p>
+            <p class="mt-3 text-charcoal">
+              Sending isn’t switched on yet, so nothing has been sent. Only your non-personal
+              choices are kept in this browser; “Start again” clears them. Once secure enquiries
+              open, this is where you’ll send your plan to The Wedding Nest.
+            </p>
+            <p class="mt-3 text-charcoal">
+              For now, you can reach the team on{" "}
+              <a href={SITE.instagram} class="underline decoration-brass underline-offset-4">
+                Instagram @twn.events
+              </a>
+            </p>
+          </div>
+        )}
       </section>
+
+      {sending && (
+        <section class="stage" data-stage="sent" hidden aria-labelledby="sent-title">
+          <h2 id="sent-title" class="stage-title" tabindex="-1">
+            Thank you — your enquiry has reached us.
+          </h2>
+          <p class="mt-6 max-w-xl text-[length:var(--text-lede)] text-charcoal">
+            The team will be in touch using the details you gave. Your reference is{" "}
+            <span class="font-medium tracking-wide" data-reference />.
+          </p>
+          <p class="mt-4 max-w-xl text-muted">
+            Your saved choices have been cleared from this browser.
+          </p>
+        </section>
+      )}
 
       <p class="planner-error" role="alert" data-error></p>
 
@@ -566,6 +615,11 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
   .notice {
     padding: 1.5rem;
     border-left: 2px solid var(--color-brass);
+    background: var(--color-paper);
+  }
+  .send-panel {
+    padding: 1.5rem;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 15%, transparent);
     background: var(--color-paper);
   }
   .planner-error {

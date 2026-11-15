@@ -7,6 +7,9 @@ const remote = process.env["PLAYWRIGHT_BASE_URL"];
 // real routing, _headers, 404 handling and the /api Worker.
 const workerd = process.env["E2E_TARGET"] === "workerd";
 const RUNTIME_PORT = 8799;
+// Submission-enabled variant (npm run build:submit), served only for planner-submit tests.
+const SUBMIT_PORT = 4322;
+const local = !remote && !workerd;
 // Cloud sessions ship a pre-installed Chromium; CI installs its own via `playwright install`.
 const executablePath = process.env["PLAYWRIGHT_CHROMIUM_EXECUTABLE"];
 
@@ -22,8 +25,22 @@ export default defineConfig({
     launchOptions: executablePath ? { executablePath } : {},
   },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"] } },
-    { name: "mobile", use: { ...devices["Pixel 7"] } },
+    { name: "desktop", use: { ...devices["Desktop Chrome"] }, testIgnore: /planner-submit/ },
+    { name: "mobile", use: { ...devices["Pixel 7"] }, testIgnore: /planner-submit/ },
+    ...(local
+      ? [
+          {
+            name: "submit-desktop",
+            testMatch: /planner-submit/,
+            use: { ...devices["Desktop Chrome"], baseURL: `http://localhost:${SUBMIT_PORT}` },
+          },
+          {
+            name: "submit-mobile",
+            testMatch: /planner-submit/,
+            use: { ...devices["Pixel 7"], baseURL: `http://localhost:${SUBMIT_PORT}` },
+          },
+        ]
+      : []),
   ],
   // Locally/CI: tests run against the production build, not the dev server.
   ...(remote
@@ -36,10 +53,18 @@ export default defineConfig({
               reuseExistingServer: !process.env["CI"],
               timeout: 120_000,
             }
-          : {
-              command: `npx astro preview --port ${PORT} --ignore-lock`,
-              url: `http://localhost:${PORT}`,
-              reuseExistingServer: !process.env["CI"],
-            },
+          : [
+              {
+                command: `npx astro preview --port ${PORT} --ignore-lock`,
+                url: `http://localhost:${PORT}`,
+                reuseExistingServer: !process.env["CI"],
+              },
+              {
+                command: `npx astro preview --port ${SUBMIT_PORT} --ignore-lock`,
+                url: `http://localhost:${SUBMIT_PORT}`,
+                env: { ASTRO_OUT_DIR: "./dist-submit" },
+                reuseExistingServer: !process.env["CI"],
+              },
+            ],
       }),
 });

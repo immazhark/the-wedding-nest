@@ -1,6 +1,6 @@
 # Enquiry API — `POST /api/enquiry`
 
-**Status:** implemented and tested; **switched off** in production (`ENQUIRIES_ENABLED="false"`, no database bound). The planner does not call it yet. Turning on live submission is owner-gated.
+**Status:** implemented and tested; **switched off** in production (`ENQUIRIES_ENABLED="false"`, no database bound). The planner's Send step is wired to it but only appears in builds with `PUBLIC_ENQUIRIES_ENABLED=true`. Production builds keep the preview disclosure and send nothing. Turning on live submission is owner-gated.
 
 ## Contract
 
@@ -54,6 +54,13 @@ npx wrangler deploy --env staging
 ```
 
 Use Cloudflare's Turnstile **test** keys in staging. Never point staging at production data.
+
+## Planner integration (browser)
+
+- Build switch: `PUBLIC_ENQUIRIES_ENABLED=true` + `PUBLIC_TURNSTILE_SITE_KEY=<site key>`. Without them the planner is the non-sending preview. With them, the CSP adds Turnstile (`script-src`/`frame-src https://challenges.cloudflare.com`) and the review step shows the human check and **Send enquiry**.
+- `src/lib/enquiry/submit.ts`: one idempotency key per reviewed payload, so retries reuse it and edits get a new one. 201/200 with an id → confirmation; 422 → back to the right step with a plain message; 403 verification → fresh check; 429/5xx/offline → "try again", keeping the answers. Never a success without a stored id.
+- On success the local draft is cleared and a short reference (first 8 characters of the id) is shown.
+- Tests: `tests/unit/submit.test.ts`; `tests/e2e/planner-submit.spec.ts` runs against `npm run build:submit` (Cloudflare's public Turnstile **test** key) with the API and Turnstile mocked, on desktop and mobile.
 
 ## Before enabling in production (owner-gated)
 
