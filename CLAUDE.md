@@ -12,7 +12,8 @@ This is a real premium wedding and event services business in Hyderabad, India. 
 Astro + TypeScript + Tailwind CSS, static-first; progressive islands only where necessary; GSAP selectively for deliberate motion; Cloudflare Workers Static Assets; verified server-side Worker enquiry endpoint and D1 when the form is ready. Avoid a CMS, job queue or automation platform until justified.
 
 ## Workflow
-- Small scoped branches/PRs and squash merging; do not modify other agents' branches. Keep PR changes reviewable. No production merge of major design changes without owner approval.
+- Small scoped branches/PRs and squash merging; do not modify other agents' branches. Keep PR changes reviewable.
+- **Standing owner authorisation (15 Nov 2026):** Claude may make production-grade engineering decisions and squash-merge its own PRs into `main` once GitHub CI `verify` passes and there are no conflicts or unresolved review comments. Report each merge. Still owner-gated: attaching the production domain, enabling search indexing, switching on live enquiry submission, and publishing business facts, media or claims.
 - For behavior changes, write failing tests before implementation, then run focused and full checks. No false PASS claims; report exact commands and outcomes.
 - Give the owner a working **Cloudflare preview URL**, plus mobile/desktop screenshots or explicit blockers, for every meaningful visual deliverable.
 - Never publish unapproved customer/event photos, personal information, real-looking synthetic portfolio imagery or unverified marketing claims.

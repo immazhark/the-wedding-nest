@@ -12,7 +12,7 @@
 - Superpowers and Impeccable external plugins in .claude/settings.json (declarations alone do not prove installation).
 - Whether each cloud session discovers all three project skills, and any marketplace/trust prompts.
 
-## M0 — implemented on branch `claude/serene-maxwell-ywyjat` (PR pending review)
+## M0 + M2 planner UI — merged to `main` via PR #3 (squash c492537, 15 Nov 2026)
 - Astro 7 + strict TypeScript + Tailwind 4 static site with real `package-lock.json`.
 - Base layout (metadata, canonical, robots noindex, skip link, visible design-preview notice), accessible header with mobile menu, footer.
 - Design-preview homepage (proposed editorial direction, honest "photograph to come" frames), Plan Your Event information page (no form), 404.
@@ -21,7 +21,7 @@
 - GitHub Actions CI workflow (format, check, unit, build, e2e). Its first run on GitHub is the evidence; local cloud runs pass.
 - `wrangler.jsonc` + `public/_headers`; deployment blocked on one owner action (docs/deployment.md).
 
-## M2 (part 1) — interactive Plan Your Event planner, same branch/PR
+## M2 (part 1) — interactive Plan Your Event planner (merged in PR #3)
 - `/plan-your-event/` is now a working 5-stage planner + review step: native checkbox/radio tiles, occasion-based service branching, optional style/budget, editable guest count, explicit consent, separate optional marketing consent.
 - **Sends nothing**: no backend yet; the review step says so plainly. Name/phone/notes live only in the open page; the localStorage draft holds non-sensitive choices only (7-day expiry, "Start again" clears it).
 - Tests: unit (stage messages, summary) + Playwright planner flows on desktop and mobile (branching, validation, keyboard, reload/draft privacy, no non-GET requests, axe per stage).
