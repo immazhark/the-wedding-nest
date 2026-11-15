@@ -3,7 +3,7 @@
 This is a real premium wedding and event services business in Hyderabad, India. The product owner directs and reviews work without writing code. **Claude Code Cloud is the default engineering environment.** GitHub is the source of truth. Do not require local laptop tooling.
 
 ## Before work
-- Read README.md, AGENTS.md, docs/decisions.md, docs/product-direction.md, docs/engineering-tooling.md and docs/progress.md.
+- Read README.md, AGENTS.md, docs/full-project-handover.md, docs/decisions.md, docs/product-direction.md, docs/engineering-tooling.md and docs/progress.md. At initial project startup also read docs/claude-code-kickoff-v5.md.
 - Ground claims in files or current external evidence; do not invent business services, rates, testimonials, portfolio imagery, awards or contact information.
 - First inspect repository state. If application code does not exist yet, establish a lean, tested scaffold; do not pretend it is built or deployed.
 - Prefer existing code and smallest sufficient dependencies. Preserve accessibility, security, SEO, performance and an editorial visual identity.
