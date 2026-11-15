@@ -8,9 +8,9 @@ Current state first; history at the end. Update after every meaningful merge.
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Site                         | Astro 7 + strict TS + Tailwind 4 static site: homepage (design preview), `/plan-your-event/` planner, 404. Proposed editorial design, not an approved brand.                                                                                                                                |
 | Planner                      | 5 stages + review, occasion-based branching, explicit consent. **Does not send**. Disclosure before step 1 asks visitors not to enter real contact details. Local draft keeps only occasion/service/style/date/guest-count/budget (7 days); never name, phone, venue/location or notes. |
-| Enquiry backend              | Not built. Validation (`src/lib/enquiry/validate.ts`) is ready for server reuse. Next PR.                                                                                                                                                                                                 |
+| Enquiry backend              | `POST /api/enquiry` Worker implemented and tested (D1 + outbox, server-side Turnstile, idempotency, shared validation). **Off in production**; staging env defined, DB not yet created. Planner not wired. See docs/enquiry-api.md.                                                      |
 | Indexing                     | Off everywhere. `PUBLIC_ALLOW_INDEXING=true` (production build only, owner-gated) flips meta robots, generated `robots.txt` and `X-Robots-Tag` together.                                                                                                                                  |
-| CI                           | GitHub Actions `verify` (format, astro check, unit, build, Playwright + axe on desktop/mobile) — green on `main`.                                                                                                                                                                         |
+| CI                           | GitHub Actions `verify`: format, astro check, unit, build, Playwright + axe on desktop/mobile against the static build **and** the local Workers runtime (`wrangler dev`: routing, live headers, API off).                                                                                 |
 | Cloudflare                   | Workers Builds connected by the owner; latest `main` build reported successful by the owner. Runtime **not yet verified by an agent**: `*.workers.dev` is blocked by this cloud session's network policy. See docs/deployment.md.                                                         |
 | Domain `theweddingnest.in`   | Not attached (owner-gated).                                                                                                                                                                                                                                                              |
 | Business content and media   | None approved yet; placeholders are labelled.                                                                                                                                                                                                                                            |
@@ -20,12 +20,13 @@ Current state first; history at the end. Update after every meaningful merge.
 - #1 tooling foundation · #2 handover docs
 - #3 (c492537) M0 foundation + planner UI
 - #4 (d63c44b) standing merge authorisation recorded in CLAUDE.md
-- Review follow-up (this PR): planner disclosure, draft privacy (no location), unified SEO switch, solid sticky header, live-URL test mode, docs reconciled
+- #5 (9c3a863) review follow-up: planner disclosure, draft privacy (no location), unified SEO switch, solid sticky header, live-URL test mode, docs reconciled
+- Enquiry API PR (this one): Worker + D1 migration + staging env + runtime tests in CI
 
 ## Next
 
 1. Verify the deployed Worker URL: run `PLAYWRIGHT_BASE_URL=<url> npm run test:e2e` from an environment that can reach it (needs the exact `*.workers.dev` host allowed, or run by the owner's reviewer).
-2. Worker `POST /api/enquiry` + D1 + server-side Turnstile, test-first, staging-only bindings; live submission stays owner-gated.
+2. Staging: create the D1 database + Turnstile test keys (Cloudflare access needed), deploy `--env staging`, then wire the planner to the API behind a flag.
 3. Owner review: design direction, planner copy/options, budget bands, privacy wording.
 
 ## Tooling verified (first cloud session)
