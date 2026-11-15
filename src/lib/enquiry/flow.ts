@@ -37,3 +37,26 @@ export function previousStage(stage: StageId): StageId | null {
 export function firstIncompleteStage(s: EnquiryState): StageId | null {
   return order.find((st) => !isStageComplete(st, s)) ?? null;
 }
+
+/** Plain-language message for the first problem on a stage, or null when it can proceed. */
+export function stageError(stage: StageId, s: EnquiryState): string | null {
+  if (isStageComplete(stage, s)) return null;
+  switch (stage) {
+    case "occasion":
+      return "Please choose at least one occasion.";
+    case "scope":
+      return s.scope === null
+        ? "Please tell us how we can help."
+        : "Please choose at least one service.";
+    case "style":
+      return null;
+    case "logistics":
+      if (s.date.kind === "date" && !isValidDate(s.date.value)) return "Please enter a valid date.";
+      return "Please enter the number of guests as a whole number, or leave it blank.";
+    case "contact":
+      if (s.name.trim().length === 0) return "Please enter your name.";
+      if (!isValidPhone(s.phone))
+        return "Please enter a phone or WhatsApp number we can reach you on.";
+      return "Please agree to us using your details to respond to this enquiry.";
+  }
+}

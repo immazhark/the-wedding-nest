@@ -30,7 +30,8 @@ In Claude Code Cloud, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chrom
 
 ## Structure
 
-- `src/pages/` — `index`, `plan-your-event` (no form until the secure backend exists), `404`
+- `src/pages/` — `index`, `plan-your-event` (interactive planner; sends nothing until the secure backend exists), `404`
+- `src/components/planner/`, `src/scripts/planner.ts` — planner UI and client controller
 - `src/layouts/BaseLayout.astro` — metadata, canonical, robots, skip link, preview notice
 - `src/components/` — header with accessible mobile menu, footer, wordmark, arch photo frame placeholder
 - `src/lib/enquiry/` — typed 5-stage question tree, branching, server-grade validation, privacy-safe local draft

@@ -21,6 +21,13 @@
 - GitHub Actions CI workflow (format, check, unit, build, e2e). Its first run on GitHub is the evidence; local cloud runs pass.
 - `wrangler.jsonc` + `public/_headers`; deployment blocked on one owner action (docs/deployment.md).
 
+## M2 (part 1) — interactive Plan Your Event planner, same branch/PR
+- `/plan-your-event/` is now a working 5-stage planner + review step: native checkbox/radio tiles, occasion-based service branching, optional style/budget, editable guest count, explicit consent, separate optional marketing consent.
+- **Sends nothing**: no backend yet; the review step says so plainly. Name/phone/notes live only in the open page; the localStorage draft holds non-sensitive choices only (7-day expiry, "Start again" clears it).
+- Tests: unit (stage messages, summary) + Playwright planner flows on desktop and mobile (branching, validation, keyboard, reload/draft privacy, no non-GET requests, axe per stage).
+- Screenshots: `docs/review/m2/`.
+- Next: owner review of planner copy/options; then Worker `POST /api/enquiry` + D1 + Turnstile in a staging environment (separate PR, using `validateEnquiry` server-side).
+
 ## Verified tooling in the first Claude Code Cloud session (15 Nov 2026)
 - Superpowers: **loaded** (session-start hook ran; `superpowers:*` skills listed and used).
 - Impeccable: **not loaded**. Its marketplace is not registered in this container and github.com/pbakaus is blocked by the session's outbound proxy (403). Needs install via the Claude Code plugin manager or an environment allowing that host.

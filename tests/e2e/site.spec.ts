@@ -79,14 +79,6 @@ test("skip link moves focus to main content", async ({ page }) => {
   await expect(page.locator("#main")).toBeFocused();
 });
 
-test("there is no enquiry form that could collect data before the secure backend exists", async ({
-  page,
-}) => {
-  await page.goto("/plan-your-event/");
-  await expect(page.locator("form")).toHaveCount(0);
-  await expect(page.locator("input, textarea")).toHaveCount(0);
-});
-
 test.describe("mobile navigation", () => {
   test.skip(({ isMobile }) => !isMobile, "mobile only");
 

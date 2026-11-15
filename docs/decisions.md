@@ -16,3 +16,4 @@
 - 2026-11-15 (M0): Motion is CSS-only in M0 with prefers-reduced-motion respected. GSAP not installed until a sequence needs it.
 - 2026-11-15 (M0): Enquiry validation module accepts `unknown` so the same rules run server-side in the Worker; local drafts exclude name, phone, notes and consent and expire after 7 days. Budget bands and option labels are draft copy pending owner approval.
 - 2026-11-15: Node pinned to 24.18.0 in `.nvmrc` (CI and Cloudflare Workers Builds). Workers Builds preinstalls 22.23.2 and 24.18.0 only; 22.23.2 is below Astro 7's minimum. Full verify passed locally on 24.18.0.
+- 2026-11-15 (M2): Planner UI is a vanilla TypeScript script over server-rendered native form controls (no UI framework island). Rules stay in `src/lib/enquiry`. No send button until the Worker + D1 path is verified end to end; contact details are never persisted client-side.
