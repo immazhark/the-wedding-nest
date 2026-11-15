@@ -1,0 +1,49 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { STAGES } from "../lib/enquiry/schema";
+import { SITE } from "../lib/site/config";
+
+// The interactive planner (M2) replaces this page body. Until enquiries are stored securely
+// server-side, there is deliberately no form here: nothing is collected or submitted.
+---
+
+<BaseLayout
+  title="Plan your event"
+  description="Tell The Wedding Nest about your wedding or celebration in Hyderabad through a short guided planner."
+>
+  <section class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-28 grid gap-16 md:grid-cols-12">
+    <div class="md:col-span-6">
+      <p class="eyebrow text-brass-deep">Plan your event</p>
+      <h1 class="mt-6 text-[length:var(--text-headline)]">
+        A guided planner, <em class="italic text-brass-deep font-[300]">in the making.</em>
+      </h1>
+      <p class="mt-8 max-w-lg text-[length:var(--text-lede)] text-charcoal">
+        We are building a short, five-step planner so you can share your occasion, the help you need
+        and your preferred way to talk. It is not accepting enquiries yet.
+      </p>
+      <p class="mt-6 max-w-lg text-charcoal">
+        In the meantime, The Wedding Nest is on Instagram as
+        <a
+          href={SITE.instagram}
+          class="underline underline-offset-4 decoration-brass"
+          rel="noopener"
+        >
+          @twn.events
+        </a>
+      </p>
+    </div>
+    <ol class="md:col-span-6 border-t border-ink/15" aria-label="Planner steps">
+      {STAGES.map((stage, i) => (
+        <li class="grid grid-cols-[4rem_1fr] gap-4 border-b border-ink/15 py-7">
+          <span class="font-display text-4xl text-brass-deep font-[300]" aria-hidden="true">
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <span>
+            <span class="block font-display text-[length:var(--text-title)]">{stage.title}</span>
+            <span class="mt-1 block text-muted">{stage.prompt}</span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  </section>
+</BaseLayout>

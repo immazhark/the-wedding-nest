@@ -7,3 +7,11 @@
 - 2026-11-15: Future enquiry: progressive visual questionnaire, typed branching states, server-side validation and Turnstile, D1 durable store; transactional/outbox notifications to be implemented only when needed.
 - 2026-11-15: Adopt repository-declared Superpowers and Impeccable plugins for single-repo Claude Code Cloud, subject to first-session verification/trust. Bespoke repo skills apply in Claude and Codex. Avoid full ECC/gstack/BMAD/automated proxies until justified.
 - 2026-11-15: No HSTS or other irreversible transport change without verifying live site. Production deployment is gated by user review and verified SSL/redirect behavior.
+- 2026-11-15 (M0): Validated stack versions from npm: Astro 7.4.12, Tailwind CSS 4.3.5 via `@tailwindcss/vite`, Vite 8, Vitest 5.1, Wrangler 4.162, Node 22.23.4 (Astro's minimum). TypeScript pinned to 6.0.x because `@astrojs/check` 0.9.12 supports TS ^5 || ^6, not TS 7. Playwright pinned to 1.63.0 to match the cloud container's pre-installed Chromium.
+- 2026-11-15 (M0): Static output, no Astro adapter yet. Cloudflare Workers Static Assets (`assets.directory: ./dist`, `404-page` handling). A Worker entry is added only when POST /api/enquiry is built.
+- 2026-11-15 (M0): Astro `security.csp` (hash-based meta CSP) plus `public/_headers` for frame-ancestors and other headers. No inline style attributes in markup.
+- 2026-11-15 (M0): All builds are noindex (meta, X-Robots-Tag, robots.txt) until approved launch; `PUBLIC_ALLOW_INDEXING=true` is the single switch for the production build.
+- 2026-11-15 (M0): Preview deployments via Cloudflare Workers Builds (dashboard GitHub integration) rather than a GitHub Actions token, so no Cloudflare API token lives in GitHub. Requires one owner action (docs/deployment.md).
+- 2026-11-15 (M0): Self-hosted variable fonts via Fontsource (Fraunces display, Instrument Sans text) — no third-party font requests. Proposed typography, not an approved brand.
+- 2026-11-15 (M0): Motion is CSS-only in M0 with prefers-reduced-motion respected. GSAP not installed until a sequence needs it.
+- 2026-11-15 (M0): Enquiry validation module accepts `unknown` so the same rules run server-side in the Worker; local drafts exclude name, phone, notes and consent and expire after 7 days. Budget bands and option labels are draft copy pending owner approval.

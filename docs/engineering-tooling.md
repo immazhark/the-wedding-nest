@@ -7,7 +7,7 @@
 - Impeccable `impeccable@impeccable`: enabled in `.claude/settings.json`; marketplace source `pbakaus/impeccable`, auto-update off pending review; [upstream](https://github.com/pbakaus/impeccable), Apache-2.0. Its published marketplace manifest identifies the plugin and marketplace as `impeccable`.
 - Local TWN-specific skills: twn-design-review, twn-enquiry-security, twn-release-review. Available in both `.claude/skills` and `.agents/skills` with identical content; authored for this project, no executable code, hooks or external dependencies.
 
-**Verification status: repository configuration only.** There has not yet been a Claude Code Cloud session showing both external plugins installed and callable. Plugins may need marketplace trust, network access, and a new session. Never report them as operational before testing.
+**Verification status (first Cloud session, 15 Nov 2026):** Superpowers loaded and callable. Impeccable **not** loaded: marketplace not registered, and github.com/pbakaus blocked by the session proxy (HTTP 403). The three `twn-*` project skills were discovered. Note: some synced user-level plugins in this environment run PreToolUse hooks (e.g. one blocks any shell command mentioning `.env`); these are not project-declared.
 
 ## Cloud compatibility nuances
 - Use **one-repository Claude Code Cloud sessions**, outside multi-repository project threads, to maximize applicability of the shared `.claude/settings.json`.

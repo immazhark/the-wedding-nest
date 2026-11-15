@@ -1,4 +1,4 @@
-# Project progress — 16 November 2026
+# Project progress — updated 15 November 2026 (M0)
 
 ## Verified in GitHub
 - Private repository immazhark/the-wedding-nest exists and uses main.
@@ -12,8 +12,23 @@
 - Superpowers and Impeccable external plugins in .claude/settings.json (declarations alone do not prove installation).
 - Whether each cloud session discovers all three project skills, and any marketplace/trust prompts.
 
+## M0 — implemented on branch `claude/serene-maxwell-ywyjat` (PR pending review)
+- Astro 7 + strict TypeScript + Tailwind 4 static site with real `package-lock.json`.
+- Base layout (metadata, canonical, robots noindex, skip link, visible design-preview notice), accessible header with mobile menu, footer.
+- Design-preview homepage (proposed editorial direction, honest "photograph to come" frames), Plan Your Event information page (no form), 404.
+- Typed 5-stage enquiry question tree, branching, server-grade validation and privacy-safe draft — unit tested.
+- Vitest unit tests, Playwright e2e (desktop + mobile) incl. axe WCAG 2.2 AA, link, CSP-console, overflow and nav tests.
+- GitHub Actions CI workflow (format, check, unit, build, e2e). Its first run on GitHub is the evidence; local cloud runs pass.
+- `wrangler.jsonc` + `public/_headers`; deployment blocked on one owner action (docs/deployment.md).
+
+## Verified tooling in the first Claude Code Cloud session (15 Nov 2026)
+- Superpowers: **loaded** (session-start hook ran; `superpowers:*` skills listed and used).
+- Impeccable: **not loaded**. Its marketplace is not registered in this container and github.com/pbakaus is blocked by the session's outbound proxy (403). Needs install via the Claude Code plugin manager or an environment allowing that host.
+- Project skills `twn-design-review`, `twn-enquiry-security`, `twn-release-review`: **discovered** and listed by the cloud session.
+- Cloudflare API and Cloudflare MCP: unreachable from the container (proxy 403); no deployment possible from the agent.
+
 ## Not yet implemented or verified
-- Astro application, lockfile, TypeScript build, unit tests, CI and Cloudflare Workers preview.
+- Cloudflare Workers preview deployment (needs owner dashboard action) and its URL.
 - Authentic, owner-approved visual portfolio content.
 - Guided enquiry UI, secure Worker API, Turnstile, D1 and actual lead notification delivery.
 - Public production website, Search Console setup or real visitor performance metrics.

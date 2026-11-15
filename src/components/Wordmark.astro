@@ -1,0 +1,14 @@
+---
+// Typographic wordmark. Replace with the official logo once supplied and approved.
+interface Props {
+  class?: string;
+}
+const { class: className = "" } = Astro.props;
+---
+
+<span class:list={["inline-flex flex-col leading-none", className]}>
+  <span class="font-display text-[1.55rem] tracking-[-0.01em] font-[380]">
+    The Wedding <em class="italic text-brass-deep font-[330]">Nest</em>
+  </span>
+  <span class="eyebrow mt-1.5 text-[0.6rem] tracking-[0.34em] text-muted">Hyderabad</span>
+</span>

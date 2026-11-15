@@ -1,0 +1,47 @@
+---
+import Wordmark from "./Wordmark.astro";
+import { NAV, SITE } from "../lib/site/config";
+const year = new Date().getFullYear();
+---
+
+<footer class="on-dark bg-kohl text-stone">
+  <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-20 pb-10">
+    <div class="grid gap-14 md:grid-cols-12">
+      <div class="md:col-span-5">
+        <Wordmark class="[&_em]:text-brass [&_.eyebrow]:text-sand" />
+        <p class="mt-6 max-w-sm text-sand">
+          Weddings and celebrations, planned and styled in {SITE.region}.
+        </p>
+      </div>
+      <nav aria-label="Footer" class="md:col-span-3">
+        <h2 class="eyebrow text-sand font-sans">Explore</h2>
+        <ul class="mt-5 space-y-3">
+          {NAV.map((item) => (
+            <li>
+              <a href={item.href} class="link-underline">
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div class="md:col-span-4">
+        <h2 class="eyebrow text-sand font-sans">Follow</h2>
+        <ul class="mt-5 space-y-3">
+          <li>
+            <a href={SITE.instagram} class="link-underline" rel="noopener" target="_blank">
+              Instagram — @twn.events<span class="sr-only"> (opens in a new tab)</span>
+            </a>
+          </li>
+        </ul>
+        <p class="mt-8 text-sm text-sand/80">
+          Phone, WhatsApp and studio details will appear here once confirmed.
+        </p>
+      </div>
+    </div>
+    <span class="rule mt-16 text-sand"></span>
+    <p class="mt-6 text-xs text-sand/80">
+      © {year} {SITE.name}. Hyderabad, India.
+    </p>
+  </div>
+</footer>

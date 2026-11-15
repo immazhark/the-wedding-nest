@@ -1,0 +1,168 @@
+@import "@fontsource-variable/fraunces/opsz.css";
+@import "@fontsource-variable/fraunces/opsz-italic.css";
+@import "@fontsource-variable/instrument-sans/index.css";
+@import "tailwindcss";
+
+/*
+ * TWN design tokens — PROPOSED direction, not an approved brand identity.
+ * Ivory/stone paper, ink, restrained antique brass, deep kohl for contrast sections.
+ * Contrast (WCAG): ink on ivory 15.6:1, brass-deep on ivory 5.4:1, ivory on kohl 14.9:1.
+ */
+@theme {
+  --color-ivory: #f6f1e8;
+  --color-paper: #fbf8f2;
+  --color-stone: #e6ddcd;
+  --color-sand: #cdbfa6;
+  --color-ink: #1d1a16;
+  --color-charcoal: #3b362f;
+  --color-muted: #625a4f;
+  --color-brass: #a8865a;
+  --color-brass-deep: #7a5c33;
+  --color-kohl: #16201c;
+  --color-kohl-soft: #22302a;
+
+  --font-display: "Fraunces Variable", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+
+  --text-display: clamp(2.75rem, 1.5rem + 4.6vw, 6.5rem);
+  --text-headline: clamp(2.1rem, 1.4rem + 3.2vw, 4.25rem);
+  --text-title: clamp(1.45rem, 1.2rem + 1.1vw, 2.1rem);
+  --text-lede: clamp(1.1rem, 1rem + 0.45vw, 1.35rem);
+
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 6rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background: var(--color-ivory);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 330;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-brass);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brass-deep);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .on-dark :focus-visible {
+    outline-color: var(--color-sand);
+  }
+}
+
+@layer components {
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 560;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .rule {
+    display: block;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.25;
+  }
+
+  .link-underline {
+    background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1px;
+    transition: background-size 0.45s var(--ease-editorial);
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 3rem;
+    padding: 0.85rem 1.6rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    transition:
+      background-color 0.35s var(--ease-editorial),
+      color 0.35s var(--ease-editorial);
+  }
+  .btn-solid {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .btn-solid:hover {
+    background: var(--color-brass-deep);
+    border-color: var(--color-brass-deep);
+  }
+  .btn-light {
+    background: var(--color-ivory);
+    border-color: var(--color-ivory);
+    color: var(--color-kohl);
+  }
+  .btn-light:hover {
+    background: var(--color-sand);
+    border-color: var(--color-sand);
+  }
+  .btn .arrow {
+    transition: transform 0.35s var(--ease-editorial);
+  }
+  .btn:hover .arrow {
+    transform: translateX(4px);
+  }
+}
+
+/* Entrance motion: CSS only for M0. Content is fully visible with reduced motion or no CSS animation. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    animation: reveal 1.1s var(--ease-editorial) both;
+    animation-delay: calc(var(--i, 0) * 110ms + 80ms);
+  }
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+  }
+}
