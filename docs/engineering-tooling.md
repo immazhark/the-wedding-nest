@@ -32,7 +32,8 @@
 
 ## Defer or exclude for now
 - Full ECC, gstack, BMAD, GSD and large agent stacks: overlapping governance and hooks.
-- RTK, Caveman, Headroom, FreeLLMAPI and model routers/proxies: can change output/telemetry/credential routing; benchmark in isolation before considering.
+- RTK (`rtk-ai/rtk`): **approved as the first token-saving pilot** (owner directive, 15 Nov 2026), opt-in per command only, no global hooks or proxies. **Status: blocked in Claude Code Cloud** — crates.io API, GitHub API and GitHub releases all return HTTP 403 via the session proxy, so owner/licence/version could not be verified and nothing was installed. Retry in an environment where those hosts are allowed; compare `git status/diff`, `npm test`, `astro check` and grep outputs with and without it, and keep it only if no diagnostic detail is lost.
+- Caveman, Headroom, trim-1, FreeLLMAPI, memory daemons and model routers/proxies: not installed without a separate evidence-based justification.
 - Claude-Mem and Trail-Code persistent memory: GitHub docs/PRs are sufficient at this size; assess privacy/telemetry and persistence if needed.
 - Strix/Pentagi autonomous security testing: only on expressly authorised isolated staging with explicit scope; never configure with real leads or broad prod credentials.
 - OpenMontage/AI-video suites, GPU models, voice cloning, avatar systems: do not bundle into public website; use separate approved media workflows if genuine business demand.
