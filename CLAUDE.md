@@ -4,7 +4,7 @@ This is a real premium wedding and event services business in Hyderabad, India. 
 
 ## Before work
 - Read AGENTS.md and docs/progress.md, then only the docs relevant to the task (e.g. docs/decisions.md for architecture, docs/product-direction.md for design/copy, docs/deployment.md for Cloudflare). Read docs/full-project-handover.md only for onboarding or a business/product question it answers; never re-read it by default.
-- For any design, motion or copy work, follow docs/creative-excellence-standards.md (and docs/photography-brief.md for media).
+- For any design, motion or copy work, follow docs/creative-excellence-standards.md (and docs/photography-brief.md for media). For reviews, proof, customer quotes and video testimonials, follow docs/customer-testimonials.md.
 - Ground claims in files or current external evidence; do not invent business services, rates, testimonials, portfolio imagery, awards or contact information.
 - First inspect repository state. If application code does not exist yet, establish a lean, tested scaffold; do not pretend it is built or deployed.
 - Prefer existing code and smallest sufficient dependencies. Preserve accessibility, security, SEO, performance and an editorial visual identity.
