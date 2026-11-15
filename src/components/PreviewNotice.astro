@@ -1,8 +1,23 @@
 ---
-// Visible on every preview build so reviewers never mistake draft copy for approved content.
+// Turnstile dummy keys are used only in isolated test builds.
+const testSubmission =
+  import.meta.env.PUBLIC_ENQUIRIES_ENABLED === "true" &&
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY === "1x00000000000000000000AA";
 ---
 
 <div class="bg-kohl text-stone text-center text-[0.8125rem] leading-snug px-4 py-2" role="note">
-  <span class="eyebrow text-sand mr-2">Design preview</span>
-  Draft copy and placeholder imagery — not yet approved by The Wedding Nest.
+  {
+    testSubmission ? (
+      <>
+        <span class="eyebrow text-sand mr-2">Test environment</span>
+        Use fictional details only. Submissions go to an isolated test database, not to The Wedding
+        Nest. No real enquiries are accepted here.
+      </>
+    ) : (
+      <>
+        <span class="eyebrow text-sand mr-2">Design preview</span>
+        Draft copy and placeholder imagery — not yet approved by The Wedding Nest.
+      </>
+    )
+  }
 </div>
