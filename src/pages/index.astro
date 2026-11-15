@@ -1,190 +1,303 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ArchFrame from "../components/ArchFrame.astro";
+import Frame from "../components/media/Frame.astro";
 import { OCCASIONS, SERVICES, STAGES } from "../lib/enquiry/schema";
 
-// DRAFT COPY — pending owner approval. No claims about prices, clients, awards or guarantees.
+// DRAFT COPY — editorial working draft pending owner approval (docs/creative-excellence-standards.md).
+// No claims about prices, clients, venues, awards or guarantees.
 const coreServices = SERVICES.filter((s) => !("onlyFor" in s));
+
+// Plain descriptions of each tradition (general cultural meaning, not claims about TWN).
+const occasionNotes: Record<string, string> = {
+  nikah: "The marriage ceremony",
+  walima: "The reception hosted by the groom’s family",
+  mehndi: "The henna evening",
+  shaadi: "The wedding day itself",
+  engagement: "Often the first time both families gather",
+  reception: "The celebration after the ceremony",
+  sangeet: "An evening of music and dance",
+};
 const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
 ---
 
 <BaseLayout>
-  <!-- Hero -->
-  <section class="relative overflow-hidden" aria-labelledby="hero-title">
-    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-12 pb-20 md:pt-16 md:pb-28 grid gap-12 md:grid-cols-12 md:items-center">
-      <div class="md:col-span-7 lg:col-span-7 relative z-10">
-        <p class="eyebrow text-brass-deep reveal [--i:0]">
-          Weddings &amp; celebrations · Hyderabad
-        </p>
-        <h1 id="hero-title" class="mt-6 text-[length:var(--text-display)] reveal [--i:1]">
-          Every celebration, <em class="italic text-brass-deep font-[300]">thoughtfully</em>{" "}
-          composed.
-        </h1>
-        <p class="mt-8 max-w-xl text-[length:var(--text-lede)] text-charcoal reveal [--i:2]">
-          From Nikah and Walima to Mehndi, receptions and milestone gatherings — tell us what you
-          are planning, whether you need a single service or the whole occasion shaped end to end.
-        </p>
-        <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5 reveal [--i:3]">
-          <a href="/plan-your-event/" class="btn btn-solid">
-            Plan your event{" "}
-            <span class="arrow" aria-hidden="true">
-              →
+  <!-- Opening -->
+  <section class="opening" aria-labelledby="hero-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-10 md:pt-16">
+      <div class="grid gap-8 md:grid-cols-12 md:items-end">
+        <div class="md:col-span-8">
+          <p class="eyebrow text-brass-deep fade-in [--i:0]">
+            Weddings and family celebrations<span class="hidden sm:inline"> · Hyderabad</span>
+          </p>
+          <h1 id="hero-title" class="mt-6 text-[length:var(--text-display)] leading-[0.98]">
+            <span class="line-mask">
+              <span class="[--i:1]">Nikah to Walima,</span>
             </span>
-          </a>
-          <a href="#services" class="link-underline text-[0.9375rem] font-medium">
-            Explore services
-          </a>
+            <span class="line-mask">
+              <span class="[--i:2]">and every day</span>
+            </span>
+            <span class="line-mask md:pl-[1.6em]">
+              <span class="[--i:3]">
+                <em class="italic font-[300] text-brass-deep">between.</em>
+              </span>
+            </span>
+          </h1>
+        </div>
+        <div class="md:col-span-4 md:pb-3 fade-in [--i:4]">
+          <p class="text-[length:var(--text-lede)] text-charcoal max-w-md">
+            We plan weddings and celebrations across Hyderabad — the whole occasion, or only the
+            parts you’d like help with.
+          </p>
+          <div class="mt-8 flex flex-wrap items-center gap-x-7 gap-y-4">
+            <a href="/plan-your-event/" class="btn btn-solid">
+              Plan your event{" "}
+              <span class="arrow" aria-hidden="true">
+                →
+              </span>
+            </a>
+            <a href="#services" class="link-underline text-[0.9375rem] font-medium">
+              What we do
+            </a>
+          </div>
         </div>
       </div>
-
-      <div class="md:col-span-5">
-        <div class="relative ml-auto w-[78%] md:w-full md:max-w-[52vh]">
-          <ArchFrame
-            label="Reserved for an approved TWN wedding photograph"
-            class="aspect-[3/4] w-full reveal [--i:2]"
-          />
-          <ArchFrame
-            label="Detail image"
-            class="hidden sm:block absolute -left-[22%] -bottom-10 aspect-[3/4] w-[42%] border-[6px] border-ivory rounded-t-full reveal [--i:4]"
-          />
-        </div>
-      </div>
+    </div>
+    <div class="mx-auto max-w-[110rem] mt-10 md:mt-16 sm:px-8 lg:px-12">
+      <Frame
+        aspectClass="aspect-[4/5] sm:aspect-[3/2] lg:aspect-[21/9]"
+        placeholder="The opening photograph — a wide moment from a TWN wedding"
+        priority
+        class="frame-reveal"
+        mediaClass="parallax-media"
+      />
     </div>
   </section>
 
   <!-- Services -->
-  <section id="services" class="bg-paper border-y border-ink/10" aria-labelledby="services-title">
-    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-32">
-      <div class="grid gap-10 md:grid-cols-12">
-        <div class="md:col-span-4">
-          <p class="eyebrow text-brass-deep">Services</p>
-          <h2 id="services-title" class="mt-5 text-[length:var(--text-headline)]">
-            Two ways <em class="italic font-[300]">to begin.</em>
-          </h2>
-        </div>
-        <div class="md:col-span-8 grid gap-14 sm:grid-cols-2 md:pt-3">
-          <article>
-            <p class="font-display text-brass-deep text-5xl font-[300]" aria-hidden="true">
-              01
+  <section id="services" class="py-24 md:py-36" aria-labelledby="services-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 grid gap-12 md:grid-cols-12">
+      <div class="md:col-span-4">
+        <p class="eyebrow text-brass-deep">What we do</p>
+        <h2 id="services-title" class="mt-5 text-[length:var(--text-headline)] max-w-[12ch]">
+          All of it, or one part.
+        </h2>
+      </div>
+      <div class="md:col-span-8 border-t border-ink/15">
+        <article class="service-row">
+          <h3 class="service-title">The whole occasion</h3>
+          <p class="text-charcoal">
+            One planner and one team from the first meeting onwards: venue, décor, food, guests and
+            the running of each day, across as many events as the wedding holds.
+          </p>
+        </article>
+        <article class="service-row">
+          <h3 class="service-title">One part, or a few</h3>
+          <div>
+            <p class="text-charcoal">
+              Catering for the Walima, décor for the Mehndi, cars for the baraat — ask for exactly
+              what you need.
             </p>
-            <h3 class="mt-6 text-[length:var(--text-title)]">The whole occasion</h3>
-            <span class="rule mt-6"></span>
-            <p class="mt-6 text-charcoal">
-              One team to shape the concept, coordinate the details and look after your guests —
-              from the first conversation to the final farewell.
-            </p>
-          </article>
-          <article>
-            <p class="font-display text-brass-deep text-5xl font-[300]" aria-hidden="true">
-              02
-            </p>
-            <h3 class="mt-6 text-[length:var(--text-title)]">Specific services</h3>
-            <span class="rule mt-6"></span>
-            <p class="mt-6 text-charcoal">Ask about one part, or a few, of your celebration:</p>
-            <ul class="mt-4 grid gap-x-6 gap-y-2 text-[0.9375rem] text-charcoal">
-              {coreServices.map((s) => (
-                <li class="flex gap-3">
-                  <span class="mt-[0.7em] h-px w-3 shrink-0 bg-brass" aria-hidden="true" />
+            <ul class="service-index mt-6" aria-label="Services you can ask about">
+              {coreServices.map((s, i) => (
+                <li>
                   {s.label}
+                  {i < coreServices.length - 1 && (
+                    <span class="text-brass" aria-hidden="true">
+                      &nbsp;/
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
-          </article>
-        </div>
+          </div>
+        </article>
+        <p class="pt-8 text-sm text-muted max-w-xl">
+          What’s possible depends on your date, venue and guest list. We’ll talk it through with you
+          before anything is agreed.
+        </p>
       </div>
-      <p class="mt-16 md:ml-[33.333%] text-sm text-muted max-w-xl">
-        What is possible depends on your date, venue and guest list — we will talk it through with
-        you personally before anything is agreed.
-      </p>
     </div>
   </section>
 
   <!-- Occasions -->
-  <section id="occasions" aria-labelledby="occasions-title">
-    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-32">
-      <p class="eyebrow text-brass-deep">Occasions</p>
-      <h2 id="occasions-title" class="mt-5 max-w-3xl text-[length:var(--text-headline)]">
-        Rooted in Hyderabad’s wedding traditions, <em class="italic font-[300]">open to every</em>{" "}
-        celebration.
+  <section id="occasions" class="bg-paper border-y border-ink/10" aria-labelledby="occasions-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36">
+      <h2 id="occasions-title" class="max-w-4xl text-[length:var(--text-headline)]">
+        Rooted in Hyderabad’s wedding traditions. Open to every celebration.
       </h2>
       <ul class="mt-16 border-t border-ink/15" role="list">
-        {weddingOccasions.map((o, i) => (
-          <li class="occasion-row group grid grid-cols-[3rem_1fr] md:grid-cols-[6rem_1fr_auto] items-baseline border-b border-ink/15 py-5 md:py-6">
-            <span class="eyebrow text-muted" aria-hidden="true">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <span class="font-display text-[clamp(2rem,1.4rem+3vw,4.5rem)] leading-none font-[320] transition-transform duration-500 ease-[var(--ease-editorial)] md:group-hover:translate-x-3">
-              {o.label}
-            </span>
+        {weddingOccasions.map((o) => (
+          <li class="occasion-row scroll-rise">
+            <span class="occasion-name">{o.label}</span>
+            <span class="occasion-note">{occasionNotes[o.id]}</span>
           </li>
         ))}
       </ul>
-      <p class="mt-10 max-w-2xl text-[length:var(--text-lede)] text-charcoal">
-        And birthdays, anniversaries, corporate evenings and private gatherings — planned with the
-        same care for families and hosts from every community.
+      <p class="mt-12 max-w-2xl text-[length:var(--text-lede)] text-charcoal">
+        And birthdays, anniversaries, corporate evenings and private gatherings, for families and
+        hosts from every community.
       </p>
     </div>
   </section>
 
-  <!-- Approach / planner preview -->
+  <!-- Planner invitation: the one place the arch appears (a threshold) -->
   <section id="approach" class="on-dark bg-kohl text-ivory" aria-labelledby="approach-title">
-    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-32 grid gap-16 md:grid-cols-12 md:items-center">
-      <div class="md:col-span-7">
-        <p class="eyebrow text-sand">Plan your event</p>
-        <h2 id="approach-title" class="mt-5 text-[length:var(--text-headline)]">
-          Five considered steps{" "}
-          <em class="italic text-brass font-[300]">to a first conversation.</em>
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36 grid gap-14 md:grid-cols-12 md:items-center">
+      <div class="md:col-span-5 order-2 md:order-1">
+        <ArchFrame
+          tone="dark"
+          label="Reserved for an approved décor or venue photograph"
+          class="aspect-[4/5] w-full max-w-sm mx-auto md:mx-0"
+        />
+      </div>
+      <div class="md:col-span-6 md:col-start-7 order-1 md:order-2">
+        <h2 id="approach-title" class="text-[length:var(--text-headline)] max-w-[14ch]">
+          Start with what you already know.
         </h2>
-        <ol class="mt-14 space-y-0 border-t border-ivory/15">
-          {STAGES.map((stage, i) => (
-            <li class="grid grid-cols-[3.5rem_1fr] gap-4 border-b border-ivory/15 py-5">
-              <span class="font-display text-2xl text-brass font-[300]" aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span>
-                <span class="block text-lg font-medium">{stage.title}</span>
-                <span class="block text-sand">{stage.prompt}</span>
-              </span>
-            </li>
+        <p class="mt-8 max-w-lg text-[length:var(--text-lede)] text-stone">
+          Most families don’t have a date, a guest count or a budget at the first conversation. The
+          planner asks five short questions and lets you skip anything that isn’t decided yet.
+        </p>
+        <p class="mt-8 text-sm tracking-[0.12em] uppercase text-sand" aria-label="Planner steps">
+          {STAGES.map((s, i) => (
+            <>
+              {s.title}
+              {i < STAGES.length - 1 && (
+                <span class="text-brass" aria-hidden="true">
+                  {" "}
+                  —{" "}
+                </span>
+              )}
+            </>
           ))}
-        </ol>
-        <a href="/plan-your-event/" class="btn btn-light mt-12">
+        </p>
+        <a href="/plan-your-event/" class="btn btn-light mt-10">
           Begin planning{" "}
           <span class="arrow" aria-hidden="true">
             →
           </span>
         </a>
-      </div>
-      <div class="md:col-span-5">
-        <ArchFrame
-          tone="dark"
-          label="Reserved for approved décor or venue photography"
-          class="aspect-[4/5] w-full max-w-md mx-auto"
-        />
+        <p class="mt-4 text-sm text-sand/80">Preview: the planner can’t send enquiries yet.</p>
       </div>
     </div>
   </section>
 
-  <!-- Work (photo-ready, honest) -->
+  <!-- Work: asymmetric, mixed ratios, photography-ready -->
   <section aria-labelledby="work-title">
-    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-32">
-      <div class="flex flex-wrap items-end justify-between gap-6">
-        <div>
-          <p class="eyebrow text-brass-deep">Our work</p>
-          <h2 id="work-title" class="mt-5 text-[length:var(--text-headline)]">
-            Real celebrations, <em class="italic font-[300]">shared with permission.</em>
-          </h2>
-        </div>
-        <p class="max-w-sm text-muted">
-          Project stories will be published here once photographs and families’ permissions are
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36">
+      <div class="grid gap-6 md:grid-cols-12 md:items-end">
+        <h2 id="work-title" class="md:col-span-7 text-[length:var(--text-headline)]">
+          Real celebrations, shared with permission.
+        </h2>
+        <p class="md:col-span-4 md:col-start-9 text-muted">
+          Project stories will appear here once the photographs and the families’ permission are
           confirmed.
         </p>
       </div>
-      <div class="mt-16 grid gap-8 sm:grid-cols-3 sm:items-end">
-        <ArchFrame label="Project story to come" class="aspect-[3/4]" />
-        <ArchFrame label="Project story to come" class="aspect-[3/5] sm:-mb-10" />
-        <ArchFrame label="Project story to come" class="aspect-[3/4]" />
+      <div class="work-grid mt-16">
+        <Frame
+          ratio="portrait"
+          placeholder="A portrait moment from a wedding"
+          sizes="(min-width: 768px) 42vw, 100vw"
+          class="work-a scroll-frame"
+        />
+        <Frame
+          ratio="landscape"
+          placeholder="A wide view of a stage or venue"
+          sizes="(min-width: 768px) 55vw, 100vw"
+          class="work-b scroll-frame"
+        />
+        <Frame
+          ratio="square"
+          placeholder="A detail: florals, food or textiles"
+          sizes="(min-width: 768px) 25vw, 100vw"
+          class="work-c scroll-frame"
+        />
+        <p class="work-d text-charcoal">
+          Each story will say what the family asked for, what we were responsible for, and who
+          photographed it.
+        </p>
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .service-row {
+    display: grid;
+    gap: 1rem;
+    padding: 2.5rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 15%, transparent);
+  }
+  .service-title {
+    font-size: var(--text-title);
+  }
+  @media (min-width: 48rem) {
+    .service-row {
+      grid-template-columns: minmax(12rem, 0.8fr) 1.2fr;
+      gap: 3rem;
+    }
+  }
+  .service-index {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.55em;
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.55rem);
+    font-weight: 330;
+    line-height: 1.55;
+    color: var(--color-ink);
+    text-wrap: pretty;
+  }
+  .occasion-row {
+    display: grid;
+    gap: 0.35rem;
+    align-items: baseline;
+    padding: 1.4rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 15%, transparent);
+  }
+  @media (min-width: 48rem) {
+    .occasion-row {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 2rem;
+    }
+  }
+  .occasion-name {
+    font-family: var(--font-display);
+    font-size: clamp(2.1rem, 1.5rem + 3vw, 4.75rem);
+    font-weight: 320;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .occasion-note {
+    color: var(--color-muted);
+    font-size: 0.9375rem;
+  }
+  .work-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+  @media (min-width: 48rem) {
+    .work-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 2rem;
+      align-items: start;
+    }
+    .work-grid :global(.work-a) {
+      grid-column: 1 / span 5;
+      grid-row: 1 / span 2;
+    }
+    .work-grid :global(.work-b) {
+      grid-column: 6 / span 7;
+    }
+    .work-grid :global(.work-c) {
+      grid-column: 6 / span 3;
+    }
+    .work-grid :global(.work-d) {
+      grid-column: 9 / span 4;
+      align-self: end;
+      max-width: 22rem;
+    }
+  }
+</style>

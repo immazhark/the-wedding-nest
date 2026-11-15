@@ -153,3 +153,11 @@ test("every stage has no serious accessibility violations", async ({ page }) => 
   await next(page);
   expect(await audit()).toEqual([]);
 });
+
+test("stage transitions know their direction", async ({ page }) => {
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await expect(page.locator("[data-planner-form]")).toHaveAttribute("data-direction", "forward");
+  await page.getByRole("button", { name: "← Back" }).click();
+  await expect(page.locator("[data-planner-form]")).toHaveAttribute("data-direction", "back");
+});

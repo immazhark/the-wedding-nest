@@ -6,7 +6,7 @@ Current state first; history at the end. Update after every meaningful merge.
 
 | Area                         | State                                                                                                                                                                                                                                                                                     |
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Site                         | Astro 7 + strict TS + Tailwind 4 static site: homepage (design preview), `/plan-your-event/` planner, 404. Proposed editorial design, not an approved brand.                                                                                                                                |
+| Site                         | Astro 7 + strict TS + Tailwind 4 static site: homepage, `/plan-your-event/` planner, 404. Creative pass 1 (PR pending owner visual approval) recomposes the homepage per docs/creative-excellence-standards.md. Proposed design, not an approved brand. |
 | Planner                      | 5 stages + review, occasion-based branching, explicit consent. **Does not send**. Disclosure before step 1 asks visitors not to enter real contact details. Local draft keeps only occasion/service/style/date/guest-count/budget (7 days); never name, phone, venue/location or notes. |
 | Enquiry backend              | `POST /api/enquiry` Worker implemented and tested (D1 + outbox, server-side Turnstile, idempotency, shared validation). **Off in production**; staging env defined, DB not yet created. Planner not wired. See docs/enquiry-api.md.                                                      |
 | Indexing                     | Off everywhere. `PUBLIC_ALLOW_INDEXING=true` (production build only, owner-gated) flips meta robots, generated `robots.txt` and `X-Robots-Tag` together.                                                                                                                                  |
@@ -24,6 +24,8 @@ Current state first; history at the end. Update after every meaningful merge.
 - Enquiry API PR (this one): Worker + D1 migration + staging env + runtime tests in CI
 
 ## Next
+
+0. Owner visual review of creative pass 1 (screenshots in `docs/review/creative-pass-1/`). Photography: see docs/photography-brief.md.
 
 1. Verify the deployed Worker URL: run `PLAYWRIGHT_BASE_URL=<url> npm run test:e2e` from an environment that can reach it (needs the exact `*.workers.dev` host allowed, or run by the owner's reviewer).
 2. Staging: create the D1 database + Turnstile test keys (Cloudflare access needed), deploy `--env staging`, then wire the planner to the API behind a flag.
