@@ -129,7 +129,13 @@ export function initPlanner(form: HTMLFormElement) {
     );
   }
 
+  const order: Panel[] = [...STAGES.map((s) => s.id), "review"];
+
   function show(panel: Panel, focus = true) {
+    // Only real navigation animates; the initial render stays still.
+    if (focus)
+      form.dataset["direction"] =
+        order.indexOf(panel) < order.indexOf(current) ? "back" : "forward";
     current = panel;
     panels.forEach((p) => (p.hidden = p.dataset["stage"] !== panel));
     const index = panel === "review" ? STAGES.length : STAGES.findIndex((s) => s.id === panel);

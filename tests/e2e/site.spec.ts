@@ -223,3 +223,43 @@ test("enquiry API is switched off in the production configuration", async ({
   expect(await res.json()).toEqual({ error: "enquiries_disabled" });
   expect((await request.get("/api/anything")).status()).toBe(404);
 });
+
+test("with reduced motion the opening is fully composed and nothing animates", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const animated = await page.evaluate(
+    () =>
+      [
+        ...document.querySelectorAll<HTMLElement>(
+          ".line-mask > span, .fade-in, .frame-reveal > div",
+        ),
+      ]
+        .map((el) => getComputedStyle(el).animationName)
+        .filter((n) => n !== "none").length,
+  );
+  expect(animated).toBe(0);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    /Nikah to Walima,\s*and every day\s*between\./,
+  );
+});
+
+test("photo placeholders are labelled honestly and never use stock imagery", async ({ page }) => {
+  await page.goto("/");
+  const frames = page.locator("[data-frame]");
+  expect(await frames.count()).toBeGreaterThanOrEqual(4);
+  await expect(page.locator('[data-frame="image"]')).toHaveCount(0);
+  await expect(page.locator("main img")).toHaveCount(0);
+  for (const label of await page.locator('[data-frame="placeholder"]').allTextContents()) {
+    expect(label).toContain("Photograph to come");
+  }
+});
+
+test("official logo is used in the header and footer with accessible names", async ({ page }) => {
+  await page.goto("/");
+  const homeLink = page.locator("[data-site-header] a[href='/']").first();
+  await expect(homeLink.locator("svg title")).toHaveText("The Wedding Nest");
+  await expect(homeLink).toHaveAccessibleName(/The Wedding Nest/);
+  await expect(page.locator("footer img[alt^='The Wedding Nest']")).toHaveCount(1);
+  expect((await page.request.get("/favicon.svg")).status()).toBe(200);
+  expect((await page.request.get("/apple-touch-icon.png")).status()).toBe(200);
+});
