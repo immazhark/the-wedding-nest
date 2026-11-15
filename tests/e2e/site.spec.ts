@@ -209,3 +209,17 @@ test("sticky header background is fully opaque so content never shows through", 
   });
   expect(alpha).toBe(1);
 });
+
+test("enquiry API is switched off in the production configuration", async ({
+  request,
+  baseURL,
+}) => {
+  test.skip(!!baseURL?.startsWith("http://localhost"), "API only exists on the Workers runtime");
+  const res = await request.post("/api/enquiry", {
+    data: {},
+    headers: { "content-type": "application/json" },
+  });
+  expect(res.status()).toBe(503);
+  expect(await res.json()).toEqual({ error: "enquiries_disabled" });
+  expect((await request.get("/api/anything")).status()).toBe(404);
+});

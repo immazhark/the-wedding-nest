@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "The Wedding Nest — premium wedding and event experiences in Hyderabad.",
+  "description": "The Wedding Nest \u2014 premium wedding and event experiences in Hyderabad.",
   "engines": {
     "node": ">=22.23.4"
   },
@@ -17,7 +17,8 @@
     "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "verify": "npm run format:check && npm run check && npm run test && npm run build && npm run test:e2e"
+    "verify": "npm run format:check && npm run check && npm run test && npm run build && npm run test:e2e && npm run test:runtime",
+    "test:runtime": "E2E_TARGET=workerd playwright test"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.3.0",

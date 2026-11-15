@@ -1,15 +1,42 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  // Static assets only for M0. A Worker entry for POST /api/enquiry (+ D1) is added in M2.
   "name": "the-wedding-nest",
+  "main": "src/worker/index.ts",
   "compatibility_date": "2026-11-01",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash",
+    // Only the API runs Worker code; every page is served straight from static assets.
+    "run_worker_first": ["/api/*"],
   },
   // workers.dev + per-version preview URLs for review. No custom domain until owner approval.
   "workers_dev": true,
   "preview_urls": true,
   "observability": { "enabled": true },
+  // Production (default env): enquiry intake OFF and no database bound. Switching on live
+  // submission is owner-gated and needs a production D1 + secret + retention policy first.
+  "vars": { "ENQUIRIES_ENABLED": "false" },
+
+  "env": {
+    // Isolated staging: its own Worker name, its own D1 database, test data only.
+    // Deploy: npx wrangler deploy --env staging (after creating the DB; see docs/enquiry-api.md).
+    "staging": {
+      "name": "the-wedding-nest-staging",
+      "vars": {
+        "ENQUIRIES_ENABLED": "false",
+        "ALLOWED_ORIGINS": "",
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "twn-enquiries-staging",
+          // Replace with the id printed by `wrangler d1 create twn-enquiries-staging`.
+          "database_id": "00000000-0000-0000-0000-000000000000",
+          "migrations_dir": "migrations",
+        },
+      ],
+    },
+  },
 }
