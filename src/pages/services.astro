@@ -1,0 +1,188 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Frame from "../components/media/Frame.astro";
+import Testimonials from "../components/testimonials/Testimonials.astro";
+import { SERVICES } from "../lib/enquiry/schema";
+import { plannerHref } from "../lib/enquiry/prefill";
+import { OCCASION_PAGES, SERVICE_NOTES } from "../lib/site/occasions";
+
+// EDITORIAL WORKING DRAFT — owner approval required. Describes what visitors can ask about;
+// listing a service is not a promise of availability.
+const core = SERVICES.filter((s) => !("onlyFor" in s));
+---
+
+<BaseLayout
+  title="Services"
+  description="Full wedding and event planning in Hyderabad, or individual services: catering, décor, guest hospitality, photography, makeup, transport, invitations and gifting."
+>
+  <section aria-labelledby="page-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-10 md:pt-16 pb-16 grid gap-10 md:grid-cols-12 md:items-end">
+      <div class="md:col-span-7">
+        <p class="eyebrow text-brass-deep fade-in [--i:0]">Services</p>
+        <h1 id="page-title" class="mt-6 text-[length:var(--text-display)] leading-[0.98]">
+          <span class="line-mask">
+            <span class="[--i:1]">Hand us all of it,</span>
+          </span>
+          <span class="line-mask">
+            <span class="[--i:2]">
+              <em class="italic font-[300] text-brass-deep">or one part.</em>
+            </span>
+          </span>
+        </h1>
+      </div>
+      <p class="md:col-span-4 md:col-start-9 md:pb-3 text-[length:var(--text-lede)] text-charcoal fade-in [--i:3]">
+        Every request starts with a conversation. What’s possible depends on your date, venue and
+        guest list, and we’ll confirm it with you before anything is agreed.
+      </p>
+    </div>
+  </section>
+
+  <!-- Two ways to work together -->
+  <section class="border-y border-ink/10 bg-paper" aria-label="Two ways to work with us">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 grid md:grid-cols-2">
+      <article class="py-14 md:py-20 md:pr-12 md:border-r border-ink/10">
+        <p class="eyebrow text-muted">One team, every event</p>
+        <h2 class="mt-5 text-[length:var(--text-headline)]">The whole occasion</h2>
+        <p class="mt-6 max-w-md text-charcoal">
+          One planner and one team from the first meeting onwards, across as many events as the
+          wedding holds.
+        </p>
+        <a href={plannerHref({})} class="mt-8 inline-block link-underline font-medium">
+          Start planning →
+        </a>
+      </article>
+      <article class="py-14 md:py-20 md:pl-12 border-t md:border-t-0 border-ink/10">
+        <p class="eyebrow text-muted">Exactly what you need</p>
+        <h2 class="mt-5 text-[length:var(--text-headline)]">One part, or a few</h2>
+        <p class="mt-6 max-w-md text-charcoal">
+          Already have a venue or a caterer? Ask only for what’s missing — we’ll work alongside
+          whoever you’ve booked.
+        </p>
+        <a href="#list" class="mt-8 inline-block link-underline font-medium">
+          See the services →
+        </a>
+      </article>
+    </div>
+  </section>
+
+  <!-- The services, as an index -->
+  <section id="list" class="py-24 md:py-32" aria-labelledby="list-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 grid gap-14 md:grid-cols-12">
+      <div class="md:col-span-4">
+        <h2 id="list-title" class="text-[length:var(--text-headline)]">
+          What you can ask for
+        </h2>
+        <Frame
+          ratio="tall"
+          placeholder="A detail: a table, a stage or a menu"
+          sizes="(min-width: 768px) 30vw, 100vw"
+          class="mt-12 hidden md:block max-w-xs scroll-frame"
+        />
+      </div>
+      <ol class="md:col-span-8 border-t border-ink/15" role="list">
+        {core.map((s, i) => (
+          <li id={s.id} class="service-entry scroll-rise">
+            <span class="service-num" aria-hidden="true">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <h3 class="service-name">{s.label}</h3>
+            <p class="service-note">{SERVICE_NOTES[s.id]}</p>
+            <a href={plannerHref({ service: s.id })} class="service-ask link-underline">
+              Ask about {s.label.toLowerCase()}
+              <span aria-hidden="true"> →</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 mt-16">
+      <p class="md:ml-[33.333%] max-w-2xl text-charcoal">
+        Some services belong to particular occasions — a Mehndi artist, ceremony coordination, or
+        sound and lighting for an evening. You’ll find them with{" "}
+        {OCCASION_PAGES.map((p, i) => (
+          <>
+            <a href={`/${p.slug}/`} class="underline underline-offset-4 decoration-brass">
+              {p.nav}
+            </a>
+            {i < OCCASION_PAGES.length - 2 ? ", " : i === OCCASION_PAGES.length - 2 ? " and " : "."}
+          </>
+        ))}
+      </p>
+    </div>
+  </section>
+
+  <Testimonials />
+
+  <section class="on-dark bg-kohl text-ivory" aria-labelledby="cta-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-28 grid gap-8 md:grid-cols-12 md:items-end">
+      <h2 id="cta-title" class="md:col-span-7 text-[length:var(--text-headline)]">
+        Not sure what you need yet?
+      </h2>
+      <div class="md:col-span-4 md:col-start-9">
+        <p class="text-stone">Start with the occasion. The planner helps you work out the rest.</p>
+        <a href={plannerHref({})} class="btn btn-light mt-6">
+          Plan your event{" "}
+          <span class="arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .service-entry {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    column-gap: 1rem;
+    row-gap: 0.4rem;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 15%, transparent);
+    scroll-margin-top: 7rem;
+  }
+  .service-entry > :not(.service-num) {
+    grid-column: 2;
+  }
+  .service-num {
+    grid-row: span 3;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--color-brass-deep);
+    padding-top: 0.5rem;
+  }
+  .service-name {
+    font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.4rem);
+  }
+  .service-note {
+    color: var(--color-charcoal);
+    max-width: 34rem;
+  }
+  .service-ask {
+    justify-self: start;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    margin-top: 0.25rem;
+  }
+  .service-ask:hover {
+    color: var(--color-ink);
+  }
+  @media (min-width: 64rem) {
+    .service-entry {
+      grid-template-columns: 4rem minmax(0, 1fr) minmax(0, 1.1fr);
+      align-items: baseline;
+    }
+    .service-entry > .service-name {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+    .service-entry > .service-note,
+    .service-entry > .service-ask {
+      grid-column: 3;
+    }
+    .service-num {
+      grid-row: 1 / span 2;
+    }
+  }
+</style>

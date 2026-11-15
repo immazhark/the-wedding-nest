@@ -161,3 +161,18 @@ test("stage transitions know their direction", async ({ page }) => {
   await page.getByRole("button", { name: "← Back" }).click();
   await expect(page.locator("[data-planner-form]")).toHaveAttribute("data-direction", "back");
 });
+
+test("choices made before the planner script finishes loading are kept", async ({ page }) => {
+  let release!: () => void;
+  const gate = new Promise<void>((r) => (release = r));
+  await page.route(/\/_astro\/.*\.js$/, async (route) => {
+    await gate;
+    await route.continue();
+  });
+  await page.goto("/plan-your-event/?occasion=mehndi", { waitUntil: "domcontentloaded" });
+  await page.getByRole("checkbox", { name: "Walima" }).check();
+  release();
+  await expect(page.locator("[data-planner-form]")).toHaveAttribute("data-ready", "true");
+  await expect(page.getByRole("checkbox", { name: "Walima" })).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: "Mehndi", exact: true })).toBeChecked();
+});

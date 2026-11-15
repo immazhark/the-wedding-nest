@@ -47,6 +47,10 @@ async function toReview(page: Page) {
   await expect(page.getByRole("heading", { name: "Review your plan" })).toBeVisible();
 }
 
+/** The human check has produced a token (the fake widget answers after ~30 ms). */
+const checkReady = (page: Page) =>
+  expect(page.locator('[data-send-panel][data-check="ready"]')).toHaveCount(1);
+
 test("with sending on, the 'can't send yet' preview disclosure is gone", async ({ page }) => {
   await setup(page, () => ({ status: 201, body: { id: "x" } }));
   await expect(page.locator("#planner-disclosure")).toHaveCount(0);
@@ -59,6 +63,7 @@ test("sends once the check passes and confirms only after the server accepts", a
     body: { id: "3f2b8c1e-9d4a-4f6b-8e2a-1c5d7e9f0a1b" },
   }));
   await toReview(page);
+  await checkReady(page);
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toBeFocused();
   await expect(page.locator("[data-reference]")).toHaveText("3F2B8C1E");
@@ -79,10 +84,11 @@ test("an outage keeps the answers, and the retry reuses the same idempotency key
       : { status: 201, body: { id: "abcdef12" } },
   );
   await toReview(page);
+  await checkReady(page);
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.getByRole("status")).toContainText("couldn’t send");
   await expect(page.locator("[data-summary]")).toContainText("Sample Person");
-  await page.waitForTimeout(100); // fresh check token after reset
+  await checkReady(page); // fresh token after the reset
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toBeVisible();
   expect(calls).toHaveLength(2);
@@ -97,6 +103,7 @@ test("server validation errors take the visitor to the right step with a clear m
     body: { error: "invalid_enquiry", errors: { phone: "invalid" } },
   }));
   await toReview(page);
+  await checkReady(page);
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.getByRole("heading", { name: "How should we reach you?" })).toBeVisible();
   await expect(page.getByRole("alert")).toContainText("phone or WhatsApp number");

@@ -11,6 +11,13 @@ export const SITE = {
   locale: "en_IN",
   region: "Hyderabad, Telangana",
   instagram: "https://www.instagram.com/twn.events/",
+  /**
+   * Public Google Business listing, as supplied by the owner in the project handover.
+   * Linked only — reviews are never copied, cached or scraped (docs/customer-testimonials.md).
+   * TODO before launch: confirm it matches the owner's share link https://share.google/aS1MwFrsfwp8ES0Js.
+   */
+  googleReviews:
+    "https://www.google.com/maps/place/The+Wedding+Nest/@17.3898158,78.4490999,106m/data=!3m1!1e3!4m6!3m5!1s0x3bcb9722d0819949:0xfffaa57907d4043d!8m2!3d17.390032!4d78.4492282!16s%2Fg%2F11y9zgk97t",
 } as const;
 
 /**
@@ -48,8 +55,9 @@ export function robotsContent(indexable: boolean): string {
 }
 
 export const NAV = [
-  { href: "/#services", label: "Services" },
-  { href: "/#occasions", label: "Occasions" },
-  { href: "/#approach", label: "Approach" },
+  { href: "/services/", label: "Services" },
+  { href: "/weddings/", label: "Weddings" },
+  { href: "/nikah-and-walima/", label: "Nikah & Walima" },
+  { href: "/celebrations/", label: "Celebrations" },
   { href: "/plan-your-event/", label: "Plan your event" },
 ] as const;

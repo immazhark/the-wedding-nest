@@ -1,0 +1,132 @@
+---
+/**
+ * Editorial testimonial section (docs/customer-testimonials.md).
+ * - One lead quotation set large, further voices quieter; films given room of their own.
+ * - Only validated, permitted entries render. With none, a single honest link to the public
+ *   Google listing — no placeholder quotes, ratings, counts or Google branding.
+ */
+import TestimonialFilm from "./TestimonialFilm.astro";
+import { TESTIMONIALS } from "../../content/testimonials";
+import { publishable } from "../../lib/testimonials/schema";
+import { SITE } from "../../lib/site/config";
+
+interface Props {
+  /** Only show testimonials verified for these event categories (all when omitted). */
+  categories?: readonly string[];
+  tone?: "light" | "dark";
+  class?: string;
+}
+const { categories, tone = "light", class: className = "" } = Astro.props;
+const all = publishable(TESTIMONIALS).filter(
+  (t) => !categories || (t.eventCategory && categories.includes(t.eventCategory)),
+);
+const quotes = all.filter((t) => t.kind === "quote");
+const films = all.filter((t) => t.kind === "video");
+const [lead, ...more] = quotes;
+---
+
+<section
+  class:list={["testimonials", tone === "dark" && "on-dark bg-kohl text-ivory", className]}
+  aria-labelledby="testimonials-title"
+  data-testimonials={all.length}
+>
+  <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-28">
+    {all.length === 0 ? (
+      <div class="grid gap-6 md:grid-cols-12 md:items-baseline border-t border-current/15 pt-10">
+        <h2 id="testimonials-title" class="md:col-span-5 text-[length:var(--text-title)]">
+          In families’ own words
+        </h2>
+        <p class="md:col-span-6 md:col-start-7 text-charcoal">
+          Reviews from the families we’ve worked with are on our public Google listing.{" "}
+          <a
+            href={SITE.googleReviews}
+            rel="noopener"
+            class="underline underline-offset-4 decoration-brass whitespace-nowrap"
+          >
+            Read them on Google
+          </a>
+        </p>
+      </div>
+    ) : (
+      <>
+        <h2 id="testimonials-title" class="eyebrow text-brass-deep">
+          In families’ own words
+        </h2>
+        {lead && (
+          <figure class="mt-10 grid gap-8 md:grid-cols-12">
+            <span class="quote-mark md:col-span-1" aria-hidden="true">
+              “
+            </span>
+            <blockquote class="md:col-span-10 lead-quote">
+              <p>{lead.text}</p>
+            </blockquote>
+            <figcaption class="md:col-start-2 md:col-span-10 eyebrow text-muted">
+              {lead.attribution}
+              {lead.sourceUrl && (
+                <>
+                  {" · "}
+                  <a href={lead.sourceUrl} rel="noopener" class="underline underline-offset-4">
+                    {lead.source === "google" ? "Review on Google" : "Source"}
+                  </a>
+                </>
+              )}
+            </figcaption>
+          </figure>
+        )}
+        {more.length > 0 && (
+          <div class="mt-16 grid gap-12 md:grid-cols-2 md:pl-[8.333%]">
+            {more.map((q) => (
+              <figure class="border-t border-current/15 pt-6">
+                <blockquote class="text-[length:var(--text-lede)]">
+                  <p>“{q.text}”</p>
+                </blockquote>
+                <figcaption class="mt-4 eyebrow text-muted">
+                  {q.attribution}
+                  {q.sourceUrl && (
+                    <>
+                      {" · "}
+                      <a href={q.sourceUrl} rel="noopener" class="underline underline-offset-4">
+                        {q.source === "google" ? "Review on Google" : "Source"}
+                      </a>
+                    </>
+                  )}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        )}
+        {films.length > 0 && (
+          <div class="mt-20 grid gap-14 md:grid-cols-2">
+            {films.map((f) => (
+              <TestimonialFilm film={f} />
+            ))}
+          </div>
+        )}
+        <p class="mt-14 text-sm text-muted">
+          More reviews are on our{" "}
+          <a href={SITE.googleReviews} rel="noopener" class="underline underline-offset-4">
+            public Google listing
+          </a>
+          .
+        </p>
+      </>
+    )}
+  </div>
+</section>
+
+<style>
+  .lead-quote {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.2rem + 2.2vw, 3.25rem);
+    font-weight: 320;
+    line-height: 1.18;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+  .quote-mark {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 3rem + 4vw, 7rem);
+    line-height: 0.8;
+    color: var(--color-brass);
+  }
+</style>

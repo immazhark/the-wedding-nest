@@ -28,10 +28,10 @@ const current = Astro.url.pathname;
     <nav
       id="site-menu"
       aria-label="Primary"
-      class="site-menu md:static md:flex md:bg-transparent"
+      class="site-menu lg:static lg:flex lg:bg-transparent"
       data-menu
     >
-      <ul class="flex flex-col md:flex-row md:items-center gap-1 md:gap-9">
+      <ul class="flex flex-col lg:flex-row lg:items-center gap-1 lg:gap-8">
         {NAV.map((item) => {
           const isCta = item.href.startsWith("/plan");
           return (
@@ -41,8 +41,8 @@ const current = Astro.url.pathname;
                 aria-current={current === item.href ? "page" : undefined}
                 class:list={[
                   isCta
-                    ? "btn btn-solid md:min-h-10 md:px-5 md:py-2 md:text-[0.72rem]"
-                    : "link-underline md:text-[0.9375rem] text-charcoal hover:text-ink",
+                    ? "btn btn-solid lg:min-h-10 lg:px-5 lg:py-2 lg:text-[0.72rem]"
+                    : "link-underline lg:text-[0.9375rem] text-charcoal hover:text-ink",
                   "nav-link",
                 ]}
               >
@@ -63,7 +63,7 @@ const current = Astro.url.pathname;
     background: var(--color-ivory);
   }
   /* Without JS the menu stays visible in-flow on mobile; with JS it becomes an overlay. */
-  @media (max-width: 47.99rem) {
+  @media (max-width: 63.99rem) {
     .site-menu {
       padding: 0 1rem 1rem;
     }
@@ -106,7 +106,7 @@ const current = Astro.url.pathname;
   :global(html.js) [data-menu-toggle] {
     display: inline-flex;
   }
-  @media (min-width: 48rem) {
+  @media (min-width: 64rem) {
     :global(html.js) [data-menu-toggle] {
       display: none;
     }
@@ -132,7 +132,7 @@ const current = Astro.url.pathname;
   const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
   const menu = document.querySelector<HTMLElement>("[data-menu]");
   const label = toggle?.querySelector<HTMLElement>("[data-menu-label]");
-  const mobile = window.matchMedia("(max-width: 47.99rem)");
+  const mobile = window.matchMedia("(max-width: 63.99rem)");
 
   function setOpen(open: boolean, restoreFocus = false) {
     if (!toggle || !menu) return;

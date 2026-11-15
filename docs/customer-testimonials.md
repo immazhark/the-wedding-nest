@@ -37,3 +37,11 @@ Testimonials are **real evidence of TWN's work**, not generic filler, decorative
 4. **Before production:** test accessible playback, mobile cropping, responsive performance, source attribution, permissions, linked reviews and freshness of any review metrics.
 
 **Do not block Astro, secure enquiry, or photo-gallery engineering while testimonial assets are pending.**
+
+## Implementation status (15 Nov 2026)
+
+- **Model:** `src/lib/testimonials/schema.ts` (unit tested). `permission: true` is mandatory. Attribution is rendered exactly as authorised (`full-name`, `first-name-initial`, `initials` or `role`). Google and Instagram quotes must link to their source. Films need a poster, WebVTT captions and a transcript. There is **no field for ratings or review counts**.
+- **Content:** `src/content/testimonials.ts` is intentionally **empty**. Add entries only from the owner's verified shortlist. Consent records stay outside Git.
+- **Components:** `src/components/testimonials/Testimonials.astro` sets one lead quotation large, other voices quieter, and films in their own space. `TestimonialFilm.astro` has explicit play, `preload="none"`, captions on by default and an expandable transcript. Sections can filter by verified event category, so occasion pages show only relevant voices.
+- **Placement now:** the homepage, Services and each occasion page show "In families' own words" with a single link to the public Google listing (owner's handover URL, in `SITE.googleReviews`). No quotes, ratings, counts or Google branding. **Before launch, confirm that URL matches the owner's share link.**
+- **Film handover spec:** MP4 (H.264, 1080p, 30–90 s), a WebVTT caption file or a transcript to build one, a still for the poster, written consent from everyone identifiable, and music licences.

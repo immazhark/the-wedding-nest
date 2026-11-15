@@ -32,12 +32,13 @@ In Claude Code Cloud, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chrom
 
 ## Structure
 
-- `src/pages/` — `index`, `plan-your-event` (interactive planner; sends nothing until the secure backend exists), `404`
+- `src/pages/` — `index`, `services`, `[occasion]` (weddings, nikah-and-walima, celebrations), `plan-your-event` (interactive planner; sends nothing until the secure backend exists), `404`
 - `src/components/planner/`, `src/scripts/planner.ts` — planner UI and client controller
 - `src/layouts/BaseLayout.astro` — metadata, canonical, robots, skip link, preview notice
 - `src/components/` — header with accessible mobile menu, footer, wordmark, arch photo frame placeholder
 - `src/lib/enquiry/` — typed 5-stage question tree, branching, server-grade validation, privacy-safe local draft
-- `src/lib/site/config.ts` — verified public facts only
+- `src/lib/site/config.ts` — verified public facts only; `src/lib/site/occasions.ts` — occasion/service page content (draft)
+- `src/lib/testimonials/`, `src/components/testimonials/`, `src/content/testimonials.ts` — testimonial model, components, approved entries (empty)
 - `wrangler.jsonc` — Workers Static Assets + `/api/*` Worker; isolated `staging` env with its own D1
 - `src/worker/` — `POST /api/enquiry` (off in production; see docs/enquiry-api.md); `migrations/` — D1 schema
 - `src/lib/site/seo-files.ts` — generates `_headers` (security + noindex) and `robots.txt` at build time from `PUBLIC_ALLOW_INDEXING`

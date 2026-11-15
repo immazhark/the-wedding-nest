@@ -2,22 +2,14 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ArchFrame from "../components/ArchFrame.astro";
 import Frame from "../components/media/Frame.astro";
+import Testimonials from "../components/testimonials/Testimonials.astro";
+import { OCCASION_NOTES } from "../lib/site/occasions";
 import { OCCASIONS, SERVICES, STAGES } from "../lib/enquiry/schema";
 
 // DRAFT COPY — editorial working draft pending owner approval (docs/creative-excellence-standards.md).
 // No claims about prices, clients, venues, awards or guarantees.
 const coreServices = SERVICES.filter((s) => !("onlyFor" in s));
 
-// Plain descriptions of each tradition (general cultural meaning, not claims about TWN).
-const occasionNotes: Record<string, string> = {
-  nikah: "The marriage ceremony",
-  walima: "The reception hosted by the groom’s family",
-  mehndi: "The henna evening",
-  shaadi: "The wedding day itself",
-  engagement: "Often the first time both families gather",
-  reception: "The celebration after the ceremony",
-  sangeet: "An evening of music and dance",
-};
 const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
 ---
 
@@ -114,7 +106,10 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
         </article>
         <p class="pt-8 text-sm text-muted max-w-xl">
           What’s possible depends on your date, venue and guest list. We’ll talk it through with you
-          before anything is agreed.
+          before anything is agreed.{" "}
+          <a href="/services/" class="underline underline-offset-4 decoration-brass">
+            All services
+          </a>
         </p>
       </div>
     </div>
@@ -129,14 +124,22 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
       <ul class="mt-16 border-t border-ink/15" role="list">
         {weddingOccasions.map((o) => (
           <li class="occasion-row scroll-rise">
-            <span class="occasion-name">{o.label}</span>
-            <span class="occasion-note">{occasionNotes[o.id]}</span>
+            <a
+              href={o.id === "nikah" || o.id === "walima" ? "/nikah-and-walima/" : "/weddings/"}
+              class="occasion-name link-underline"
+            >
+              {o.label}
+            </a>
+            <span class="occasion-note">{OCCASION_NOTES[o.id]}</span>
           </li>
         ))}
       </ul>
       <p class="mt-12 max-w-2xl text-[length:var(--text-lede)] text-charcoal">
         And birthdays, anniversaries, corporate evenings and private gatherings, for families and
-        hosts from every community.
+        hosts from every community.{" "}
+        <a href="/celebrations/" class="underline underline-offset-4 decoration-brass">
+          Celebrations
+        </a>
       </p>
     </div>
   </section>
@@ -221,6 +224,7 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
       </div>
     </div>
   </section>
+  <Testimonials />
 </BaseLayout>
 
 <style>

@@ -1,0 +1,47 @@
+---
+/**
+ * Testimonial film: explicit play only (no autoplay), captions required by the schema,
+ * poster for a fast, stable first paint, transcript for everyone who can't or won't watch.
+ */
+import type { Testimonial } from "../../lib/testimonials/schema";
+
+interface Props {
+  film: Extract<Testimonial, { kind: "video" }>;
+}
+const { film } = Astro.props;
+const minutes = Math.floor(film.video.durationSeconds / 60);
+const seconds = String(Math.round(film.video.durationSeconds % 60)).padStart(2, "0");
+---
+
+<figure class="film">
+  <video
+    controls
+    preload="none"
+    playsinline
+    poster={film.video.poster}
+    class="block w-full aspect-video bg-kohl object-cover"
+    aria-label={`${film.title} (${minutes}:${seconds})`}
+  >
+    <source src={film.video.src} type="video/mp4" />
+    <track kind="captions" src={film.video.captions} srclang="en" label="English" default />
+  </video>
+  <figcaption class="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+    <span class="font-display text-[length:var(--text-title)] font-[330]">{film.title}</span>
+    <span class="eyebrow text-muted">{film.attribution}</span>
+  </figcaption>
+  <details class="mt-4 text-charcoal">
+    <summary class="cursor-pointer text-sm font-medium underline underline-offset-4 decoration-brass">
+      Read the transcript
+    </summary>
+    <p class="mt-3 max-w-2xl whitespace-pre-line">{film.transcript}</p>
+  </details>
+  {film.sourceUrl && (
+    <a
+      href={film.sourceUrl}
+      rel="noopener"
+      class="mt-2 inline-block text-sm text-muted underline underline-offset-4"
+    >
+      Also on Instagram
+    </a>
+  )}
+</figure>

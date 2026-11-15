@@ -13,6 +13,7 @@ import {
 import { nextStage, previousStage, stageError } from "../lib/enquiry/flow";
 import { DRAFT_STORAGE_KEY, restoreDraft, toDraft } from "../lib/enquiry/draft";
 import { summarise } from "../lib/enquiry/summary";
+import { prefillFromQuery } from "../lib/enquiry/prefill";
 import { FIELD_STAGE, fieldMessage, submitEnquiry } from "../lib/enquiry/submit";
 
 type TurnstileApi = {
@@ -142,6 +143,8 @@ export function initPlanner(form: HTMLFormElement) {
     const sendLabel = form.querySelector<HTMLElement>("[data-send-label]")!;
     const status = form.querySelector<HTMLElement>("[data-send-status]")!;
     const widgetEl = form.querySelector<HTMLElement>("[data-turnstile]")!;
+    const panel = form.querySelector<HTMLElement>("[data-send-panel]")!;
+    panel.dataset["check"] = "pending";
     const reference = form.querySelector<HTMLElement>("[data-reference]")!;
     const sitekey = form.dataset["sitekey"] ?? "";
     let key: string | null = null; // one key per reviewed payload: retries reuse it
@@ -151,6 +154,7 @@ export function initPlanner(form: HTMLFormElement) {
 
     const resetCheck = () => {
       token = "";
+      panel.dataset["check"] = "pending";
       if (widgetId !== undefined) window.turnstile?.reset(widgetId);
     };
 
@@ -212,9 +216,13 @@ export function initPlanner(form: HTMLFormElement) {
               theme: "light",
               callback: (t: string) => {
                 token = t;
+                panel.dataset["check"] = "ready";
                 status.textContent = "";
               },
-              "expired-callback": () => (token = ""),
+              "expired-callback": () => {
+                token = "";
+                panel.dataset["check"] = "pending";
+              },
               "error-callback": () => {
                 token = "";
                 status.textContent = "The quick check couldn’t load. Please refresh the page.";
@@ -373,7 +381,15 @@ export function initPlanner(form: HTMLFormElement) {
   });
 
   // Restore a non-sensitive draft if one exists; contact details are never in it.
-  applyState(form, restoreDraft(storage.load(), Date.now()) ?? emptyEnquiry());
+  // If the visitor already ticked something before this script ran (slow devices), keep it.
+  // Otherwise restore the non-sensitive draft. Links from occasion/service pages then add
+  // their (validated) choices on top.
+  const touched = form.querySelector("input:checked") !== null;
+  const base = touched
+    ? readState(form)
+    : (restoreDraft(storage.load(), Date.now()) ?? emptyEnquiry());
+  applyState(form, prefillFromQuery(base, new URLSearchParams(window.location.search)));
   syncConditional();
   show("occasion", false);
+  form.dataset["ready"] = "true";
 }

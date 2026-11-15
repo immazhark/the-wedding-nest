@@ -1,0 +1,217 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Frame from "../components/media/Frame.astro";
+import Testimonials from "../components/testimonials/Testimonials.astro";
+import { OCCASIONS, serviceOptionsFor } from "../lib/enquiry/schema";
+import { plannerHref } from "../lib/enquiry/prefill";
+import { OCCASION_NOTES, OCCASION_PAGES, type OccasionPage } from "../lib/site/occasions";
+
+export function getStaticPaths() {
+  return OCCASION_PAGES.map((page) => ({ params: { occasion: page.slug }, props: { page } }));
+}
+
+interface Props {
+  page: OccasionPage;
+}
+const { page } = Astro.props;
+const label = (id: string) => OCCASIONS.find((o) => o.id === id)?.label ?? id;
+const numerals = ["I", "II", "III", "IV", "V", "VI"];
+const services = serviceOptionsFor(page.occasions);
+const cta = plannerHref({ occasions: page.occasions });
+---
+
+<BaseLayout title={page.title} description={page.description}>
+  <!-- Opening: headline left, lede right; frame offset to the right with a margin note -->
+  <section aria-labelledby="page-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-10 md:pt-16">
+      <div class="grid gap-8 md:grid-cols-12 md:items-end">
+        <div class="md:col-span-7">
+          <p class="eyebrow text-brass-deep fade-in [--i:0]">{page.eyebrow}</p>
+          <h1 id="page-title" class="mt-6 text-[length:var(--text-display)] leading-[0.98]">
+            <span class="line-mask">
+              <span class="[--i:1]">{page.headline[0]}</span>
+            </span>
+            <span class="line-mask">
+              <span class="[--i:2]">
+                <em class="italic font-[300] text-brass-deep">{page.headline[1]}</em>
+              </span>
+            </span>
+          </h1>
+        </div>
+        <div class="md:col-span-4 md:col-start-9 md:pb-3 fade-in [--i:3]">
+          <p class="text-[length:var(--text-lede)] text-charcoal">{page.lede}</p>
+          <a href={cta} class="btn btn-solid mt-8">
+            Start planning{" "}
+            <span class="arrow" aria-hidden="true">
+              →
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="mx-auto max-w-[90rem] mt-12 md:mt-16 sm:px-8 lg:px-12 grid md:grid-cols-12 gap-6">
+      <Frame
+        aspectClass="aspect-[4/5] sm:aspect-[3/2] lg:aspect-[16/9]"
+        placeholder={page.photo}
+        priority
+        class="md:col-span-10 md:col-start-3 frame-reveal"
+        mediaClass="parallax-media"
+      />
+    </div>
+  </section>
+
+  <!-- Programme: set like the function list on an invitation card -->
+  <section class="py-24 md:py-32" aria-labelledby="programme-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 grid gap-12 md:grid-cols-12">
+      <div class="md:col-span-4">
+        <h2 id="programme-title" class="text-[length:var(--text-headline)] max-w-[10ch]">
+          The programme
+        </h2>
+      </div>
+      <ol class="md:col-span-8 programme" role="list">
+        {page.occasions.map((id, i) => (
+          <li class="programme-row scroll-rise">
+            <span class="programme-num" aria-hidden="true">
+              {numerals[i]}
+            </span>
+            <span class="programme-name">{label(id)}</span>
+            <span class="programme-note">{OCCASION_NOTES[id]}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- What families ask for -->
+  <section class="bg-paper border-y border-ink/10" aria-labelledby="asks-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-32 grid gap-10 md:grid-cols-12">
+      <h2 id="asks-title" class="md:col-span-4 text-[length:var(--text-headline)] max-w-[12ch]">
+        What families ask us for
+      </h2>
+      <div class="md:col-span-8">
+        <ul class="service-index" role="list">
+          {services.map((s, i) => (
+            <li>
+              <a
+                href={plannerHref({ occasions: page.occasions, service: s.id })}
+                class="link-underline"
+              >
+                {s.label}
+                <span class="sr-only"> — start planning with this</span>
+              </a>
+              {i < services.length - 1 && (
+                <span class="text-brass" aria-hidden="true">
+                  &nbsp;/
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+        <p class="mt-8 text-sm text-muted max-w-xl">
+          Choose one to start planning with it already selected. What’s possible depends on your
+          date, venue and guest list; we’ll confirm before anything is agreed.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The first conversation -->
+  <section class="py-24 md:py-32" aria-labelledby="conversation-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12">
+      <h2 id="conversation-title" class="text-[length:var(--text-headline)] max-w-[16ch]">
+        What the first conversation covers
+      </h2>
+      <div class="mt-14 grid gap-10 md:grid-cols-3">
+        {page.conversation.map((c) => (
+          <article class="border-t border-ink/15 pt-6">
+            <h3 class="text-[length:var(--text-title)]">{c.title}</h3>
+            <p class="mt-4 text-charcoal">{c.text}</p>
+          </article>
+        ))}
+      </div>
+      <div class="mt-20 grid gap-6 md:grid-cols-12 md:items-end">
+        <Frame
+          ratio="portrait"
+          placeholder="A detail from this kind of occasion"
+          sizes="(min-width: 768px) 40vw, 100vw"
+          class="md:col-span-5 scroll-frame"
+        />
+        <Frame
+          ratio="landscape"
+          placeholder="Guests, the setting or the table"
+          sizes="(min-width: 768px) 50vw, 100vw"
+          class="md:col-span-6 md:col-start-7 md:mb-16 scroll-frame"
+        />
+      </div>
+    </div>
+  </section>
+
+  <Testimonials categories={page.testimonialCategories} />
+
+  <!-- Closing invitation -->
+  <section class="on-dark bg-kohl text-ivory" aria-labelledby="cta-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-28 grid gap-8 md:grid-cols-12 md:items-end">
+      <h2 id="cta-title" class="md:col-span-7 text-[length:var(--text-headline)]">
+        Tell us about your {page.ctaNoun}.
+      </h2>
+      <div class="md:col-span-4 md:col-start-9">
+        <p class="text-stone">Five short questions. Anything undecided can wait.</p>
+        <a href={cta} class="btn btn-light mt-6">
+          Plan your event{" "}
+          <span class="arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .programme {
+    border-top: 1px solid color-mix(in srgb, var(--color-ink) 15%, transparent);
+  }
+  .programme-row {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    column-gap: 1rem;
+    row-gap: 0.25rem;
+    align-items: baseline;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 15%, transparent);
+  }
+  .programme-num {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--color-brass-deep);
+    grid-row: span 2;
+  }
+  .programme-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 1.4rem + 2vw, 3.25rem);
+    font-weight: 320;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+  }
+  .programme-note {
+    color: var(--color-muted);
+  }
+  @media (min-width: 48rem) {
+    .programme-row {
+      grid-template-columns: 4rem minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .programme-num {
+      grid-row: auto;
+    }
+  }
+  .service-index {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.55em;
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 1.1rem + 0.8vw, 1.8rem);
+    font-weight: 330;
+    line-height: 1.55;
+  }
+</style>

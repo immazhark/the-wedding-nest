@@ -1,7 +1,14 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const PAGES = ["/", "/plan-your-event/"];
+const PAGES = [
+  "/",
+  "/services/",
+  "/weddings/",
+  "/nikah-and-walima/",
+  "/celebrations/",
+  "/plan-your-event/",
+];
 
 for (const path of PAGES) {
   test.describe(`page ${path}`, () => {
@@ -54,11 +61,15 @@ for (const path of PAGES) {
   });
 }
 
-test("all internal links resolve", async ({ page, request }) => {
-  await page.goto("/");
-  const hrefs = await page.$$eval("a[href^='/']", (as) => [
-    ...new Set(as.map((a) => a.getAttribute("href")!)),
-  ]);
+test("all internal links on every page resolve", async ({ page, request }) => {
+  const hrefs = new Set<string>();
+  for (const path of PAGES) {
+    await page.goto(path);
+    for (const h of await page.$$eval("a[href^='/']", (as) =>
+      as.map((a) => a.getAttribute("href")!),
+    ))
+      hrefs.add(h);
+  }
   for (const href of hrefs) {
     const [pathname, hash] = href.split("#");
     const res = await request.get(pathname || "/");
@@ -111,7 +122,13 @@ test.describe("mobile navigation", () => {
     const box = await nav.boundingBox();
     const viewport = page.viewportSize()!;
     expect(box!.height).toBeGreaterThan(viewport.height * 0.6);
-    for (const name of ["Services", "Occasions", "Approach", "Plan your event"]) {
+    for (const name of [
+      "Services",
+      "Weddings",
+      "Nikah & Walima",
+      "Celebrations",
+      "Plan your event",
+    ]) {
       await expect(nav.getByRole("link", { name })).toBeInViewport();
     }
   });
@@ -139,15 +156,11 @@ test.describe("mobile navigation", () => {
 
   test("anchor targets are not hidden behind the sticky header", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: "Menu" }).click();
-    await page
-      .getByRole("navigation", { name: "Primary" })
-      .getByRole("link", { name: "Occasions" })
-      .click();
-    await expect(page).toHaveURL(/#occasions$/);
+    await page.getByRole("link", { name: "What we do" }).click();
+    await expect(page).toHaveURL(/#services$/);
     const header = (await page.locator("[data-site-header]").boundingBox())!;
     await expect
-      .poll(async () => (await page.locator("#occasions-title").boundingBox())!.y)
+      .poll(async () => (await page.locator("#services-title").boundingBox())!.y)
       .toBeGreaterThanOrEqual(header.y + header.height);
   });
 
@@ -156,10 +169,14 @@ test.describe("mobile navigation", () => {
     await page.getByRole("button", { name: "Menu" }).click();
     await page
       .getByRole("navigation", { name: "Primary" })
-      .getByRole("link", { name: "Occasions" })
+      .getByRole("link", { name: "Services" })
       .click();
-    await expect(page).toHaveURL(/#occasions$/);
+    await expect(page).toHaveURL(/\/services\/$/);
     await expect(page.locator("[data-menu-toggle]")).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator('[data-menu] a[href="/services/"]')).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
   });
 });
 
@@ -170,7 +187,13 @@ test.describe("desktop navigation", () => {
     await page.goto("/");
     await expect(page.locator("[data-menu-toggle]")).toBeHidden();
     const nav = page.getByRole("navigation", { name: "Primary" });
-    for (const name of ["Services", "Occasions", "Approach", "Plan your event"]) {
+    for (const name of [
+      "Services",
+      "Weddings",
+      "Nikah & Walima",
+      "Celebrations",
+      "Plan your event",
+    ]) {
       await expect(nav.getByRole("link", { name })).toBeVisible();
     }
   });
@@ -262,4 +285,54 @@ test("official logo is used in the header and footer with accessible names", asy
   await expect(page.locator("footer img[alt^='The Wedding Nest']")).toHaveCount(1);
   expect((await page.request.get("/favicon.svg")).status()).toBe(200);
   expect((await page.request.get("/apple-touch-icon.png")).status()).toBe(200);
+});
+
+test("occasion pages link into the planner with their occasions already chosen", async ({
+  page,
+}) => {
+  await page.goto("/nikah-and-walima/");
+  await page.getByRole("link", { name: /Start planning/ }).click();
+  await expect(page).toHaveURL(/occasion=nikah&occasion=walima&occasion=mehndi/);
+  await expect(page.locator("[data-planner-form]")).toHaveAttribute("data-ready", "true");
+  for (const name of ["Nikah", "Walima", "Mehndi"])
+    await expect(page.getByRole("checkbox", { name, exact: true })).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: "Corporate event" })).not.toBeChecked();
+});
+
+test("service pages link into the planner with that service selected", async ({ page }) => {
+  await page.goto("/services/");
+  await page.getByRole("link", { name: /Ask about catering/ }).click();
+  await expect(page.locator("[data-planner-form]")).toHaveAttribute("data-ready", "true");
+  await page.getByRole("checkbox", { name: "Walima" }).check();
+  await page.getByRole("button", { name: /^Continue/ }).click();
+  await expect(page.getByRole("radio", { name: /Specific services/ })).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: "Catering & menus" })).toBeChecked();
+});
+
+test("each occasion page has its own programme, title and description", async ({ page }) => {
+  const seen = new Set<string>();
+  for (const path of ["/weddings/", "/nikah-and-walima/", "/celebrations/"]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { name: "The programme" })).toBeVisible();
+    seen.add(await page.title());
+    seen.add((await page.locator('meta[name="description"]').getAttribute("content")) ?? "");
+  }
+  expect(seen.size).toBe(6);
+});
+
+test("testimonials: no invented quotes, ratings or counts — only a link to the real reviews", async ({
+  page,
+}) => {
+  for (const path of ["/", "/services/", "/nikah-and-walima/"]) {
+    await page.goto(path);
+    const block = page.locator("[data-testimonials]");
+    await expect(block).toHaveAttribute("data-testimonials", "0");
+    await expect(block.locator("blockquote")).toHaveCount(0);
+    await expect(block).not.toContainText(/★|\d(\.\d)?\s*(stars?|\/\s*5)|\d+\s+reviews/i);
+    const link = block.getByRole("link", { name: "Read them on Google" });
+    await expect(link).toHaveAttribute(
+      "href",
+      /^https:\/\/www\.google\.com\/maps\/place\/The\+Wedding\+Nest\//,
+    );
+  }
 });
