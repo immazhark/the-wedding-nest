@@ -17,5 +17,8 @@ Authentic photography-led, restrained and cinematic, not generic SaaS tiles or A
 - Submit only after explicit consent to processing contact details, with server-side confirmation and an accessible failure/retry path.
 - Offer a verified WhatsApp contact route only when the business provides its approved number.
 
+## Customer trust: authentic reviews and video testimonials
+The owner has identified The Wedding Nest's genuine Google Business Profile reviews and client video testimonials already published on the business Instagram account as authentic social-proof sources. A carefully designed testimonial/editorial section is approved as a **future content feature**, but individual quotes, names, likenesses and videos require verification and appropriate permissions before publishing. Follow [docs/customer-testimonials.md](customer-testimonials.md) for sources, compliant Google link/display options, attribution and luxury art direction. Do not scrape Google reviews or invent social proof.
+
 ## Assets required
 Approved logo, original event photography/video with publication rights, verified services and coverage, contact details, hours, legal/privacy text, enquiry handling owners, authentic testimonials with permission. Until supplied, mark the content as placeholder and do not ship production claims.
