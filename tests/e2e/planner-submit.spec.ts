@@ -262,6 +262,29 @@ test("server validation errors take the visitor to the right step with a clear m
   await expect(phone).toHaveAttribute("aria-describedby", "planner-error-msg");
 });
 
+test("keeps a server field error until that answer is corrected", async ({ page }) => {
+  await setup(page, () => ({
+    status: 422,
+    body: { error: "invalid_enquiry", errors: { name: "too_long" } },
+  }));
+  await toReview(page);
+  await waitForFakeCheck(page);
+  await page.getByRole("button", { name: "Send enquiry" }).click();
+  const name = page.getByLabel("Your name");
+  await expect(name).toHaveAttribute("aria-invalid", "true");
+
+  // A different contact answer cannot resolve the server's rejected name.
+  await page.getByRole("checkbox", { name: /future offers/ }).check();
+  await expect(page.getByRole("alert")).toContainText("name is a little long");
+  await expect(name).toHaveAttribute("aria-invalid", "true");
+  await expect(name).toHaveAttribute("aria-describedby", "planner-error-msg");
+
+  await name.fill("Revised Person");
+  await expect(page.getByRole("alert")).toBeEmpty();
+  await expect(name).not.toHaveAttribute("aria-invalid");
+  await expect(name).not.toHaveAttribute("aria-describedby");
+});
+
 test("nothing is sent before the human check completes", async ({ page }) => {
   const calls: unknown[] = [];
   await page.route("https://challenges.cloudflare.com/**", (r) =>
