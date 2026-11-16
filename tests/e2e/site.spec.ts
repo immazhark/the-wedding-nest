@@ -263,3 +263,8 @@ test("official logo is used in the header and footer with accessible names", asy
   expect((await page.request.get("/favicon.svg")).status()).toBe(200);
   expect((await page.request.get("/apple-touch-icon.png")).status()).toBe(200);
 });
+
+test("non-sending preview clearly discloses that enquiries are disabled", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByText("Preview: the planner can’t send enquiries yet.")).toBeVisible();
+});
