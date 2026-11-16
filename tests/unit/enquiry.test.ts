@@ -121,6 +121,22 @@ describe("validateEnquiry (server-grade, accepts unknown input)", () => {
     }
   });
 
+  it("rejects duplicated occasion, service and style choices from untrusted JSON", () => {
+    const variants = [
+      { occasions: ["nikah", "nikah"] },
+      { services: ["catering", "catering"] },
+      { styles: ["heritage", "heritage"] },
+    ] as const;
+    for (const fields of variants) {
+      const result = validateEnquiry({ ...complete(), ...fields });
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        const field = Object.keys(fields)[0] as "occasions" | "services" | "styles";
+        expect(result.errors[field]).toBe("invalid");
+      }
+    }
+  });
+
   it("rejects a service that is not offered for the chosen occasions", () => {
     const r = validateEnquiry({
       ...complete(),
