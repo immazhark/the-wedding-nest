@@ -57,6 +57,18 @@ describe("approved event media catalog", () => {
     expect(() => buildApprovedMediaCatalog({}, { [file]: image })).toThrow(/unreviewed/i);
   });
 
+  it("rejects unreviewed event files missed by the supported-image glob", () => {
+    const unsupported = "../../assets/events/nikah/courtyard-wedding/family.gif";
+    expect(() => buildApprovedMediaCatalog({}, {}, [unsupported])).toThrow(/unreviewed/i);
+    const manifest = { [manifestPath]: { images: [entry] } };
+    const images = { [file]: image };
+    expect(() => buildApprovedMediaCatalog(manifest, images, [file, unsupported])).toThrow(
+      /unreviewed/i,
+    );
+    const catalog = buildApprovedMediaCatalog(manifest, images, [file]);
+    expect(catalog["home-hero"]?.entry.file).toBe(file);
+  });
+
   it("rejects duplicate editorial slots and photographs across separate manifests", () => {
     const second = "../../assets/events/nikah/2026-02-courtyard-nikah/01-ceremony.jpg";
     const other = { ...entry, file: second, category: "nikah", releaseRef: "TWN-REL-2026-B002" };
