@@ -11,7 +11,23 @@ src/assets/events/<category>/<event-slug>/<nn>-<short-description>.jpg
 `<category>`: `nikah`, `walima`, `mehndi`, `shaadi`, `engagement`, `reception`, `sangeet`, `celebrations`, `corporate`, `catering`, `decor`, `details`.
 `<event-slug>`: a neutral label, e.g. `2025-12-garden-walima`. No family names unless they have agreed to be named.
 
-Each image is registered with a small entry, `src/content/media/<event-slug>.json`, validated by `src/lib/media/schema.ts`: anything without `"permission": true` is rejected (unit tested).
+Each image is registered with a small entry, `src/content/media/<event-slug>.json`,
+validated by `mediaManifestSchema` in `src/lib/media/schema.ts`. The path must
+be a local file under `../../assets/events/<category>/<event-slug>/<image>.jpg`
+(or `.jpeg`, `.png`, `.webp`, `.avif`), and the category folder must match
+the metadata. External URLs, parent-directory traversal, unsupported formats and
+duplicate image entries are rejected.
+
+A photograph supplied to `Frame.astro` must also have its validated metadata
+passed as `entry`; missing or invalid entries fail the Astro build. The frame
+renders the declared alt text, focal point, caption and credit, rather than
+unreviewed image props. Placeholder frames still work without entries.
+
+**Important:** `"permission": true` is an editor's declaration, not evidence
+that consent exists. Before any file or manifest is committed for publication,
+retain an independent record of the family's and photographer's permission,
+verify attribution, and obtain the owner's approval. The manifest directory is
+a handover convention, not an automatic gallery-loader yet.
 
 ```json
 {

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { focalClass, mediaEntrySchema, RATIOS } from "../../src/lib/media/schema";
+import {
+  focalClass,
+  mediaEntrySchema,
+  mediaManifestSchema,
+  publishedMediaForFrame,
+  RATIOS,
+} from "../../src/lib/media/schema";
 
 const entry = {
   file: "../../assets/events/walima/2025-12-garden-walima/01-stage-wide.jpg",
@@ -20,6 +26,33 @@ describe("media manifest schema", () => {
     for (const permission of [false, undefined, "yes"]) {
       expect(mediaEntrySchema.safeParse({ ...entry, permission }).success).toBe(false);
     }
+  });
+
+  it("refuses external, absolute, traversing or category-mismatched sources", () => {
+    const invalid = [
+      "https://example.com/wedding.jpg",
+      "/private/wedding.jpg",
+      "../../assets/events/nikah/2025-12-garden-walima/01-stage-wide.jpg",
+      "../../assets/events/walima/../../private/01-stage-wide.jpg",
+      "../../assets/events/walima/2025-12-garden-walima/01-stage-wide.svg",
+      "../../assets/events/walima/2025-12-garden-walima/01-stage-wide.jpg?x=1",
+      "../../assets/events/walima/2025-12-garden-walima/01-stage-wide.jpg/extra",
+    ];
+    for (const file of invalid) {
+      expect(mediaEntrySchema.safeParse({ ...entry, file }).success, file).toBe(false);
+    }
+  });
+
+  it("rejects duplicate photo entries in a gallery manifest", () => {
+    expect(mediaManifestSchema.safeParse({ images: [entry] }).success).toBe(true);
+    expect(mediaManifestSchema.safeParse({ images: [entry, entry] }).success).toBe(false);
+  });
+
+  it("requires verified manifest metadata before a photo can render", () => {
+    expect(publishedMediaForFrame(false, undefined)).toBeUndefined();
+    expect(() => publishedMediaForFrame(true, undefined)).toThrow();
+    expect(() => publishedMediaForFrame(true, { ...entry, permission: false })).toThrow();
+    expect(publishedMediaForFrame(true, entry)?.alt).toBe(entry.alt);
   });
 
   it("requires meaningful alt text and a known category", () => {
