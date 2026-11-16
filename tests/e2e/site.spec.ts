@@ -185,9 +185,7 @@ test.describe("mobile navigation", () => {
       .toBeGreaterThanOrEqual(header.y + header.height);
   });
 
-  test("focus moves to the section after following a same-page menu link", async ({
-    page,
-  }) => {
+  test("focus moves to the section after following a same-page menu link", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Menu" }).click();
     const nav = page.getByRole("navigation", { name: "Primary" });
