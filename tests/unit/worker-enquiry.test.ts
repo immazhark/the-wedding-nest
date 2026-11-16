@@ -280,9 +280,7 @@ describe("POST /api/enquiry", () => {
 
   it("rejects malformed guest counts without writes or false duplicate acknowledgements", async () => {
     for (const guestCount of [200, { count: 200 }, false, []]) {
-      const response = await call(
-        request({ ...ok(), enquiry: { ...validEnquiry, guestCount } }),
-      );
+      const response = await call(request({ ...ok(), enquiry: { ...validEnquiry, guestCount } }));
       expect(response.status).toBe(422);
       expect(await response.json()).toEqual({
         error: "invalid_enquiry",
