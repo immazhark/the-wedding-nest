@@ -32,7 +32,7 @@ In Claude Code Cloud, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chrom
 
 ## Structure
 
-- `src/pages/` — homepage, guided `plan-your-event`, and 404; contextual occasion/service links begin a safe preselected plan
+- `src/pages/` — homepage, guided `plan-your-event`, 404, and approval-only `services/[slug]` and `stories/[slug]` templates
 - `src/components/planner/`, `src/scripts/planner.ts` — planner UI and client controller
 - `src/layouts/BaseLayout.astro` — metadata, canonical, robots, skip link, preview notice
 - `src/components/` — header with accessible mobile menu, footer, wordmark, arch photo frame placeholder
@@ -41,6 +41,7 @@ In Claude Code Cloud, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chrom
 - `wrangler.jsonc` — Workers Static Assets + `/api/*` Worker; isolated `staging` env with its own D1
 - `src/worker/` — `POST /api/enquiry` (off in production; see docs/enquiry-api.md); `migrations/` — D1 schema
 - `src/lib/site/seo-files.ts` — generates `_headers` (security + noindex) and `robots.txt` at build time from `PUBLIC_ALLOW_INDEXING`
+- `src/lib/services/publication.ts` and `src/lib/stories/publication.ts` — fail-closed factual approval, consent-paired media and conditional homepage discovery; zero pages until individually approved
 
 ## Next milestone
 
