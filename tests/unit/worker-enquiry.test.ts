@@ -255,6 +255,25 @@ describe("POST /api/enquiry", () => {
     expect(turnstile).not.toHaveBeenCalled();
   });
 
+  it("requires an exact JSON media type and permits case-insensitive parameters", async () => {
+    for (const contentType of [
+      "application/jsonp",
+      "application/json-extra",
+      "application/json+xml",
+      "text/plain",
+      "",
+    ]) {
+      const res = await call(request(ok(), { headers: { "content-type": contentType } }));
+      expect(res.status, contentType).toBe(415);
+    }
+    expect(turnstile).not.toHaveBeenCalled();
+    const accepted = await call(
+      request(ok(), { headers: { "content-type": "Application/JSON; charset=UTF-8" } }),
+    );
+    expect(accepted.status).toBe(201);
+    expect(db.enquiries.size).toBe(1);
+  });
+
   it("requires JSON, a bounded body and parseable content", async () => {
     expect((await call(request(ok(), { headers: { "content-type": "text/plain" } }))).status).toBe(
       415,
