@@ -24,10 +24,16 @@ renders the declared alt text, focal point, caption and credit, rather than
 unreviewed image props. Placeholder frames still work without entries.
 
 **Important:** `"permission": true` is an editor's declaration, not evidence
-that consent exists. Before any file or manifest is committed for publication,
-retain an independent record of the family's and photographer's permission,
-verify attribution, and obtain the owner's approval. The manifest directory is
-a handover convention, not an automatic gallery-loader yet.
+that consent exists. Each photo must additionally include an opaque
+`releaseRef` such as `TWN-REL-2026-A001`, pointing to a privately held,
+verified record of the family's and photographer's permission. Never add
+family names, personal contact information, release document URLs or the
+consent document itself to the public source manifest. Before committing any
+photo, confirm the release covers that image and intended use, verify
+attribution, and obtain the owner's explicit approval. The format of a
+release reference is checked automatically; the underlying consent must
+still be verified by an authorised human. The manifest directory is a
+handover convention, not an automatic gallery-loader yet.
 
 ```json
 {
@@ -40,7 +46,8 @@ a handover convention, not an automatic gallery-loader yet.
       "orientation": "landscape",
       "caption": "Optional, factual.",
       "credit": "Photographer name",
-      "permission": true
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-A001"
     }
   ]
 }

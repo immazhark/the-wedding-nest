@@ -15,6 +15,7 @@ const entry = {
   orientation: "landscape",
   credit: "Photographer",
   permission: true,
+  releaseRef: "TWN-REL-2026-A001",
 };
 
 describe("media manifest schema", () => {
@@ -26,6 +27,24 @@ describe("media manifest schema", () => {
     for (const permission of [false, undefined, "yes"]) {
       expect(mediaEntrySchema.safeParse({ ...entry, permission }).success).toBe(false);
     }
+  });
+
+  it("requires an opaque consent release reference that cannot expose names or URLs", () => {
+    const invalid = [
+      undefined,
+      "",
+      "family-name-consent",
+      "https://example.com/consent.pdf",
+      "../../private/release.pdf",
+      "TWN-REL-2026-",
+      "TWN-REL-2026-☃",
+    ];
+    for (const releaseRef of invalid) {
+      expect(mediaEntrySchema.safeParse({ ...entry, releaseRef }).success, String(releaseRef)).toBe(
+        false,
+      );
+    }
+    expect(mediaEntrySchema.safeParse(entry).success).toBe(true);
   });
 
   it("refuses external, absolute, traversing or category-mismatched sources", () => {
