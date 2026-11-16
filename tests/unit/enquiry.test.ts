@@ -244,6 +244,19 @@ describe("local draft (privacy)", () => {
     expect(restoreDraft(valid, 1_000 + DRAFT_TTL_MS)).not.toBeNull();
   });
 
+  it("rejects duplicate options in restored drafts before they reach the planner", () => {
+    const saved = toDraft(complete(), 1_000);
+    expect(restoreDraft(saved, 1_001)).not.toBeNull();
+
+    for (const data of [
+      { occasions: ["nikah", "nikah"] },
+      { services: ["catering", "catering"] },
+      { styles: ["heritage", "heritage"] },
+    ]) {
+      expect(restoreDraft({ ...saved, data: { ...saved.data, ...data } }, 1_001)).toBeNull();
+    }
+  });
+
   it("discards tampered drafts", () => {
     expect(restoreDraft({ v: 1, savedAt: 0, data: { occasions: ["hack"] } }, 10)).toBeNull();
     expect(restoreDraft("nonsense", 10)).toBeNull();

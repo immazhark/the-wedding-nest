@@ -55,7 +55,13 @@ export function restoreDraft(raw: unknown, now: number): EnquiryState | null {
   const allowed = new Set<string>(serviceOptionsFor(occasions).map((s) => s.id));
   const services = Array.isArray(data.services) ? data.services : [];
   const styles = Array.isArray(data.styles) ? data.styles : [];
-  if (!services.every((s) => allowed.has(s)) || !styles.every((s) => isOneOf(STYLES, s)))
+  if (
+    new Set(occasions).size !== occasions.length ||
+    new Set(services).size !== services.length ||
+    new Set(styles).size !== styles.length ||
+    !services.every((s) => allowed.has(s)) ||
+    !styles.every((s) => isOneOf(STYLES, s))
+  )
     return null;
 
   const base = emptyEnquiry();
