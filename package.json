@@ -16,7 +16,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format:check": "prettier --write scripts/verify-editorial-fixtures.mjs tests/editorial/published-pages.spec.ts && git diff -- scripts/verify-editorial-fixtures.mjs tests/editorial/published-pages.spec.ts && exit 1",
     "verify": "npm run format:check && npm run check && npm run test && npm run build && npm run build:submit && npm run test:e2e && npm run test:runtime",
     "test:runtime": "E2E_TARGET=workerd playwright test",
     "test:editorial-fixtures": "node scripts/verify-editorial-fixtures.mjs",
