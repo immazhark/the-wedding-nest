@@ -26,6 +26,35 @@ test.beforeEach(async ({ page }) => {
   await page.reload();
 });
 
+test("conditional service link waits for a compatible occasion without guessing one", async ({
+  page,
+}) => {
+  await page.goto("/plan-your-event/?service=mehndi-artist");
+  await expect(page.getByRole("checkbox", { name: "Mehndi" })).not.toBeChecked();
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await expect(page.getByRole("radio", { name: /Specific services/ })).not.toBeChecked();
+  await page.getByRole("button", { name: "← Back" }).click();
+  await page.getByRole("checkbox", { name: "Mehndi" }).check();
+  await next(page);
+  await expect(page.getByRole("radio", { name: /Specific services/ })).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: "Mehndi artist" })).toBeChecked();
+});
+
+test("explicit full-planning choice overrides an earlier conditional service link", async ({
+  page,
+}) => {
+  await page.goto("/plan-your-event/?service=mehndi-artist");
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await page.getByRole("button", { name: "← Back" }).click();
+  await page.getByRole("checkbox", { name: "Mehndi" }).check();
+  await next(page);
+  await expect(page.getByRole("radio", { name: /End-to-end planning/ })).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: "Mehndi artist" })).toBeHidden();
+});
+
 test("walks through all five stages to a review, without sending anything", async ({ page }) => {
   const requests: string[] = [];
   page.on("request", (r) => {
