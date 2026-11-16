@@ -265,6 +265,32 @@ describe("local draft (privacy)", () => {
     expect(draft.data.styles).toEqual(["heritage"]);
   });
 
+  it("does not persist unexpected objects in draft scalar fields", () => {
+    const contaminated = {
+      phone: "PRIVATE PHONE",
+      address: "PRIVATE HOME",
+    };
+    const state = {
+      ...complete(),
+      scope: contaminated,
+      budget: contaminated,
+      guestCount: contaminated,
+      date: { kind: "date", value: contaminated },
+    } as unknown as EnquiryState;
+    const draft = toDraft(state, 1_000);
+    expect(draft.data.scope).toBeNull();
+    expect(draft.data.budget).toBeNull();
+    expect(draft.data.guestCount).toBe("");
+    expect(draft.data.date).toEqual({ kind: "undecided" });
+    expect(JSON.stringify(draft)).not.toContain("PRIVATE");
+
+    const valid = toDraft(complete(), 1_000);
+    expect(valid.data.scope).toBe("specific-services");
+    expect(valid.data.budget).toBe("discuss");
+    expect(valid.data.guestCount).toBe("350");
+    expect(valid.data.date).toEqual({ kind: "date", value: "2027-02-14" });
+  });
+
   it("serializes only approved date fields from a contaminated runtime object", () => {
     const date = {
       kind: "date" as const,
