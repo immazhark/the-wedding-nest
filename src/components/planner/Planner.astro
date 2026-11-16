@@ -56,8 +56,17 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
       <p class="eyebrow text-brass-deep" data-step-count>
         Step 1 of 5
       </p>
-      <div class="mt-3 h-px w-full bg-ink/15 lg:hidden" aria-hidden="true">
-        <div class="progress-bar h-px bg-brass-deep" data-progress-bar></div>
+      <div
+        class="mt-3 h-px w-full bg-ink/15 lg:hidden"
+        role="progressbar"
+        aria-label="Planner completion"
+        aria-valuemin="0"
+        aria-valuemax="5"
+        aria-valuenow="1"
+        aria-valuetext="Step 1 of 5"
+        data-progress-track
+      >
+        <div class="progress-bar h-px bg-brass-deep" data-progress-bar aria-hidden="true"></div>
       </div>
       <ol class="mt-6 hidden lg:block border-t border-ink/15">
         {STAGES.map((stage, i) => (
