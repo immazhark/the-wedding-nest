@@ -2,7 +2,7 @@
 
 Current state first. GitHub and Cloudflare live records remain authoritative for commits, checks and exact deployed versions. This snapshot is not a production-launch approval.
 
-**Repository baseline at this update:** `main` at `ad0cf8e6eea7217ffef38be68a68086460eeaf6b` (PR #44), preceded by `f249258fff6543107ee5c698d5d93f98e45bfc2e` (PR #43). Both PR heads passed complete CI before merging; later `main` runs and Worker deployment versions must still be checked independently.
+**Repository baseline at this update:** `main` at `777cfe391afba52519d2504415e971b81f23cb0f` (PR #51), following `de479d8d4a7dc7fb974856d1e84ff63cef86eda1` (PR #50). Both PR heads passed full CI, including the production-site and disposable editorial-fixture jobs. Check the newest combined `main` CI and Cloudflare deployments live, not this snapshot; this is not launch approval.
 
 ## Current implementation
 
@@ -13,8 +13,10 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 | Branch previews | Fixed in #11. Wrangler declares explicit preview-safe variables; enquiry intake stays off. Branch URLs are temporary and may disappear after merge. |
 | Isolated staging | https://the-wedding-nest-staging.mazharkhan-it.workers.dev/ — isolated APAC D1, public Turnstile test keys, exact staging Origin allow-list and fictional-data-only notice. |
 | Enquiry reliability | Server-side Turnstile fetch and JSON consumption have a 10-second deadline; timeout returns retryable 503 before any write. Browser script loading also has a 10-second deadline, cleans failed scripts and retries through Back → Review. Late script loads cannot render hidden review widgets. |
-| Privacy | Browser drafts exclude names, numbers, locations, notes and consent. Enquiries and an outbox event are stored atomically. No lead notifications or marketing are sent. Production retention and recipient decisions remain open. |
-| CI | Formatting, strict type checks, unit tests, production/test builds, desktop/mobile Playwright and axe, and the local Cloudflare Workers runtime. Separate deployed staging browser tests use real dummy-key verification and the live API without mocks. |
+| Privacy | Browser drafts exclude names, numbers, locations, notes and consent. Enquiries and an outbox event are stored atomically. A separate read-only impact estimator (#49) returns only retention counts; no deletion job or agreed production retention. |
+| Enquiry correctness | Reused idempotency keys acknowledge only identical validated details, including the concurrent-key race (#48). Changed details yield a conflict and a visitor-initiated fresh-send path, preserving answers. |
+| Notification foundation | #50 adds a dormant outbox lease/claim/ACK/retry core and additive v2 migration, **not applied** to Cloudflare. #51 adds a validated plain-text internal notice renderer. No recipient, provider, scheduler or send endpoint is configured; outbox events remain unsent. |
+| CI | Formatting, strict type checks, unit tests, production/test builds, desktop/mobile Playwright and axe, local Workers runtime, plus a separate disposable synthetic-content editorial browser job (#46). Separate deployed staging browser tests use real dummy-key verification and the live API without mocks. |
 | Conversion | Homepage occasions and listed service interests open the planner with allow-listed preselected choices (#41). Hidden specific services are cleared and rejected when full planning is chosen (#40). |
 | Editorial publishing | #43 adds consent-paired, owner-gated event story pages; #44 adds owner-gated service detail pages. Neither publishes a page without approved source records. #45 links pages from the homepage only after such records exist. |
 | Release gates | Production domain, indexing, real enquiry intake and unapproved business content remain owner-gated. |
@@ -24,6 +26,12 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 
 ## Latest work
 
+- #51 (`777cfe39`): private, validated, plain-text operational notice contract, no transport or recipients.
+- #50 (`de479d8`): dormant outbox leases, stale-token fencing, bounded retries and v2 SQL migration; not applied or activated.
+- #49 (`27f11e80`): read-only, aggregate-only retention assessment, no deletion route/cron.
+- #48 (`e2364a8e`): stored-payload-bound idempotency, conflict recovery and browser/SQLite regressions.
+- #47 (`1cd06e8b`): preserve approved story occasion in five-stage planner.
+- #46 (`c0235bb5`): disposable synthetic CI pages exercise approved editorial route layouts without public mock content.
 - #45: approved-only homepage discovery for portfolio stories and service details; fallback continues to the planner.
 - #44 (`ad0cf8e`): strictly approved service-detail page generation and an editorial template; no source records yet.
 - #43 (`f249258`): case-study routes tied to owner-reviewed stories and exact released original event images; zero public stories.
@@ -44,9 +52,9 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 
 ## Next work
 
-1. Verify merged `main` after #43–#45, actual Cloudflare worker versions, and the noindex/intake-off gates. The main and staging workers have separate bindings; keep production intake disabled.
+1. Verify current merged `main`, the combined CI run, and Cloudflare Workers bindings on every takeover. The public Worker must stay noindex with intake disabled and no D1, while staging remains fictional-data-only.
 2. Obtain exact business-owner approval of original event photographs, usage permissions and individual testimonials before publishing any of them. Existing image placeholders are deliberately honest.
-3. Resolve [launch-decisions.md](launch-decisions.md): named lead-response owner, notification destination, privacy contact, data retention policy and verified service/contact details. Until then, the outbox remains unsent and production lead collection disabled.
+3. Resolve [launch-decisions.md](launch-decisions.md): named lead-response owner, recipient/channel, privacy contact, retention and verified business details. The notification contract and v2 migration are **not deployed as a delivery pipeline**. Before any sender, explicitly approve and apply the migration in isolated staging, require provider-side idempotency, and test fictional records. Outbox events remain unsent, production lead collection disabled.
 4. Independently review the final responsive/cinematic creative result using approved photography, measurable accessibility/performance, and the Cloudflare preview before permitting any domain, indexing or real-enquiry activation.
 
 ## Verification commands
