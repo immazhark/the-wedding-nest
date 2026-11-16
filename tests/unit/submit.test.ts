@@ -163,6 +163,20 @@ describe("submitEnquiry", () => {
     });
   });
 
+  it("rejects forged or incomplete success acknowledgements instead of showing Sent", async () => {
+    const storedId = "f11e8989-1a22-4e2f-bc91-609acc25ef0e";
+    for (const id of ["abc", "not-a-uuid", "  " + storedId, storedId + "  "]) {
+      expect(await submitEnquiry(state(), "t", KEY, respond(201, { id }) as never)).toEqual({
+        kind: "retryable",
+      });
+    }
+    for (const status of [202, 206]) {
+      expect(
+        await submitEnquiry(state(), "t", KEY, respond(status, { id: storedId }) as never),
+      ).toEqual({ kind: "retryable" });
+    }
+  });
+
   it("maps 422 field errors so the visitor can fix them", async () => {
     const r = await submitEnquiry(
       state(),
