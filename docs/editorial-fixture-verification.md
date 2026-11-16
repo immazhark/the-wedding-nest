@@ -21,11 +21,12 @@ without placing fictional stories or service claims into the repository.
 5. Deletes every created record, image and build output even on a failed test.
    Real original media and approved source files are never overwritten.
 
-The normal production build runs **before** the fixture build in GitHub CI,
-which means that build still proves all unapproved routes are 404. Only CI
-invokes this synthetic build; running it locally requires explicit
-`TWN_ALLOW_LOCAL_FIXTURES=1`. This command is never part of Cloudflare
-deployment and fixture source files are never checked in.
+The normal production build and its unapproved-route 404 checks run in a
+**separate parallel CI job**. It uses a different checkout/workspace from the
+synthetic build, so neither job can mix real-preview outputs and fixture assets.
+Only CI invokes the synthetic build by default; running it locally requires
+explicit `TWN_ALLOW_LOCAL_FIXTURES=1`. This command is never part of
+Cloudflare deployment, and fixture source files are never checked in.
 
 **No sample service, photograph, review or customer is publication-approved by
 this test.** Production-domain, indexing, photography and real-enquiry gates
