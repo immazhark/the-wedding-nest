@@ -4,11 +4,7 @@
  * No real photography is imported or published until its original and consent record are approved.
  */
 import type { ImageMetadata } from "astro";
-import {
-  mediaManifestSchema,
-  type HomeMediaSlot,
-  type MediaEntry,
-} from "./schema";
+import { mediaManifestSchema, type HomeMediaSlot, type MediaEntry } from "./schema";
 
 export interface ApprovedPhoto {
   readonly image: ImageMetadata;
