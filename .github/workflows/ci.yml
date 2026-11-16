@@ -47,6 +47,8 @@ jobs:
           if-no-files-found: error
       - name: Same suite on the local Cloudflare Workers runtime (routing, headers, API)
         run: npm run test:runtime
+      - name: Verify populated editorial pages with disposable synthetic CI fixtures
+        run: npm run test:editorial-fixtures
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
