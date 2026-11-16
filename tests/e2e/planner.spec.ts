@@ -56,7 +56,7 @@ test("homepage occasion links open the planner with only the chosen occasion sel
   page,
 }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: /Nikah.*start planning/i }).click();
+  await page.getByRole("link", { name: "Nikah" }).click();
   await expect(page).toHaveURL(/\/plan-your-event\/\?occasion=nikah$/);
   await expect(page.getByRole("checkbox", { name: "Nikah" })).toBeChecked();
   await expect(page.getByRole("checkbox", { name: "Walima" })).not.toBeChecked();
