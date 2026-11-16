@@ -12,7 +12,7 @@ test("approved service template renders a useful, accessible and linked page", a
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "CI-only service page — never publish",
   );
-  await expect(page.getByRole("heading", { level: 2 })).toHaveCount(2);
+  await expect(page.locator("main article").getByRole("heading", { level: 2 })).toHaveCount(2);
   await expect(page.getByRole("link", { name: "Explore in the planner" })).toHaveAttribute(
     "href",
     "/plan-your-event/?service=catering",
@@ -36,7 +36,7 @@ test("approved story template renders only its released fixture photographs", as
   await expect(images.nth(1)).toHaveAttribute("alt", /synthetic/i);
   await expect(page.getByRole("link", { name: "Start planning" })).toHaveAttribute(
     "href",
-    "/plan-your-event/",
+    "/plan-your-event/?occasion=walima",
   );
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
 });
