@@ -39,7 +39,7 @@ test("approved story template renders only its released fixture photographs", as
   await expect(images.nth(1)).toHaveAttribute("alt", /synthetic/i);
   await expect(page.getByRole("link", { name: "Start planning" })).toHaveAttribute(
     "href",
-    "/plan-your-event/?occasion=walima",
+    "/plan-your-event/",
   );
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
