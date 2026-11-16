@@ -370,9 +370,23 @@ export function initPlanner(form: HTMLFormElement) {
     if (prev) show(prev);
   });
 
-  form.addEventListener("change", () => {
+  // localStorage is synchronous. Only persistent planning choices should trigger
+  // writes; typing a name, phone, venue or notes never touches browser storage.
+  const draftFields = new Set([
+    "occasions",
+    "scope",
+    "services",
+    "styles",
+    "dateKind",
+    "date",
+    "guestCount",
+    "budget",
+  ]);
+  form.addEventListener("change", (event) => {
     syncConditional();
-    storage.save(readState(form));
+    const target = event.target;
+    if (target instanceof HTMLInputElement && draftFields.has(target.name))
+      storage.save(readState(form));
     if (
       current !== "review" &&
       current !== "sent" &&
@@ -381,7 +395,12 @@ export function initPlanner(form: HTMLFormElement) {
     )
       errorEl.textContent = "";
   });
-  form.addEventListener("input", () => storage.save(readState(form)));
+  form.addEventListener("input", (event) => {
+    const target = event.target;
+    // Keep free-form count/date edits resumable before they lose focus.
+    if (target instanceof HTMLInputElement && ["guestCount", "date"].includes(target.name))
+      storage.save(readState(form));
+  });
 
   summaryEl.addEventListener("click", (event) => {
     if (current !== "review" || sending?.isBusy()) return;
