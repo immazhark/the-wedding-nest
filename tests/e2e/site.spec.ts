@@ -354,6 +354,15 @@ test("official logo is used in the header and footer with accessible names", asy
   expect((await page.request.get("/apple-touch-icon.png")).status()).toBe(200);
 });
 
+test("preview contact fields do not invite personal-data autofill", async ({ page }) => {
+  await page.goto("/plan-your-event/");
+  const form = page.locator("[data-planner-form]");
+  await expect(form).toHaveAttribute("data-submit", "off");
+  for (const name of ["name", "phone"]) {
+    await expect(form.locator(`input[name="${name}"]`)).toHaveAttribute("autocomplete", "off");
+  }
+});
+
 test("non-sending preview clearly discloses that enquiries are disabled", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByText("Preview: the planner can’t send enquiries yet.")).toBeVisible();

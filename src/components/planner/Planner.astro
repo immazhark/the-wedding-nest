@@ -261,7 +261,7 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
               id="pl-name"
               name="name"
               type="text"
-              autocomplete="name"
+              autocomplete={sending ? "name" : "off"}
               maxlength={LIMITS.name}
               class="field-input"
               required
@@ -275,7 +275,7 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
               id="pl-phone"
               name="phone"
               type="tel"
-              autocomplete="tel"
+              autocomplete={sending ? "tel" : "off"}
               maxlength={LIMITS.phone}
               class="field-input"
               required
