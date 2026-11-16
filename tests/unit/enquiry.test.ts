@@ -231,6 +231,54 @@ describe("validateEnquiry (server-grade, accepts unknown input)", () => {
 });
 
 describe("local draft (privacy)", () => {
+
+  it("serializes only approved date fields from a contaminated runtime object", () => {
+    const date = {
+      kind: "date" as const,
+      value: "2027-02-14",
+      phone: "PRIVATE PHONE",
+      location: "PRIVATE HOME ADDRESS",
+    };
+    const draft = toDraft({ ...complete(), date }, 1_000);
+    expect(draft.data.date).toEqual({ kind: "date", value: "2027-02-14" });
+    expect(JSON.stringify(draft)).not.toContain("PRIVATE");
+    expect(draft.savedAt).toBe(1_000);
+  });
+
+  it("scrubs nested date fields when restoring and rewriting a legacy draft", () => {
+    const saved = toDraft(complete(), 1_000);
+    const restored = restoreDraft(
+      {
+        ...saved,
+        data: {
+          ...saved.data,
+          date: {
+            kind: "date",
+            value: "2027-02-14",
+            phone: "PRIVATE PHONE",
+            location: "PRIVATE HOME ADDRESS",
+          },
+        },
+      },
+      1_001,
+    );
+    expect(restored?.date).toEqual({ kind: "date", value: "2027-02-14" });
+    expect(restored).not.toBeNull();
+    const rewritten = toDraft(restored!, saved.savedAt);
+    expect(JSON.stringify(rewritten)).not.toContain("PRIVATE");
+    expect(rewritten.savedAt).toBe(1_000);
+  });
+
+  it("does not coerce malformed nested date values into valid dates", () => {
+    const saved = toDraft(complete(), 1_000);
+    for (const value of [["2027-02-14"], { value: "2027-02-14" }, null, 20270214]) {
+      const restored = restoreDraft(
+        { ...saved, data: { ...saved.data, date: { kind: "date", value } } },
+        1_001,
+      );
+      expect(restored?.date).toEqual({ kind: "undecided" });
+    }
+  });
   it("never includes contact details or notes", () => {
     const draft = toDraft(complete(), 0);
     const json = JSON.stringify(draft);
