@@ -92,6 +92,7 @@ test("discloses before the first step that sending is off and real details shoul
   await expect(disclosure).toBeVisible();
   await expect(disclosure).toContainText("enquiries can’t be sent yet");
   await expect(disclosure).toContainText("don’t enter real contact details");
+  await expect(disclosure).toContainText(/message\s+@twn\.events\s+on Instagram\./);
   const disclosureBox = await disclosure.boundingBox();
   const firstQuestion = await heading(page).boundingBox();
   expect(disclosureBox!.y).toBeLessThan(firstQuestion!.y);
