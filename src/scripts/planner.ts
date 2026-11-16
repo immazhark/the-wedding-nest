@@ -334,7 +334,9 @@ export function initPlanner(form: HTMLFormElement) {
           ? "name"
           : stageError("contact", { ...s, consent: true })
             ? "phone"
-            : null
+            : s.consent
+              ? null
+              : "consent"
         : stage === "logistics"
           ? s.date.kind === "date" && stageError("logistics", { ...s, guestCount: "" })
             ? "date"
@@ -381,6 +383,22 @@ export function initPlanner(form: HTMLFormElement) {
     )
       errorEl.textContent = "";
   });
+  // Once the visitor supplies the required consent, remove its stale error
+  // state immediately instead of leaving the checkbox flagged after correction.
+  form.addEventListener("change", (event) => {
+    const consent = form.elements.namedItem("consent");
+    if (
+      current === "contact" &&
+      event.target === consent &&
+      !stageError("contact", readState(form)) &&
+      consent instanceof HTMLElement
+    ) {
+      consent.removeAttribute("aria-invalid");
+      consent.removeAttribute("aria-describedby");
+      errorEl.textContent = "";
+    }
+  });
+
   form.addEventListener("input", () => storage.save(readState(form)));
 
   summaryEl.addEventListener("click", (event) => {
