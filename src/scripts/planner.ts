@@ -416,7 +416,16 @@ export function initPlanner(form: HTMLFormElement) {
   // real contact details. This control does not exist in submission-enabled builds.
   const previewSkip = form.querySelector<HTMLButtonElement>("[data-preview-skip-contact]");
   previewSkip?.addEventListener("click", () => {
-    if (!sending && current === "contact") show("review");
+    if (sending || current !== "contact") return;
+    for (const name of ["name", "phone"]) {
+      const field = form.elements.namedItem(name);
+      if (field instanceof HTMLInputElement) field.value = "";
+    }
+    for (const name of ["consent", "marketingConsent"]) {
+      const field = form.elements.namedItem(name);
+      if (field instanceof HTMLInputElement) field.checked = false;
+    }
+    show("review");
   });
 
   backBtn.addEventListener("click", () => {
