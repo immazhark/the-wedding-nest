@@ -12,6 +12,7 @@ import {
   isOneOf,
   serviceOptionsFor,
   type EnquiryState,
+  type EventDate,
 } from "./schema";
 import { isValidDate, isValidGuestCount } from "./validate";
 
@@ -26,10 +27,12 @@ export type Draft = { v: 1; savedAt: number; data: DraftData };
 
 export function toDraft(s: EnquiryState, now: number): Draft {
   const { occasions, scope, services, styles, date, guestCount, budget } = s;
+  const savedDate: EventDate =
+    date.kind === "date" ? { kind: "date", value: date.value } : { kind: "undecided" };
   return {
     v: 1,
     savedAt: now,
-    data: { occasions, scope, services, styles, date, guestCount, budget },
+    data: { occasions, scope, services, styles, date: savedDate, guestCount, budget },
   };
 }
 
@@ -66,7 +69,12 @@ export function restoreDraft(raw: unknown, now: number): EnquiryState | null {
 
   const base = emptyEnquiry();
   const scope = isOneOf(SCOPES, data.scope) ? data.scope : null;
-  const date = data.date?.kind === "date" && isValidDate(data.date.value) ? data.date : base.date;
+  const date: EventDate =
+    data.date?.kind === "date" &&
+    typeof data.date.value === "string" &&
+    isValidDate(data.date.value)
+      ? { kind: "date", value: data.date.value }
+      : base.date;
   return {
     ...base,
     occasions,

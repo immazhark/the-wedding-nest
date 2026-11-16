@@ -273,7 +273,12 @@ test("scrubs unapproved fields from valid legacy drafts without resetting expiry
             scope: null,
             services: [],
             styles: [],
-            date: { kind: "undecided" },
+            date: {
+              kind: "date",
+              value: "2027-02-14",
+              phone: "PRIVATE NESTED PHONE",
+              location: "PRIVATE NESTED HOME ADDRESS",
+            },
             guestCount: "",
             budget: null,
             location: "PRIVATE HOME ADDRESS",
@@ -289,6 +294,8 @@ test("scrubs unapproved fields from valid legacy drafts without resetting expiry
   expect(cleaned).toContain('"nikah"');
   expect(cleaned).not.toContain("PRIVATE HOME ADDRESS");
   expect(cleaned).not.toContain("PRIVATE PHONE");
+  expect(cleaned).not.toContain("PRIVATE NESTED");
+  expect(JSON.parse(cleaned).data.date).toEqual({ kind: "date", value: "2027-02-14" });
   expect(JSON.parse(cleaned).savedAt).toBe(savedAt);
 });
 
