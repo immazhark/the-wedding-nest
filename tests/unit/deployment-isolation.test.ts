@@ -30,7 +30,8 @@ describe("enquiry deployment isolation", () => {
       },
     ]);
     const namespaces = Object.values(config.env).flatMap(
-      (environment: any) => (environment.ratelimits ?? []).map((binding: any) => binding.namespace_id),
+      (environment: { ratelimits?: { namespace_id: string }[] }) =>
+        (environment.ratelimits ?? []).map((binding) => binding.namespace_id),
     );
     expect(new Set(namespaces).size).toBe(namespaces.length);
   });
