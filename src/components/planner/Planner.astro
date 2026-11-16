@@ -371,15 +371,14 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
               Copy planning choices
             </button>
             <p class="mt-3 text-sm text-muted">
-              Copies only your planning selections. Name, phone, venue and notes are excluded.
-              You decide whether to share the text.
+              Copies only your planning choices; no name, phone, venue or notes.
             </p>
             <p
               class="mt-2 text-sm text-charcoal"
               role="status"
               aria-live="polite"
               data-copy-status
-            ></p>
+            />
           </div>
         )}
       </section>
