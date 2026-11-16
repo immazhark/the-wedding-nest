@@ -249,7 +249,10 @@ describe("POST /api/enquiry", () => {
 
   it("rejects malformed selections before storage and on duplicate retries", async () => {
     for (const field of ["services", "styles"] as const) {
-      const malformed = { ...ok(), enquiry: { ...validEnquiry, [field]: "private-invalid-choice" } };
+      const malformed = {
+        ...ok(),
+        enquiry: { ...validEnquiry, [field]: "private-invalid-choice" },
+      };
       const response = await call(request(malformed));
       expect(response.status).toBe(422);
       expect(await response.json()).toEqual({
