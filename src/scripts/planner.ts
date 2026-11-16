@@ -114,6 +114,7 @@ export function initPlanner(form: HTMLFormElement) {
   const summaryEl = form.querySelector<HTMLElement>("[data-summary]")!;
   const stepCount = root.querySelector<HTMLElement>("[data-step-count]");
   const progressBar = root.querySelector<HTMLElement>("[data-progress-bar]");
+  const progressTrack = root.querySelector<HTMLElement>("[data-progress-track]");
   const resetBtn = form.querySelector<HTMLButtonElement>("[data-reset]")!;
   const reviewReturnBtn = form.querySelector<HTMLButtonElement>("[data-review-return]")!;
   let current: Panel = "occasion";
@@ -318,6 +319,8 @@ export function initPlanner(form: HTMLFormElement) {
           : panel === "review"
             ? "Review"
             : `Step ${index + 1} of ${STAGES.length}`;
+    progressTrack?.setAttribute("aria-valuenow", String(Math.min(index + 1, STAGES.length)));
+    progressTrack?.setAttribute("aria-valuetext", stepCount?.textContent ?? "");
     // CSSOM writes are allowed by the CSP (inline style attributes in markup are not).
     progressBar?.style.setProperty(
       "width",
