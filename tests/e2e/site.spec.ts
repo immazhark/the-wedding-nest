@@ -82,9 +82,7 @@ test("skip link moves focus to main content", async ({ page }) => {
 test.describe("mobile navigation", () => {
   test.skip(({ isMobile }) => !isMobile, "mobile only");
 
-  test("opens, focuses navigation, closes with Escape and restores focus", async ({
-    page,
-  }) => {
+  test("opens, focuses navigation, closes with Escape and restores focus", async ({ page }) => {
     await page.goto("/");
     const toggle = page.getByRole("button", { name: "Menu" });
     const nav = page.getByRole("navigation", { name: "Primary" });
