@@ -9,8 +9,7 @@ import { MEDIA_CATEGORIES, mediaEntrySchema } from "../media/schema";
 import { approvedEventPhotos } from "../media/catalog";
 
 const NEUTRAL_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const SOURCE_PATH =
-  /^\.\.\/\.\.\/content\/stories\/([a-z0-9]+(?:-[a-z0-9]+)*)\.json$/;
+const SOURCE_PATH = /^\.\.\/\.\.\/content\/stories\/([a-z0-9]+(?:-[a-z0-9]+)*)\.json$/;
 
 export const storySchema = z
   .object({
