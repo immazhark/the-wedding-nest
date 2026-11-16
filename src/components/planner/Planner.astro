@@ -36,23 +36,21 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
         Preview — enquiries can’t be sent yet
       </p>
       <p class="mt-3 text-charcoal">
-        You’re welcome to explore the planner, but please{" "}
-        <strong>don’t enter real contact details</strong>: this preview can’t send them to The
-        Wedding Nest. To get in touch now, message{" "}
+        Explore the planner, but <strong>don’t enter real contact details</strong>. Enquiries can’t
+        be sent yet. To get in touch, message{" "}
         <a href={SITE.instagram} class="underline decoration-brass underline-offset-4">
           @twn.events
         </a>{" "}
         on Instagram.
       </p>
       <p class="mt-2 text-sm text-muted">
-        Your occasion, service, style, date, guest-count and budget choices are kept in this browser
-        for 7 days so you can return to them. Your name, number, venue and notes are never saved,
-        and nothing leaves your device.
+        Planning choices stay in this browser for 7 days. Names, phone numbers, venue details and
+        notes are never saved or sent.
       </p>
     </div>
   )}
 
-  <div class="js-only mt-12 grid gap-10 lg:grid-cols-12">
+  <div class="js-only mt-7 sm:mt-12 grid gap-10 lg:grid-cols-12">
     <!-- Progress -->
     <nav class="lg:col-span-4" aria-label="Planner progress">
       <p class="eyebrow text-brass-deep" data-step-count>
@@ -424,9 +422,14 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
   }
   .disclosure {
     max-width: 52rem;
-    padding: 1.25rem 1.5rem;
+    padding: 1rem 1.1rem;
     border-left: 2px solid var(--color-brass);
     background: var(--color-paper);
+  }
+  @media (min-width: 640px) {
+    .disclosure {
+      padding: 1.25rem 1.5rem;
+    }
   }
   .stage-legend {
     padding: 0;
