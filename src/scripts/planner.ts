@@ -545,6 +545,7 @@ export function initPlanner(form: HTMLFormElement) {
 
   resetBtn.addEventListener("click", () => {
     editingReview = false;
+    pendingService = undefined;
     storage.clear();
     form.reset();
     applyState(form, emptyEnquiry());
