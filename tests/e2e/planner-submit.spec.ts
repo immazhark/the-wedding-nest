@@ -256,6 +256,10 @@ test("server validation errors take the visitor to the right step with a clear m
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.getByRole("heading", { name: "How should we reach you?" })).toBeVisible();
   await expect(page.getByRole("alert")).toContainText("phone or WhatsApp number");
+  const phone = page.getByLabel("Phone or WhatsApp number");
+  await expect(phone).toBeFocused();
+  await expect(phone).toHaveAttribute("aria-invalid", "true");
+  await expect(phone).toHaveAttribute("aria-describedby", "planner-error-msg");
 });
 
 test("nothing is sent before the human check completes", async ({ page }) => {
