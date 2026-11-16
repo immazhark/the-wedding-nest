@@ -293,9 +293,7 @@ describe("POST /api/enquiry", () => {
     const blank = { ...ok(), enquiry: { ...validEnquiry, guestCount: "" } };
     expect((await call(request(blank))).status).toBe(201);
     turnstile.mockClear();
-    const retry = await call(
-      request({ ...ok(), enquiry: { ...validEnquiry, guestCount: 200 } }),
-    );
+    const retry = await call(request({ ...ok(), enquiry: { ...validEnquiry, guestCount: 200 } }));
     expect(retry.status).toBe(422);
     expect(await retry.json()).toEqual({
       error: "invalid_enquiry",
