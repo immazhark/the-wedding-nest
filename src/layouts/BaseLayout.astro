@@ -3,7 +3,14 @@ import "../styles/global.css";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import PreviewNotice from "../components/PreviewNotice.astro";
-import { ALLOW_INDEXING, SITE, canonicalUrl, pageTitle, robotsContent } from "../lib/site/config";
+import {
+  ALLOW_INDEXING,
+  SITE,
+  canonicalUrl,
+  organizationJsonLd,
+  pageTitle,
+  robotsContent,
+} from "../lib/site/config";
 
 interface Props {
   title?: string;
@@ -38,6 +45,7 @@ const canonical = canonicalUrl(Astro.url.pathname);
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={SITE.locale} />
     <meta name="twitter:card" content="summary" />
+    <script type="application/ld+json" is:inline set:html={organizationJsonLd()}></script>
   </head>
   <body class="min-h-dvh flex flex-col">
     <a
