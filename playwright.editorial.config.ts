@@ -16,12 +16,12 @@ export default defineConfig({
     { name: "editorial-mobile", use: { ...devices["Pixel 7"] } },
   ],
   use: {
-    baseURL: `http://127.0.0.1:${PORT}`,
+    baseURL: `http://localhost:${PORT}`,
     launchOptions: executablePath ? { executablePath } : {},
   },
   webServer: {
     command: `npx astro preview --port ${PORT} --ignore-lock`,
-    url: `http://127.0.0.1:${PORT}`,
+    url: `http://localhost:${PORT}`,
     env: { ASTRO_OUT_DIR: "./dist-editorial-fixtures" },
     reuseExistingServer: false,
     timeout: 120_000,
