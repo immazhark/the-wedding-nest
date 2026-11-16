@@ -12,6 +12,7 @@ import {
 } from "../lib/enquiry/schema";
 import { firstIncompleteStage, nextStage, previousStage, stageError } from "../lib/enquiry/flow";
 import { DRAFT_STORAGE_KEY, restoreDraft, toDraft } from "../lib/enquiry/draft";
+import { applyPlannerIntent, readPlannerIntent } from "../lib/enquiry/intent";
 import { summarise } from "../lib/enquiry/summary";
 import { FIELD_STAGE, fieldMessage, submitEnquiry } from "../lib/enquiry/submit";
 import { createTurnstileLoader } from "../lib/enquiry/turnstile";
@@ -449,7 +450,10 @@ export function initPlanner(form: HTMLFormElement) {
     storage.clear();
     if (restored) storage.save(restored, (rawDraft as { savedAt: number }).savedAt);
   }
-  applyState(form, restored ?? emptyEnquiry());
+  const restoredState = restored ?? emptyEnquiry();
+  const initialState = applyPlannerIntent(restoredState, readPlannerIntent(window.location.search));
+  applyState(form, initialState);
   syncConditional();
+  if (initialState !== restoredState) storage.save(readState(form));
   show("occasion", false);
 }

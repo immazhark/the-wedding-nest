@@ -103,7 +103,9 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
             <ul class="service-index mt-6" aria-label="Services you can ask about">
               {coreServices.map((s, i) => (
                 <li>
-                  {s.label}
+                  <a href={`/plan-your-event/?service=${s.id}`} class="link-underline">
+                    {s.label}
+                  </a>
                   {i < coreServices.length - 1 && (
                     <span class="text-brass" aria-hidden="true">
                       &nbsp;/
@@ -131,7 +133,12 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
       <ul class="mt-16 border-t border-ink/15" role="list">
         {weddingOccasions.map((o) => (
           <li class="occasion-row scroll-rise">
-            <span class="occasion-name">{o.label}</span>
+            <a
+              href={`/plan-your-event/?occasion=${o.id}`}
+              class="occasion-name underline decoration-brass underline-offset-8"
+            >
+              {o.label}
+            </a>
             <span class="occasion-note">{occasionNotes[o.id]}</span>
           </li>
         ))}
