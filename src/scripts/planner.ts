@@ -10,7 +10,7 @@ import {
   type EnquiryState,
   type StageId,
 } from "../lib/enquiry/schema";
-import { nextStage, previousStage, stageError } from "../lib/enquiry/flow";
+import { firstIncompleteStage, nextStage, previousStage, stageError } from "../lib/enquiry/flow";
 import { DRAFT_STORAGE_KEY, restoreDraft, toDraft } from "../lib/enquiry/draft";
 import { summarise } from "../lib/enquiry/summary";
 import { FIELD_STAGE, fieldMessage, submitEnquiry } from "../lib/enquiry/submit";
@@ -108,7 +108,9 @@ export function initPlanner(form: HTMLFormElement) {
   const stepCount = root.querySelector<HTMLElement>("[data-step-count]");
   const progressBar = root.querySelector<HTMLElement>("[data-progress-bar]");
   const resetBtn = form.querySelector<HTMLButtonElement>("[data-reset]")!;
+  const reviewReturnBtn = form.querySelector<HTMLButtonElement>("[data-review-return]")!;
   let current: Panel = "occasion";
+  let editingReview = false;
   const sending = form.dataset["submit"] === "on" ? initSending() : null;
 
   /** Live submission (only when the build enables it). */
@@ -141,6 +143,9 @@ export function initPlanner(form: HTMLFormElement) {
       sendBtn.disabled = true;
       backBtn.disabled = true;
       resetBtn.disabled = true;
+      summaryEl.querySelectorAll<HTMLButtonElement>("[data-edit-stage]").forEach((button) => {
+        button.disabled = true;
+      });
       form.setAttribute("aria-busy", "true");
       sendLabel.textContent = "Sending…";
       status.textContent = "";
@@ -150,6 +155,9 @@ export function initPlanner(form: HTMLFormElement) {
       sendBtn.disabled = false;
       backBtn.disabled = false;
       resetBtn.disabled = false;
+      summaryEl.querySelectorAll<HTMLButtonElement>("[data-edit-stage]").forEach((button) => {
+        button.disabled = false;
+      });
       form.removeAttribute("aria-busy");
       sendLabel.textContent = "Send enquiry";
       switch (result.kind) {
@@ -185,6 +193,7 @@ export function initPlanner(form: HTMLFormElement) {
     });
 
     return {
+      isBusy: () => busy,
       async enterReview() {
         reviewing = true;
         const attempt = ++reviewAttempt;
@@ -245,7 +254,16 @@ export function initPlanner(form: HTMLFormElement) {
         const dt = document.createElement("dt");
         dt.textContent = row.label;
         const dd = document.createElement("dd");
-        dd.textContent = row.value; // textContent: user input is never parsed as HTML
+        const value = document.createElement("span");
+        value.className = "summary-value";
+        value.textContent = row.value; // Never interpret user-supplied answers as HTML.
+        const edit = document.createElement("button");
+        edit.type = "button";
+        edit.className = "summary-edit link-underline";
+        edit.dataset["editStage"] = row.stage;
+        edit.setAttribute("aria-label", `Edit ${row.label.toLowerCase()}`);
+        edit.textContent = "Edit";
+        dd.append(value, edit);
         return [dt, dd];
       }),
     );
@@ -254,6 +272,7 @@ export function initPlanner(form: HTMLFormElement) {
   const order: Panel[] = [...STAGES.map((s) => s.id), "review"];
 
   function show(panel: Panel, focus = true) {
+    if (panel === "review" || panel === "sent") editingReview = false;
     // Only real navigation animates; the initial render stays still.
     if (focus)
       form.dataset["direction"] =
@@ -282,6 +301,7 @@ export function initPlanner(form: HTMLFormElement) {
       else item.removeAttribute("aria-current");
     });
     backBtn.hidden = panel === "occasion" || panel === "sent";
+    reviewReturnBtn.hidden = !editingReview || panel === "review" || panel === "sent";
     nextBtn.hidden = panel === "review" || panel === "sent";
     resetBtn.hidden = panel === "sent";
     resetBtn.closest<HTMLElement>(".planner-nav")!.hidden = panel === "sent";
@@ -358,7 +378,30 @@ export function initPlanner(form: HTMLFormElement) {
   });
   form.addEventListener("input", () => storage.save(readState(form)));
 
+  summaryEl.addEventListener("click", (event) => {
+    if (current !== "review" || sending?.isBusy()) return;
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-edit-stage]");
+    const target = button?.dataset["editStage"];
+    if (!STAGES.some((stage) => stage.id === target)) return;
+    editingReview = true;
+    show(target as StageId);
+  });
+
+  reviewReturnBtn.addEventListener("click", () => {
+    if (!editingReview || current === "review" || current === "sent") return;
+    const state = readState(form);
+    const incomplete = firstIncompleteStage(state);
+    if (incomplete) {
+      show(incomplete);
+      errorEl.textContent = stageError(incomplete, state) ?? "Please review this step.";
+      markInvalid(incomplete, state);
+      return;
+    }
+    show("review");
+  });
+
   resetBtn.addEventListener("click", () => {
+    editingReview = false;
     storage.clear();
     form.reset();
     applyState(form, emptyEnquiry());
