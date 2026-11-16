@@ -182,6 +182,14 @@ export function initPlanner(form: HTMLFormElement) {
           errorEl.textContent = fieldMessage(field, code);
           return;
         }
+        case "conflict":
+          // The previous key refers to another stored payload. Never claim
+          // changes were saved, and never auto-send a second enquiry.
+          key = null;
+          resetCheck();
+          status.textContent =
+            "An earlier enquiry may already be saved under this reference, but these answers differ. Please review your details and send again to create a separate enquiry.";
+          return;
         case "verification":
           resetCheck();
           status.textContent = "The quick check expired. Please let it finish again, then send.";
