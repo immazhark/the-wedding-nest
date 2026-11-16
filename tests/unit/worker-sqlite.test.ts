@@ -135,13 +135,9 @@ describe("explicit enquiry deletion using the real D1 migration", () => {
 
     expect(await deleteEnquiryRecord(d1, firstId)).toBe(true);
     expect(db.prepare("SELECT id FROM enquiries").all()).toEqual([{ id: secondId }]);
-    expect(db.prepare("SELECT enquiry_id FROM outbox").all()).toEqual([
-      { enquiry_id: secondId },
-    ]);
+    expect(db.prepare("SELECT enquiry_id FROM outbox").all()).toEqual([{ enquiry_id: secondId }]);
     expect(await deleteEnquiryRecord(d1, firstId)).toBe(false);
-    await expect(deleteEnquiryRecord(d1, "' OR 1=1 --")).rejects.toThrow(
-      "Invalid enquiry id",
-    );
+    await expect(deleteEnquiryRecord(d1, "' OR 1=1 --")).rejects.toThrow("Invalid enquiry id");
     expect(db.prepare("SELECT COUNT(*) AS c FROM enquiries").get()).toEqual({ c: 1 });
     expect(db.prepare("SELECT COUNT(*) AS c FROM outbox").get()).toEqual({ c: 1 });
   });
