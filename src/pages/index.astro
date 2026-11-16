@@ -131,9 +131,11 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
       <ul class="mt-16 border-t border-ink/15" role="list">
         {weddingOccasions.map((o) => (
           <li class="occasion-row scroll-rise">
-            <a href={`/plan-your-event/?occasion=${o.id}`} class="occasion-name occasion-link">
+            <a
+              href={`/plan-your-event/?occasion=${o.id}`}
+              class="occasion-name underline decoration-brass underline-offset-8"
+            >
               {o.label}
-              <span class="occasion-arrow" aria-hidden="true">↗</span>
             </a>
             <span class="occasion-note">{occasionNotes[o.id]}</span>
           </li>
@@ -279,31 +281,6 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
     font-weight: 320;
     line-height: 1;
     letter-spacing: -0.02em;
-  }
-  .occasion-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45em;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.14em;
-  }
-  .occasion-link:hover,
-  .occasion-link:focus-visible {
-    text-decoration: underline;
-  }
-  .occasion-arrow {
-    font-family: var(--font-sans);
-    font-size: 0.42em;
-    opacity: 0.6;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .occasion-arrow {
-      transition: transform 0.35s var(--ease-editorial);
-    }
-    .occasion-link:hover .occasion-arrow,
-    .occasion-link:focus-visible .occasion-arrow {
-      transform: translate(0.15em, -0.15em);
-    }
   }
   .occasion-note {
     color: var(--color-muted);
