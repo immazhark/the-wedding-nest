@@ -407,12 +407,10 @@ export function initPlanner(form: HTMLFormElement) {
 
   // The non-sending design preview can be explored without entering fictional or
   // real contact details. This control does not exist in submission-enabled builds.
-  form.querySelector<HTMLButtonElement>("[data-preview-skip-contact]")?.addEventListener(
-    "click",
-    () => {
-      if (!sending && current === "contact") show("review");
-    },
-  );
+  const previewSkip = form.querySelector<HTMLButtonElement>("[data-preview-skip-contact]");
+  previewSkip?.addEventListener("click", () => {
+    if (!sending && current === "contact") show("review");
+  });
 
   backBtn.addEventListener("click", () => {
     if (current === "sent") return;
