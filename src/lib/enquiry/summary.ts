@@ -31,7 +31,9 @@ export function summarise(s: EnquiryState): SummaryRow[] {
         ? labelOf(SCOPES, s.scope)
         : "—";
   const notes = s.notes.trim();
-  const notesRows: SummaryRow[] = notes ? [{ label: "Notes", value: notes, stage: "logistics" }] : [];
+  const notesRows: SummaryRow[] = notes
+    ? [{ label: "Notes", value: notes, stage: "logistics" }]
+    : [];
   return [
     {
       label: "Occasion",
