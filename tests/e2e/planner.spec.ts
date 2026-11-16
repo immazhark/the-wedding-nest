@@ -52,6 +52,29 @@ test("walks through all five stages to a review, without sending anything", asyn
   expect(requests).toEqual([]);
 });
 
+test("preview allows reviewing a plan without entering private contact details", async ({ page }) => {
+  const posts: string[] = [];
+  page.on("request", (request) => {
+    if (request.method() === "POST") posts.push(request.url());
+  });
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await next(page);
+  await next(page);
+  await next(page);
+  await expect(heading(page)).toHaveText("How should we reach you?");
+  await page.getByRole("button", { name: "Skip contact — preview only" }).click();
+  await expect(heading(page)).toHaveText("Review your plan");
+  await expect(page.locator("[data-summary]")).toContainText("Nikah");
+  await expect(page.getByText(/nothing has been sent/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Send enquiry" })).toHaveCount(0);
+  expect(posts).toEqual([]);
+  expect(await page.evaluate(() => localStorage.getItem("twn:enquiry-draft") ?? "")).not.toContain(
+    "phone",
+  );
+});
+
 test("homepage occasion links open the planner with only the chosen occasion selected", async ({
   page,
 }) => {
