@@ -9,8 +9,22 @@ import AxeBuilder from "@axe-core/playwright";
 const STORED_ID = "f11e8989-1a22-4e2f-bc91-609acc25ef0e";
 
 const FAKE_TURNSTILE = `window.turnstile = {
-  render(el, opts) { window.__ts = opts; setTimeout(() => opts.callback("test-token"), 30); return "w1"; },
-  reset() { setTimeout(() => window.__ts.callback("test-token-2"), 30); }
+  render(el, opts) {
+    window.__ts = opts;
+    document.documentElement.dataset.testCheckReady = "false";
+    setTimeout(() => {
+      opts.callback("test-token");
+      document.documentElement.dataset.testCheckReady = "true";
+    }, 30);
+    return "w1";
+  },
+  reset() {
+    document.documentElement.dataset.testCheckReady = "false";
+    setTimeout(() => {
+      window.__ts.callback("test-token-2");
+      document.documentElement.dataset.testCheckReady = "true";
+    }, 30);
+  }
 };`;
 
 type Call = { key: string | null; body: Record<string, unknown> };
@@ -35,6 +49,11 @@ async function setup(page: Page, responder: (n: number) => { status: number; bod
 
 const next = (page: Page) => page.getByRole("button", { name: /^(Continue|Review)/ }).click();
 
+/** Wait for the mocked verification callback, not an arbitrary wall-clock delay. */
+async function waitForFakeCheck(page: Page) {
+  await expect(page.locator("html")).toHaveAttribute("data-test-check-ready", "true");
+}
+
 test("navigation and reset stay locked until a pending send finishes", async ({ page }) => {
   await setup(page, () => ({ status: 201, body: { id: STORED_ID } }));
   let finish: (() => void) | undefined;
@@ -49,6 +68,7 @@ test("navigation and reset stay locked until a pending send finishes", async ({ 
     });
   });
   await toReview(page);
+  await waitForFakeCheck(page);
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.locator("[data-back]")).toBeDisabled();
   await expect(page.getByRole("button", { name: "Edit occasion" })).toBeDisabled();
@@ -177,10 +197,11 @@ test("an outage keeps the answers, and the retry reuses the same idempotency key
       : { status: 201, body: { id: STORED_ID } },
   );
   await toReview(page);
+  await waitForFakeCheck(page);
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.getByRole("status")).toContainText("couldn’t send");
   await expect(page.locator("[data-summary]")).toContainText("Sample Person");
-  await page.waitForTimeout(100); // fresh check token after reset
+  await waitForFakeCheck(page); // a fresh token arrives after reset
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toBeVisible();
   expect(calls).toHaveLength(2);
@@ -190,6 +211,7 @@ test("an outage keeps the answers, and the retry reuses the same idempotency key
 test("does not report Sent for a malformed positive acknowledgement", async ({ page }) => {
   const calls = await setup(page, () => ({ status: 201, body: { id: "accepted123" } }));
   await toReview(page);
+  await waitForFakeCheck(page);
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.getByRole("status")).toContainText("couldn’t send");
   await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toHaveCount(0);
@@ -205,6 +227,7 @@ test("server validation errors take the visitor to the right step with a clear m
     body: { error: "invalid_enquiry", errors: { phone: "invalid" } },
   }));
   await toReview(page);
+  await waitForFakeCheck(page);
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.getByRole("heading", { name: "How should we reach you?" })).toBeVisible();
   await expect(page.getByRole("alert")).toContainText("phone or WhatsApp number");
@@ -241,6 +264,7 @@ test("review and confirmation steps have no serious accessibility violations", a
       .filter((v) => ["serious", "critical"].includes(v.impact ?? ""))
       .map((v) => v.id);
   expect(await audit()).toEqual([]);
+  await waitForFakeCheck(page);
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toBeVisible();
   expect(await audit()).toEqual([]);
