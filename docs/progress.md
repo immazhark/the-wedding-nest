@@ -2,7 +2,7 @@
 
 Current state first. GitHub and Cloudflare live records remain authoritative for commits, checks and exact deployed versions. This snapshot is not a production-launch approval.
 
-**Repository baseline at this update:** `main` at `7a5a63423f5ebdfb0c941c7645ec844d6e6b0aa4` (PR #37), preceded by `890476e8e6be0449e3083c723d14aeec36bc3ccb` (PR #38). Both PR heads passed the complete CI suite before merging. Post-merge runs may still be in progress; check Actions before claiming a passing `main`.
+**Repository baseline at this update:** `main` at `f79aaf67f8541f03a7a5ede9d1f537e456aea8a8` (PR #41), preceded by `7461d33dd780f486a0629d63c25dab897a9887de` (PR #40). Both PR heads passed the complete CI suite before merging. Their later `main` runs and Worker deployment versions must be independently checked rather than assumed.
 
 ## Current implementation
 
@@ -15,6 +15,7 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 | Enquiry reliability | Server-side Turnstile fetch and JSON consumption have a 10-second deadline; timeout returns retryable 503 before any write. Browser script loading also has a 10-second deadline, cleans failed scripts and retries through Back → Review. Late script loads cannot render hidden review widgets. |
 | Privacy | Browser drafts exclude names, numbers, locations, notes and consent. Enquiries and an outbox event are stored atomically. No lead notifications or marketing are sent. Production retention and recipient decisions remain open. |
 | CI | Formatting, strict type checks, unit tests, production/test builds, desktop/mobile Playwright and axe, and the local Cloudflare Workers runtime. Separate deployed staging browser tests use real dummy-key verification and the live API without mocks. |
+| Conversion | Homepage occasions and listed service interests open the planner with allow-listed preselected choices (#41). Hidden specific services are cleared and rejected when full planning is chosen (#40). |
 | Release gates | Production domain, indexing, real enquiry intake and unapproved business content remain owner-gated. |
 **Authentic media:** Build-time exact photo/manifest pairing with permission and private release references. PR #37 rejects unreviewed files of normally enumerated types from the event directory; no approved event originals are yet published.
 
@@ -22,6 +23,8 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 
 ## Latest work
 
+- #41 (`f79aaf6`): contextual homepage occasion/service links with safe URL intent, privacy-respecting draft merging, and browser/unit coverage.
+- #40 (`7461d33`): clear specific-service selections on scope changes, cleanse restored drafts and reject inconsistent full-planning payloads.
 - #38 (`890476e`): minimal safe Organization structured data with verified name, registered domain and Instagram profile, unit/browser tests; no invented address, phone, reviews or price information.
 - #37 (`7a5a634`): fail-closed all-file scan for staged event assets beyond importable photo extensions; no images published.
 - #36 (`d170bf4`): reject duplicate occasion, service and style selections in submitted enquiry data.
@@ -37,7 +40,7 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 
 ## Next work
 
-1. Verify post-merge `main` CI and the actual Cloudflare worker versions, then check the noindex/intake-off gates. The main and staging workers have separate bindings; keep production intake disabled.
+1. Verify `f79aaf6` post-merge `main` CI and actual Cloudflare worker versions, then check the noindex/intake-off gates. The main and staging workers have separate bindings; keep production intake disabled.
 2. Obtain exact business-owner approval of original event photographs, usage permissions and individual testimonials before publishing any of them. Existing image placeholders are deliberately honest.
 3. Resolve [launch-decisions.md](launch-decisions.md): named lead-response owner, notification destination, privacy contact, data retention policy and verified service/contact details. Until then, the outbox remains unsent and production lead collection disabled.
 4. Independently review the final responsive/cinematic creative result using approved photography, measurable accessibility/performance, and the Cloudflare preview before permitting any domain, indexing or real-enquiry activation.

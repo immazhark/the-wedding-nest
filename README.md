@@ -2,7 +2,7 @@
 
 Premium wedding and event experiences in Hyderabad, India.
 
-**Status:** design preview on `main` — Astro 7 + TypeScript + Tailwind 4 site, homepage, and a five-step Plan Your Event planner that **does not send enquiries yet**. Deployed via Cloudflare Workers Builds to a workers.dev preview (noindex, no custom domain). Current detail: [docs/progress.md](docs/progress.md), [docs/deployment.md](docs/deployment.md).
+**Status:** Astro 7 + TypeScript + Tailwind 4 editorial site and five-step planner on a Cloudflare Workers design preview. Public enquiries are **disabled** and search indexing is off. An isolated staging Worker accepts fictional test submissions with Turnstile and a separate D1 database. No custom production domain is attached. Current state: [docs/progress.md](docs/progress.md), [docs/deployment.md](docs/deployment.md).
 
 - Domain: https://theweddingnest.in (registered; production site not yet deployed)
 - Product owner workflow: Claude Code Cloud for implementation, GitHub for source control, ChatGPT/Codex for independent review.
@@ -32,7 +32,7 @@ In Claude Code Cloud, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chrom
 
 ## Structure
 
-- `src/pages/` — `index`, `plan-your-event` (interactive planner; sends nothing until the secure backend exists), `404`
+- `src/pages/` — homepage, guided `plan-your-event`, and 404; contextual occasion/service links begin a safe preselected plan
 - `src/components/planner/`, `src/scripts/planner.ts` — planner UI and client controller
 - `src/layouts/BaseLayout.astro` — metadata, canonical, robots, skip link, preview notice
 - `src/components/` — header with accessible mobile menu, footer, wordmark, arch photo frame placeholder
@@ -44,4 +44,4 @@ In Claude Code Cloud, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chrom
 
 ## Next milestone
 
-M1/M2: owner review of the design direction on a Cloudflare preview; interactive Plan Your Event UI built on `src/lib/enquiry`; then Worker API + D1 + Turnstile in a staging environment.
+Review the current responsive preview, then add only original owner-approved event photographs, approved testimonials, verified contact/service coverage and a legally reviewed privacy contact. Lead notifications, retention policy and production Turnstile require explicit business decisions before enabling real enquiries. Production domain attachment and indexing remain separate owner approval gates.
