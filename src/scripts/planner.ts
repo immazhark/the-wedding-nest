@@ -16,6 +16,7 @@ import { applyPlannerIntent, readPlannerIntent } from "../lib/enquiry/intent";
 import { summarise } from "../lib/enquiry/summary";
 import { FIELD_STAGE, fieldMessage, submitEnquiry } from "../lib/enquiry/submit";
 import { createTurnstileLoader } from "../lib/enquiry/turnstile";
+import { validateEnquiry } from "../lib/enquiry/validate";
 
 // Loaded only when a visitor reaches review with sending on.
 const loadTurnstile = createTurnstileLoader();
@@ -117,6 +118,7 @@ export function initPlanner(form: HTMLFormElement) {
   const reviewReturnBtn = form.querySelector<HTMLButtonElement>("[data-review-return]")!;
   let current: Panel = "occasion";
   let editingReview = false;
+  let serverError: { field: keyof EnquiryState; value: string } | null = null;
   const sending = form.dataset["submit"] === "on" ? initSending() : null;
 
   /** Live submission (only when the build enables it). */
@@ -180,6 +182,7 @@ export function initPlanner(form: HTMLFormElement) {
           key = null; // the payload will change
           show(FIELD_STAGE[field]);
           errorEl.textContent = fieldMessage(field, code);
+          serverError = { field, value: JSON.stringify(readState(form)[field]) };
           const input = [...form.querySelectorAll<HTMLElement>(`[name="${field}"]`)].find(
             (el) => !el.closest("[hidden]"),
           );
@@ -325,6 +328,7 @@ export function initPlanner(form: HTMLFormElement) {
     resetBtn.closest<HTMLElement>(".planner-nav")!.hidden = panel === "sent";
     nextLabel.textContent = panel === "contact" ? "Review" : "Continue";
     errorEl.textContent = "";
+    serverError = null;
     form.querySelectorAll("[aria-invalid]").forEach((el) => {
       el.removeAttribute("aria-invalid");
       el.removeAttribute("aria-describedby");
@@ -423,13 +427,18 @@ export function initPlanner(form: HTMLFormElement) {
   // Clear resolved validation feedback as soon as typed answers become valid,
   // without waiting for blur/change on mobile keyboards.
   function clearResolvedError() {
-    if (
-      current !== "review" &&
-      current !== "sent" &&
-      errorEl.textContent &&
-      !stageError(current, readState(form))
-    ) {
+    if (current === "review" || current === "sent" || !errorEl.textContent) return;
+    const state = readState(form);
+    if (serverError) {
+      // A lightweight stage check cannot overrule a server rejection. Keep its
+      // feedback until the rejected answer changes and passes shared validation.
+      if (JSON.stringify(state[serverError.field]) === serverError.value) return;
+      const validation = validateEnquiry(state);
+      if (!validation.ok && validation.errors[serverError.field]) return;
+    }
+    if (!stageError(current, state)) {
       errorEl.textContent = "";
+      serverError = null;
       form.querySelectorAll<HTMLElement>("[aria-invalid]").forEach((field) => {
         field.removeAttribute("aria-invalid");
         field.removeAttribute("aria-describedby");
