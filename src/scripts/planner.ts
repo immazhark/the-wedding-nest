@@ -74,14 +74,19 @@ const storage = {
   load(): unknown {
     try {
       const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
-      return raw ? JSON.parse(raw) : null;
+      if (raw === null) return null;
+      const parsed: unknown = JSON.parse(raw);
+      if (parsed === null) this.clear();
+      return parsed;
     } catch {
+      // A corrupt legacy value must not persist indefinitely in browser storage.
+      this.clear();
       return null;
     }
   },
-  save(s: EnquiryState) {
+  save(s: EnquiryState, now = Date.now()) {
     try {
-      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(toDraft(s, Date.now())));
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(toDraft(s, now)));
     } catch {
       /* storage unavailable: the planner still works without a draft */
     }
@@ -366,8 +371,16 @@ export function initPlanner(form: HTMLFormElement) {
     show("occasion");
   });
 
-  // Restore a non-sensitive draft if one exists; contact details are never in it.
-  applyState(form, restoreDraft(storage.load(), Date.now()) ?? emptyEnquiry());
+  // Restore only valid selections. Purge stale/corrupt drafts, and rewrite any
+  // valid legacy draft through the allow-listed serializer so stray personal
+  // fields cannot remain in localStorage. Preserve the original expiry time.
+  const rawDraft = storage.load();
+  const restored = restoreDraft(rawDraft, Date.now());
+  if (rawDraft !== null) {
+    storage.clear();
+    if (restored) storage.save(restored, (rawDraft as { savedAt: number }).savedAt);
+  }
+  applyState(form, restored ?? emptyEnquiry());
   syncConditional();
   show("occasion", false);
 }

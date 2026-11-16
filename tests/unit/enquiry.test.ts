@@ -203,6 +203,14 @@ describe("local draft (privacy)", () => {
     expect(restoreDraft(draft, 1_000 + DRAFT_TTL_MS + 1)).toBeNull();
   });
 
+  it("discards non-finite, negative and future timestamps", () => {
+    const valid = toDraft(complete(), 1_000);
+    for (const savedAt of [Number.NaN, Number.POSITIVE_INFINITY, -1, 1_001]) {
+      expect(restoreDraft({ ...valid, savedAt }, 1_000)).toBeNull();
+    }
+    expect(restoreDraft(valid, 1_000 + DRAFT_TTL_MS)).not.toBeNull();
+  });
+
   it("discards tampered drafts", () => {
     expect(restoreDraft({ v: 1, savedAt: 0, data: { occasions: ["hack"] } }, 10)).toBeNull();
     expect(restoreDraft("nonsense", 10)).toBeNull();

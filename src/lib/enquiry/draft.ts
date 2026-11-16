@@ -37,7 +37,16 @@ export function toDraft(s: EnquiryState, now: number): Draft {
 export function restoreDraft(raw: unknown, now: number): EnquiryState | null {
   if (typeof raw !== "object" || raw === null) return null;
   const d = raw as Partial<Draft>;
-  if (d.v !== 1 || typeof d.savedAt !== "number" || now - d.savedAt > DRAFT_TTL_MS) return null;
+  if (
+    d.v !== 1 ||
+    typeof d.savedAt !== "number" ||
+    !Number.isFinite(d.savedAt) ||
+    !Number.isFinite(now) ||
+    d.savedAt < 0 ||
+    d.savedAt > now ||
+    now - d.savedAt > DRAFT_TTL_MS
+  )
+    return null;
   const data = d.data as Partial<DraftData> | undefined;
   if (!data || typeof data !== "object") return null;
 
