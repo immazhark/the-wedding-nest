@@ -87,6 +87,7 @@ test("planner provides a readable Instagram fallback without JavaScript", async 
   browser,
   baseURL,
 }) => {
+  if (!baseURL) throw new Error("Playwright base URL is required for this test");
   const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
   try {
     const page = await context.newPage();
