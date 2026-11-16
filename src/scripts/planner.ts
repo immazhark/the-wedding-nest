@@ -270,8 +270,15 @@ export function initPlanner(form: HTMLFormElement) {
   }
 
   function renderSummary() {
+    const state = readState(form);
+    const rows = summarise(state).filter(
+      (row) =>
+        sending ||
+        row.stage !== "contact" ||
+        (row.label === "Name" ? state.name.trim().length > 0 : state.phone.trim().length > 0),
+    );
     summaryEl.replaceChildren(
-      ...summarise(readState(form)).flatMap((row) => {
+      ...rows.flatMap((row) => {
         const dt = document.createElement("dt");
         dt.textContent = row.label;
         const dd = document.createElement("dd");
