@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SITE, canonicalUrl, pageTitle, robotsContent } from "../../src/lib/site/config";
+import { SITE, canonicalUrl, pageTitle, robotsContent, organizationJsonLd } from "../../src/lib/site/config";
 
 describe("site metadata", () => {
   it("uses the registered production domain", () => {
@@ -22,6 +22,22 @@ describe("site metadata", () => {
   it("is not indexable unless explicitly enabled for an approved production launch", () => {
     expect(robotsContent(false)).toBe("noindex, nofollow");
     expect(robotsContent(true)).toBe("index, follow");
+  });
+
+  it("provides only verified facts in Organization structured data", () => {
+    const raw = organizationJsonLd();
+    const json = JSON.parse(raw);
+    expect(json).toEqual({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://theweddingnest.in/#organization",
+      name: "The Wedding Nest",
+      url: "https://theweddingnest.in",
+      sameAs: ["https://www.instagram.com/twn.events/"],
+    });
+    for (const unapproved of ["telephone", "address", "email", "aggregateRating", "review", "priceRange"]) {
+      expect(json).not.toHaveProperty(unapproved);
+    }
   });
 
   it("only lists verified public profiles", () => {
