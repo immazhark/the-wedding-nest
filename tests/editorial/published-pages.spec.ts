@@ -17,10 +17,7 @@ test("approved service template renders a useful, accessible and linked page", a
     "href",
     "/plan-your-event/?service=catering",
   );
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-    "content",
-    "noindex, nofollow",
-  );
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
     "https://theweddingnest.in" + SERVICE,
@@ -41,10 +38,7 @@ test("approved story template renders only its released fixture photographs", as
     "href",
     "/plan-your-event/",
   );
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-    "content",
-    "noindex, nofollow",
-  );
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
 });
 
 test("approved content is discoverable; unrelated unapproved routes remain absent", async ({
@@ -78,9 +72,7 @@ for (const path of [SERVICE, STORY]) {
     const axe = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
       .analyze();
-    const serious = axe.violations.filter((v) =>
-      ["serious", "critical"].includes(v.impact ?? ""),
-    );
+    const serious = axe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""));
     expect(serious.map((v) => v.id)).toEqual([]);
   });
 }
