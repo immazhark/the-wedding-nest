@@ -137,6 +137,15 @@ describe("validateEnquiry (server-grade, accepts unknown input)", () => {
     }
   });
 
+  it("rejects hidden service selections when the visitor chooses full planning", () => {
+    const result = validateEnquiry({ ...complete(), scope: "full-planning", services: ["catering"] });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.services).toBe("invalid");
+    expect(validateEnquiry({ ...complete(), scope: "full-planning", services: [] }).ok).toBe(
+      true,
+    );
+  });
+
   it("rejects a service that is not offered for the chosen occasions", () => {
     const r = validateEnquiry({
       ...complete(),
@@ -209,6 +218,11 @@ describe("local draft (privacy)", () => {
       10,
     );
     expect(restored?.location).toBe("");
+  });
+
+  it("discards old service selections stored under full planning", () => {
+    const stale = toDraft({ ...complete(), scope: "full-planning", services: ["catering"] }, 100);
+    expect(restoreDraft(stale, 200)?.services).toEqual([]);
   });
 
   it("restores non-sensitive selections and expires old drafts", () => {
