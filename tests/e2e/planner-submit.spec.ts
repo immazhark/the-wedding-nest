@@ -163,6 +163,13 @@ test("a script finishing after leaving review does not render a hidden widget", 
   await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toBeVisible();
 });
 
+test("sending-enabled planner never offers a contact bypass", async ({ page }) => {
+  await setup(page, () => ({ status: 201, body: { id: STORED_ID } }));
+  await expect(page.getByRole("button", { name: "Skip contact — preview only" })).toHaveCount(0);
+  await toReview(page);
+  await expect(page.getByRole("heading", { name: "Review your plan" })).toBeVisible();
+});
+
 test("with sending on, the 'can't send yet' preview disclosure is gone", async ({ page }) => {
   await setup(page, () => ({ status: 201, body: { id: "x" } }));
   await expect(page.locator("#planner-disclosure")).toHaveCount(0);
