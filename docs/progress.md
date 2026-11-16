@@ -33,6 +33,8 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 
 ## Latest work
 
+- #61: server-rejected field feedback stays visible across unrelated edits. Its memory-only answer snapshot clears on navigation/reset; correction must change that answer and pass shared field validation before the error clears. Regression-first CI `43947853218` reproduced the disappearing message on desktop and mobile; final CI must pass before merge. No production launch gate changed.
+
 - #60: server validation feedback now identifies and focuses the exact visible rejected control, including field-level ARIA error association. The new browser regression failed on desktop and mobile before implementation (CI run `43943270721`); final CI remains to be checked before merge. Intake and launch gates are unchanged.
 
 - #51 (`777cfe39`): private, validated, plain-text operational notice contract, no transport or recipients.
