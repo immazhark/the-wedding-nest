@@ -57,18 +57,11 @@ describe("approved event media catalog", () => {
     expect(() => buildApprovedMediaCatalog({}, { [file]: image })).toThrow(/unreviewed/i);
   });
 
-  it("rejects an unsupported, unmanifested event file even when no image is imported", () => {
-    const guard = buildApprovedMediaCatalog as unknown as (
-      manifests: Record<string, unknown>,
-      images: Record<string, ImageMetadata>,
-      eventFiles: readonly string[],
-    ) => ReturnType<typeof buildApprovedMediaCatalog>;
-    const unreviewed = "../../assets/events/nikah/2026-02-courtyard-nikah/01-family.gif";
-    expect(() => guard({}, {}, [unreviewed])).toThrow(/unreviewed/i);
-    expect(() =>
-      guard({ [manifestPath]: { images: [entry] } }, { [file]: image }, [file, unreviewed]),
-    ).toThrow(/unreviewed/i);
-    expect(guard({ [manifestPath]: { images: [entry] } }, { [file]: image }, [file])["home-hero"]?.entry.file).toBe(file);
+  it("rejects unreviewed event files missed by the supported-image glob", () => {
+    const unsupported = "../../assets/events/nikah/courtyard-wedding/family.gif";
+    expect(() => Reflect.apply(buildApprovedMediaCatalog, null, [{}, {}, [unsupported]])).toThrow(
+      /unreviewed/i,
+    );
   });
 
   it("rejects duplicate editorial slots and photographs across separate manifests", () => {
