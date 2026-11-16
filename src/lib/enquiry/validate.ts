@@ -84,8 +84,11 @@ export function validateEnquiry(input: unknown): ValidationResult {
     errors.services = servicesRaw.every((s) => typeof s === "string")
       ? "not_available_for_occasion"
       : "invalid";
-  } else if (new Set(services).size !== services.length) errors.services = "invalid";
-  else if (scope === "specific-services" && services.length === 0) errors.services = "required";
+  } else if (new Set(services).size !== services.length) {
+    errors.services = "invalid";
+  } else if (scope === "specific-services" && services.length === 0) {
+    errors.services = "required";
+  }
 
   const stylesRaw = arr(i["styles"]) ?? [];
   const styles = stylesRaw.filter((s): s is StyleId => isOneOf(STYLES, s));
