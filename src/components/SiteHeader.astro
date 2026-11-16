@@ -190,7 +190,24 @@ const current = Astro.url.pathname;
       }
     });
     menu.addEventListener("click", (e) => {
-      if ((e.target as HTMLElement).closest("a")) setOpen(false);
+      const anchor = (e.target as HTMLElement).closest<HTMLAnchorElement>("a[href]");
+      if (!anchor) return;
+      const destinationUrl = new URL(anchor.href);
+      const samePage =
+        mobile.matches &&
+        destinationUrl.origin === window.location.origin &&
+        destinationUrl.pathname === window.location.pathname;
+      const destination =
+        samePage && destinationUrl.hash
+          ? document.getElementById(destinationUrl.hash.slice(1))
+          : null;
+      setOpen(false);
+      if (destination) {
+        // Same-document navigation does not reliably focus the destination after
+        // the overlay becomes inert. Keep the browser's native hash/scroll behavior.
+        destination.tabIndex = -1;
+        requestAnimationFrame(() => destination.focus({ preventScroll: true }));
+      }
     });
     mobile.addEventListener("change", () => setOpen(false));
   }
