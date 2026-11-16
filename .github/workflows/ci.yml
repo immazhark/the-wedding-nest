@@ -24,7 +24,13 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Format
+        id: format
         run: npm run format:check
+      - name: Temporary format diff diagnostic
+        if: ${{ failure() && steps.format.outcome == 'failure' }}
+        run: |
+          npx prettier --write astro.config.mjs
+          git diff -- astro.config.mjs
       - name: Type and Astro check
         run: npm run check
       - name: Unit tests
