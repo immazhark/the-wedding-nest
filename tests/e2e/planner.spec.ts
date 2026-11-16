@@ -83,6 +83,38 @@ test("preview reviews a plan without contact details", async ({ page }) => {
   );
 });
 
+test("preview copies planning choices without contact, venue or private notes", async ({ page }) => {
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await next(page);
+  await next(page);
+  await page.getByLabel(/Venue or area/).fill("PRIVATE ADDRESS");
+  await page.getByLabel(/Anything else we should know/).fill("PRIVATE FAMILY NOTES");
+  await next(page);
+  await page.getByLabel("Your name").fill("PRIVATE PERSON");
+  await page.getByLabel("Phone or WhatsApp number").fill("9876543210");
+  await page.getByRole("checkbox", { name: /I agree/ }).check();
+  await next(page);
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (text: string) => {
+          sessionStorage.setItem("copied-plan-test", text);
+        },
+      },
+    });
+  });
+  await page.getByRole("button", { name: "Copy planning choices" }).click();
+  await expect(page.getByRole("status")).toContainText("Planning choices copied");
+  const copied = await page.evaluate(() => sessionStorage.getItem("copied-plan-test"));
+  expect(copied).toContain("Occasion: Nikah");
+  for (const forbidden of ["PRIVATE", "9876543210", "Location:", "Notes:", "Contact:"]) {
+    expect(copied).not.toContain(forbidden);
+  }
+});
+
 test("skipping preview contact clears previously typed private answers", async ({ page }) => {
   await page.getByRole("checkbox", { name: "Nikah" }).check();
   await next(page);
