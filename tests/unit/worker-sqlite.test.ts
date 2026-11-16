@@ -132,9 +132,13 @@ describe("idempotency key bound to the real stored SQLite enquiry", () => {
     };
     const key = "11111111-2222-4333-8444-555555555555";
     const original = await handleEnquiry(req(key), env, deps);
-    const originalId = (await original.json() as { id: string }).id;
+    const originalId = ((await original.json()) as { id: string }).id;
 
-    const changed = await handleEnquiry(req(key, { ...enquiry, name: "Updated Person" }), env, deps);
+    const changed = await handleEnquiry(
+      req(key, { ...enquiry, name: "Updated Person" }),
+      env,
+      deps,
+    );
     expect(changed.status).toBe(409);
     expect(await changed.json()).toEqual({ error: "idempotency_conflict" });
 
