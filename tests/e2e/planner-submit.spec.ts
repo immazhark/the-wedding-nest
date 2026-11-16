@@ -156,9 +156,7 @@ test("sends once the check passes and confirms only after the server accepts", a
   }));
   await toReview(page);
   // A delayed Turnstile callback must not make this success-path test race the check.
-  await expect
-    .poll(() => page.evaluate(() => Boolean((window as Window & { __fakeCheckReady?: boolean }).__fakeCheckReady)))
-    .toBe(true);
+  await expect(page.locator("html")).toHaveAttribute("data-test-check-ready", "true");
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toBeFocused();
   await expect(page.locator("[data-reference]")).toHaveText("3F2B8C1E");
