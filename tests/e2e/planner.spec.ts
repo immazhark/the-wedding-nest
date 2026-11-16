@@ -102,6 +102,13 @@ test("requires explicit consent and a valid phone number", async ({ page }) => {
   await page.getByLabel("Phone or WhatsApp number").fill("9876543210");
   await next(page);
   await expect(page.getByRole("alert")).toContainText("agree");
+  const consent = page.getByRole("checkbox", { name: /I agree/ });
+  await expect(consent).toBeFocused();
+  await expect(consent).toHaveAttribute("aria-invalid", "true");
+  await expect(consent).toHaveAttribute("aria-describedby", "planner-error-msg");
+  await consent.check();
+  await expect(consent).not.toHaveAttribute("aria-invalid");
+  await expect(page.getByRole("alert")).toBeEmpty();
   await expect(page.getByRole("checkbox", { name: /future offers/ })).not.toBeChecked();
 });
 
