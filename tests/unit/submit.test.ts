@@ -192,6 +192,20 @@ describe("submitEnquiry", () => {
     expect(r).toEqual({ kind: "invalid", errors: { phone: "invalid" } });
   });
 
+  it("distinguishes a stored-key conflict from outages and arbitrary rejections", async () => {
+    expect(
+      await submitEnquiry(
+        state(),
+        "t",
+        KEY,
+        respond(409, { error: "idempotency_conflict" }) as never,
+      ),
+    ).toEqual({ kind: "conflict" });
+    expect(
+      await submitEnquiry(state(), "t", KEY, respond(409, { error: "other" }) as never),
+    ).toEqual({ kind: "rejected" });
+  });
+
   it("marks upload timeouts, outages, rate limits and network failures as retryable", async () => {
     for (const status of [408, 503, 429, 500]) {
       expect(

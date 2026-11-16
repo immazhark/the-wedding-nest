@@ -20,9 +20,9 @@ function fakeD1() {
           return stmt;
         },
         async first<T>() {
-          if (sql.startsWith("SELECT id FROM enquiries")) {
+          if (sql.startsWith("SELECT id, payload_json FROM enquiries")) {
             const row = enquiries.get(String(stmt.args[0]));
-            return (row ? { id: row.id } : null) as T | null;
+            return (row ? { id: row.id, payload_json: row.payload } : null) as T | null;
           }
           return null;
         },
@@ -254,6 +254,40 @@ describe("POST /api/enquiry", () => {
     expect(((await res.json()) as { id: string }).id).toBe(first.id);
     expect(db.enquiries.size).toBe(1);
     expect(db.outbox).toHaveLength(1);
+  });
+
+  it("rejects changed data under a reused idempotency key without claiming it was saved", async () => {
+    const accepted = await call(request(ok()));
+    expect(accepted.status).toBe(201);
+    const first = (await accepted.json()) as { id: string };
+
+    const changed = await call(
+      request({ ...ok(), enquiry: { ...validEnquiry, name: "Different Customer" } }),
+    );
+    expect(changed.status).toBe(409);
+    expect(await changed.json()).toEqual({ error: "idempotency_conflict" });
+    expect(db.enquiries.size).toBe(1);
+    expect(db.outbox).toHaveLength(1);
+    expect(JSON.stringify([...db.enquiries.values()])).not.toContain("Different Customer");
+    expect(turnstile).toHaveBeenCalledTimes(1);
+
+    // The unchanged retry still acknowledges precisely the originally stored record.
+    const retry = await call(request(ok()));
+    expect(retry.status).toBe(200);
+    expect(await retry.json()).toEqual({ id: first.id });
+  });
+
+  it("rejects an invalid changed duplicate rather than acknowledging the original", async () => {
+    expect((await call(request(ok()))).status).toBe(201);
+    const response = await call(
+      request({ ...ok(), enquiry: { ...validEnquiry, consent: false, phone: "<private>" } }),
+    );
+    expect(response.status).toBe(422);
+    const serialized = JSON.stringify(await response.json());
+    expect(serialized).not.toContain("<private>");
+    expect(db.enquiries.size).toBe(1);
+    expect(db.outbox).toHaveLength(1);
+    expect(turnstile).toHaveBeenCalledTimes(1);
   });
 
   it("is disabled unless ENQUIRIES_ENABLED is exactly 'true'", async () => {

@@ -68,7 +68,7 @@ const enquiry = {
   marketingConsent: true,
 };
 
-const req = (key: string) =>
+const req = (key: string, entry = enquiry) =>
   new Request("https://staging.example.test/api/enquiry", {
     method: "POST",
     headers: {
@@ -76,7 +76,7 @@ const req = (key: string) =>
       origin: "https://staging.example.test",
       "idempotency-key": key,
     },
-    body: JSON.stringify({ turnstileToken: "t", enquiry }),
+    body: JSON.stringify({ turnstileToken: "t", enquiry: entry }),
   });
 
 describe("enquiry handler against the real D1 schema (SQLite)", () => {
@@ -110,6 +110,52 @@ describe("enquiry handler against the real D1 schema (SQLite)", () => {
     expect(db.prepare("SELECT enquiry_id, kind FROM outbox").all()).toEqual([
       { enquiry_id: id, kind: "enquiry.created" },
     ]);
+  });
+});
+
+describe("idempotency key bound to the real stored SQLite enquiry", () => {
+  it("does not confirm altered name, phone, or consent under the same key", async () => {
+    const { d1, db } = sqliteD1();
+    const env = {
+      ENQUIRIES_ENABLED: "true",
+      ALLOWED_ORIGINS: "https://staging.example.test",
+      TURNSTILE_SECRET: "s",
+      DB: d1,
+    };
+    let verifications = 0;
+    const deps = {
+      fetch: (async () => {
+        verifications++;
+        return Response.json({ success: true });
+      }) as unknown as typeof fetch,
+      log: () => {},
+    };
+    const key = "11111111-2222-4333-8444-555555555555";
+    const original = await handleEnquiry(req(key), env, deps);
+    const originalId = ((await original.json()) as { id: string }).id;
+
+    const changed = await handleEnquiry(
+      req(key, { ...enquiry, name: "Updated Person" }),
+      env,
+      deps,
+    );
+    expect(changed.status).toBe(409);
+    expect(await changed.json()).toEqual({ error: "idempotency_conflict" });
+
+    const invalid = await handleEnquiry(req(key, { ...enquiry, consent: false }), env, deps);
+    expect(invalid.status).toBe(422);
+
+    const retry = await handleEnquiry(req(key), env, deps);
+    expect(retry.status).toBe(200);
+    expect(await retry.json()).toEqual({ id: originalId });
+
+    expect(verifications).toBe(1);
+    expect(db.prepare("SELECT COUNT(*) AS c FROM enquiries").get()).toEqual({ c: 1 });
+    expect(db.prepare("SELECT COUNT(*) AS c FROM outbox").get()).toEqual({ c: 1 });
+    const record = db.prepare("SELECT payload_json FROM enquiries").get() as {
+      payload_json: string;
+    };
+    expect(JSON.parse(record.payload_json).name).toBe("Sample Person");
   });
 });
 

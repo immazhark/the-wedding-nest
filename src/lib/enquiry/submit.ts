@@ -9,6 +9,7 @@ export type SubmitResult =
   | { kind: "accepted"; id: string }
   | { kind: "invalid"; errors: Partial<Record<keyof EnquiryState, ErrorCode>> }
   | { kind: "verification" }
+  | { kind: "conflict" }
   | { kind: "retryable" }
   | { kind: "rejected" };
 
@@ -87,6 +88,8 @@ export async function submitEnquiry(
       }
       if (res.status === 403 && body["error"] === "verification_failed")
         return { kind: "verification" };
+      if (res.status === 409 && body["error"] === "idempotency_conflict")
+        return { kind: "conflict" };
       if (res.status === 408 || res.status === 429 || res.status >= 500)
         return { kind: "retryable" };
       return { kind: "rejected" };

@@ -13,9 +13,10 @@ Request: `POST /api/enquiry`, `Content-Type: application/json`, `Origin` on the 
 | Status | Body                                                    | Meaning                                                                       |
 | ------ | ------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | 201    | `{ "id" }`                                              | Stored in D1 with its outbox event (one transaction). Not "notification sent". |
-| 200    | `{ "id" }`                                              | Same `Idempotency-Key` seen before; original id returned, nothing duplicated. |
+| 200    | `{ "id" }`                                              | Exact normalized payload retry for the same key; original id returned.       |
 | 400    | `invalid_json` / `invalid_idempotency_key`              | Malformed request.                                                            |
 | 408    | `request_timeout`                                       | Request body did not finish within 10 seconds; no enquiry was stored.         |
+| 409    | `idempotency_conflict`                                  | Same key with changed valid details: original stored enquiry remains intact. |
 | 403    | `forbidden_origin` / `verification_failed`              | Origin not allowed, or Turnstile failed/missing.                              |
 | 405    | `method_not_allowed` (+ `Allow: POST`)                  | Not POST.                                                                     |
 | 413    | `payload_too_large`                                     | Body > 16 KB.                                                                 |
