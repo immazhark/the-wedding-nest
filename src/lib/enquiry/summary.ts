@@ -6,6 +6,7 @@ import {
   SERVICES,
   STYLES,
   type EnquiryState,
+  type StageId,
 } from "./schema";
 
 const labelOf = (list: readonly { id: string; label: string }[], id: string) =>
@@ -19,7 +20,7 @@ const formatDate = (iso: string) =>
     timeZone: "UTC",
   });
 
-export type SummaryRow = { label: string; value: string };
+export type SummaryRow = { label: string; value: string; stage: StageId };
 
 /** Human-readable review of an enquiry, shown before sending. */
 export function summarise(s: EnquiryState): SummaryRow[] {
@@ -30,21 +31,23 @@ export function summarise(s: EnquiryState): SummaryRow[] {
         ? labelOf(SCOPES, s.scope)
         : "—";
   return [
-    { label: "Occasion", value: s.occasions.map((id) => labelOf(OCCASIONS, id)).join(", ") || "—" },
-    { label: "Help needed", value: scope },
+    { label: "Occasion", value: s.occasions.map((id) => labelOf(OCCASIONS, id)).join(", ") || "—", stage: "occasion" },
+    { label: "Help needed", value: scope, stage: "scope" },
     {
       label: "Style",
       value: s.styles.map((id) => labelOf(STYLES, id)).join(", ") || "No preference yet",
+      stage: "style",
     },
-    { label: "Date", value: s.date.kind === "date" ? formatDate(s.date.value) : "Not decided yet" },
-    { label: "Guests", value: s.guestCount.trim() || "Not sure yet" },
-    { label: "Location", value: s.location.trim() || "Not decided yet" },
-    { label: "Budget", value: s.budget ? labelOf(BUDGETS, s.budget) : "Not shared" },
-    ...(s.notes.trim() ? [{ label: "Notes", value: s.notes.trim() }] : []),
-    { label: "Name", value: s.name.trim() || "—" },
+    { label: "Date", value: s.date.kind === "date" ? formatDate(s.date.value) : "Not decided yet", stage: "logistics" },
+    { label: "Guests", value: s.guestCount.trim() || "Not sure yet", stage: "logistics" },
+    { label: "Location", value: s.location.trim() || "Not decided yet", stage: "logistics" },
+    { label: "Budget", value: s.budget ? labelOf(BUDGETS, s.budget) : "Not shared", stage: "logistics" },
+    ...(s.notes.trim() ? [{ label: "Notes", value: s.notes.trim(), stage: "logistics" as const }] : []),
+    { label: "Name", value: s.name.trim() || "—", stage: "contact" },
     {
       label: "Contact",
       value: `${s.phone.trim() || "—"} · ${labelOf(CONTACT_CHANNELS, s.contactChannel)}`,
+      stage: "contact",
     },
   ];
 }
