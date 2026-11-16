@@ -278,6 +278,34 @@ describe("POST /api/enquiry", () => {
     expect(db.outbox).toHaveLength(1);
   });
 
+  it("rejects malformed guest counts without writes or false duplicate acknowledgements", async () => {
+    for (const guestCount of [200, { count: 200 }, false, []]) {
+      const response = await call(request({ ...ok(), enquiry: { ...validEnquiry, guestCount } }));
+      expect(response.status).toBe(422);
+      expect(await response.json()).toEqual({
+        error: "invalid_enquiry",
+        errors: { guestCount: "invalid" },
+      });
+    }
+    expect(db.enquiries.size).toBe(0);
+    expect(db.outbox).toHaveLength(0);
+
+    const blank = { ...ok(), enquiry: { ...validEnquiry, guestCount: "" } };
+    expect((await call(request(blank))).status).toBe(201);
+    turnstile.mockClear();
+    const retry = await call(request({ ...ok(), enquiry: { ...validEnquiry, guestCount: 200 } }));
+    expect(retry.status).toBe(422);
+    expect(await retry.json()).toEqual({
+      error: "invalid_enquiry",
+      errors: { guestCount: "invalid" },
+    });
+    expect(turnstile).not.toHaveBeenCalled();
+    expect(db.enquiries.size).toBe(1);
+    expect(db.outbox).toHaveLength(1);
+    expect(JSON.parse([...db.enquiries.values()][0]!.payload).guestCount).toBe("");
+    expect((await call(request(blank))).status).toBe(200);
+  });
+
   it("is idempotent: a retry with the same key returns the same id without a duplicate", async () => {
     const first = (await (await call(request(ok()))).json()) as { id: string };
     const res = await call(request(ok()));

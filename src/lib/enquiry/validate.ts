@@ -113,7 +113,8 @@ export function validateEnquiry(input: unknown): ValidationResult {
   } else if (!(d && typeof d === "object" && d["kind"] === "undecided")) errors.date = "invalid";
 
   const guestCount = str(i["guestCount"]) ?? "";
-  if (guestCount !== "" && !isValidGuestCount(guestCount)) errors.guestCount = "invalid";
+  if (i["guestCount"] != null && typeof i["guestCount"] !== "string") errors.guestCount = "invalid";
+  else if (guestCount !== "" && !isValidGuestCount(guestCount)) errors.guestCount = "invalid";
 
   const text = (key: "location" | "notes" | "name", required: boolean) => {
     const v = str(i[key] ?? "");

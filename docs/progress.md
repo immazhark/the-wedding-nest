@@ -33,6 +33,8 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 
 ## Latest work
 
+- #63: explicit non-null, non-string guest counts now return a field validation error instead of normalizing to blank. Optional omitted/null/blank counts keep their existing behavior. Regression-first unit/Worker tests cover no writes and rejecting a malformed retry against a stored blank count. A direct runtime reproduction confirmed the prior acceptance; final CI must pass before merge. Release gates are unchanged.
+
 - #62: browser draft date serialization/restoration now reconstructs only approved date keys and restores only string date values. Unit regressions cover contaminated runtime objects, legacy rewrite and coercible malformed values; the browser regression checks reload scrubbing without changing the valid event date or expiry. A direct Node runtime reproduction confirmed nested private fields survived before the fix. Final CI must pass before merge; release gates are unchanged.
 
 - #61: server-rejected field feedback stays visible across unrelated edits. Its memory-only answer snapshot clears on navigation/reset; correction must change that answer and pass shared field validation before the error clears. Regression-first CI `43947853218` reproduced the disappearing message on desktop and mobile; final CI must pass before merge. No production launch gate changed.
