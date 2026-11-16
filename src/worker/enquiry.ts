@@ -3,7 +3,7 @@
  *
  * Order of checks (cheapest and most security-relevant first):
  * method → kill switch/config → origin → content type → size → JSON → idempotency key →
- * duplicate lookup → Turnstile (server-side) → shared validation → one D1 transaction
+ * duplicate payload check → Turnstile (server-side) → shared validation → one D1 transaction
  * (enquiry + outbox event). A 2xx means the database accepted the enquiry — not that any
  * notification was delivered. Responses and logs never contain personal data.
  */
@@ -180,16 +180,33 @@ export async function handleEnquiry(
   }
 
   const db = env.DB;
+
+  // A reused key is a retry only for the SAME normalised enquiry.
+  // Checking only the key could return a 200 for a different name, phone or
+  // consent choice and falsely imply those changed details were saved.
+  // We can safely skip single-use Turnstile on an exact retry, but not content checks.
+  const acknowledgeExisting = (
+    existing: { id: string; payload_json: string },
+  ): Response => {
+    const incoming = validateEnquiry((body as Record<string, unknown>)["enquiry"]);
+    if (!incoming.ok) {
+      deps.log({ event: "enquiry", outcome: "invalid", status: 422 });
+      return json(422, { error: "invalid_enquiry", errors: incoming.errors });
+    }
+    if (JSON.stringify(incoming.value) !== existing.payload_json)
+      return fail(409, "idempotency_conflict");
+
+    deps.log({ event: "enquiry", outcome: "duplicate", status: 200 });
+    return json(200, { id: existing.id });
+  };
+
   try {
     // A safe retry (same key) returns the original id without re-verifying a single-use token.
     const existing = await db
-      .prepare("SELECT id FROM enquiries WHERE idempotency_key = ?1")
+      .prepare("SELECT id, payload_json FROM enquiries WHERE idempotency_key = ?1")
       .bind(key)
-      .first<{ id: string }>();
-    if (existing) {
-      deps.log({ event: "enquiry", outcome: "duplicate", status: 200 });
-      return json(200, { id: existing.id });
-    }
+      .first<{ id: string; payload_json: string }>();
+    if (existing) return acknowledgeExisting(existing);
   } catch {
     return fail(503, "storage_unavailable");
   }
@@ -235,12 +252,11 @@ export async function handleEnquiry(
     if (!inserted || inserted.meta.changes === 0) {
       // Lost a race with a concurrent request using the same key.
       const row = await db
-        .prepare("SELECT id FROM enquiries WHERE idempotency_key = ?1")
+        .prepare("SELECT id, payload_json FROM enquiries WHERE idempotency_key = ?1")
         .bind(key)
-        .first<{ id: string }>();
+        .first<{ id: string; payload_json: string }>();
       if (!row) return fail(503, "storage_unavailable");
-      deps.log({ event: "enquiry", outcome: "duplicate", status: 200 });
-      return json(200, { id: row.id });
+      return acknowledgeExisting(row);
     }
   } catch {
     return fail(503, "storage_unavailable");
