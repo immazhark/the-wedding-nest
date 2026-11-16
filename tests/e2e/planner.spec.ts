@@ -86,7 +86,7 @@ test("switching to full planning clears specific services from the browser draft
   await page.getByRole("radio", { name: /Specific services/ }).check();
   await page.getByRole("checkbox", { name: "Catering & menus" }).check();
   await page.getByRole("radio", { name: /End-to-end planning/ }).check();
-  await expect(page.getByRole("checkbox", { name: "Catering & menus" })).not.toBeChecked();
+  await expect(page.locator('input[name="services"][value="catering"]')).not.toBeChecked();
   const saved = await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"));
   expect(JSON.parse(saved!).data.services).toEqual([]);
 });
