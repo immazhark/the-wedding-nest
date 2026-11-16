@@ -82,9 +82,7 @@ test("skip link moves focus to main content", async ({ page }) => {
 test.describe("mobile navigation", () => {
   test.skip(({ isMobile }) => !isMobile, "mobile only");
 
-  test("opens with the menu button, traps nothing, closes with Escape and restores focus", async ({
-    page,
-  }) => {
+  test("opens, focuses navigation, closes with Escape and restores focus", async ({ page }) => {
     await page.goto("/");
     const toggle = page.getByRole("button", { name: "Menu" });
     const nav = page.getByRole("navigation", { name: "Primary" });
@@ -99,6 +97,42 @@ test.describe("mobile navigation", () => {
     await page.keyboard.press("Escape");
     await expect(page.locator("[data-menu-toggle]")).toHaveAttribute("aria-expanded", "false");
     await expect(page.locator("[data-menu-toggle]")).toBeFocused();
+  });
+
+  test("keeps focus inside an open mobile menu", async ({ page }) => {
+    await page.goto("/");
+    const toggle = page.getByRole("button", { name: "Menu" });
+    const homeLink = page.locator("[data-site-header] a[href='/']").first();
+    const nav = page.getByRole("navigation", { name: "Primary" });
+    const lastLink = nav.getByRole("link", { name: "Plan your event" });
+
+    await toggle.click();
+    await expect(page.locator("main")).toHaveAttribute("inert", "");
+    await expect(page.locator("footer")).toHaveAttribute("inert", "");
+    await lastLink.focus();
+    await page.keyboard.press("Tab");
+    await expect(homeLink).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(lastLink).toBeFocused();
+
+    await page.getByRole("button", { name: "Close" }).click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator("main")).not.toHaveAttribute("inert");
+    await expect(page.locator("footer")).not.toHaveAttribute("inert");
+    await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
+  });
+
+  test("mobile navigation works on the homepage and event planner", async ({ page }) => {
+    for (const path of ["/", "/plan-your-event/"]) {
+      await page.goto(path);
+      const toggle = page.getByRole("button", { name: "Menu" });
+      await expect(toggle).toBeVisible();
+      await toggle.click();
+      const nav = page.getByRole("navigation", { name: "Primary" });
+      await expect(nav.getByRole("link", { name: "Services" })).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    }
   });
 
   test("open menu panel covers the viewport below the header and shows every link", async ({
