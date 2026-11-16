@@ -481,7 +481,7 @@ export function initPlanner(form: HTMLFormElement) {
     if (!editingReview || current === "review" || current === "sent") return;
     const state = readState(form);
     const incomplete = firstIncompleteStage(state);
-    if (incomplete) {
+    if (incomplete && (sending || incomplete !== "contact")) {
       show(incomplete);
       errorEl.textContent = stageError(incomplete, state) ?? "Please review this step.";
       markInvalid(incomplete, state);
