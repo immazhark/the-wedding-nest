@@ -26,6 +26,8 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 
 ## Latest work
 
+- #60: server validation feedback now identifies and focuses the exact visible rejected control, including field-level ARIA error association. The new browser regression failed on desktop and mobile before implementation (CI run `43943270721`); final CI remains to be checked before merge. Intake and launch gates are unchanged.
+
 - #51 (`777cfe39`): private, validated, plain-text operational notice contract, no transport or recipients.
 - #50 (`de479d8`): dormant outbox leases, stale-token fencing, bounded retries and v2 SQL migration; not applied or activated.
 - #49 (`27f11e80`): read-only, aggregate-only retention assessment, no deletion route/cron.
