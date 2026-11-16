@@ -74,7 +74,10 @@ export async function submitEnquiry(
           )
         )
           return { kind: "retryable" };
-        return { kind: "invalid", errors: errors as Partial<Record<keyof EnquiryState, ErrorCode>> };
+        return {
+          kind: "invalid",
+          errors: errors as Partial<Record<keyof EnquiryState, ErrorCode>>,
+        };
       }
       if (res.status === 403 && body["error"] === "verification_failed")
         return { kind: "verification" };
