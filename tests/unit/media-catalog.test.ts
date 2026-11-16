@@ -42,10 +42,7 @@ describe("approved event media catalog", () => {
       { ...entry, slot: "private-portrait" },
     ]) {
       expect(() =>
-        buildApprovedMediaCatalog(
-          { [manifestPath]: { images: [invalid] } },
-          { [file]: image },
-        ),
+        buildApprovedMediaCatalog({ [manifestPath]: { images: [invalid] } }, { [file]: image }),
       ).toThrow();
     }
   });
@@ -87,7 +84,10 @@ describe("approved event media catalog", () => {
   it("rejects invalid manifest modules and asset entries", () => {
     expect(() => buildApprovedMediaCatalog({ [manifestPath]: null }, {})).toThrow();
     expect(() =>
-      buildApprovedMediaCatalog({ [manifestPath]: { images: [entry] } }, { [file]: {} as ImageMetadata }),
+      buildApprovedMediaCatalog(
+        { [manifestPath]: { images: [entry] } },
+        { [file]: {} as ImageMetadata },
+      ),
     ).toThrow(/metadata/i);
   });
 });
