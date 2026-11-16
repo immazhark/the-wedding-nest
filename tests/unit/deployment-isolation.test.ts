@@ -29,9 +29,9 @@ describe("enquiry deployment isolation", () => {
         simple: { limit: 30, period: 60 },
       },
     ]);
-    const namespaces = Object.values(config.env).flatMap(
-      (environment: { ratelimits?: { namespace_id: string }[] }) =>
-        (environment.ratelimits ?? []).map((binding) => binding.namespace_id),
+    const environments = config.env as Record<string, { ratelimits?: { namespace_id: string }[] }>;
+    const namespaces = Object.values(environments).flatMap((environment) =>
+      (environment.ratelimits ?? []).map((binding) => binding.namespace_id),
     );
     expect(new Set(namespaces).size).toBe(namespaces.length);
   });
