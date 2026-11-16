@@ -1,8 +1,9 @@
-"""Exercise the isolated deployed Worker using fictional data only (no dependencies)."""
+"""Exercise isolated deployed staging with fictional data. Requires Python 3 and curl."""
 
 import json
-import urllib.error
-import urllib.request
+import email
+import subprocess
+import tempfile
 import uuid
 
 STAGING = "https://the-wedding-nest-staging.mazharkhan-it.workers.dev"
@@ -11,15 +12,22 @@ MAIN = "https://the-wedding-nest.mazharkhan-it.workers.dev"
 
 def request(origin, path, *, method="GET", body=None, headers=None):
     payload = None if body is None else json.dumps(body).encode()
-    req = urllib.request.Request(
-        origin + path, data=payload, method=method, headers=headers or {}
-    )
-    try:
-        response = urllib.request.urlopen(req, timeout=30)
-    except urllib.error.HTTPError as error:
-        response = error
-    with response:
-        return response.status, response.headers, response.read().decode()
+    with tempfile.TemporaryDirectory() as directory:
+        header_path = directory + "/headers"
+        command = ["curl", "--silent", "--show-error", "--max-time", "30",
+                   "--request", method, "--dump-header", header_path,
+                   "--write-out", "\n%{http_code}"]
+        for name, value in (headers or {}).items():
+            command.extend(["--header", name + ": " + value])
+        if payload is not None:
+            command.extend(["--data-binary", "@-"])
+        result = subprocess.run(command + [origin + path], input=payload,
+                                capture_output=True, check=True)
+        body, status = result.stdout.decode().rsplit("\n", 1)
+        with open(header_path, encoding="utf-8") as file:
+            raw_headers = file.read().strip().split("\n\n")[-1]
+        parsed = email.message_from_string(raw_headers.split("\n", 1)[1])
+        return int(status), parsed, body
 
 
 def main():

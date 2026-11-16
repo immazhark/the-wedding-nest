@@ -1,6 +1,6 @@
 # Deployment — Cloudflare Workers Static Assets
 
-**Status (16 Nov 2026):** Cloudflare MCP management is connected. Main `2417182` deployed successfully (build `7efe712d-36ed-40e2-b144-c84638317145`) to https://the-wedding-nest.mazharkhan-it.workers.dev. Live HTTP checks confirm disallow-all robots.txt and noindex/security headers. Preview build logs identified the missing `previews` block in wrangler.jsonc; branch builds use `npx wrangler preview`, and the config now declares preview-safe variables with enquiries disabled. Full deployed browser verification is pending. Domain, indexing and live enquiry gates remain unchanged.
+**Status (16 Nov 2026):** Cloudflare MCP management is connected. Main `2417182` deployed successfully (build `7efe712d-36ed-40e2-b144-c84638317145`) to https://the-wedding-nest.mazharkhan-it.workers.dev. Live HTTP checks confirm disallow-all robots.txt and noindex/security headers. Preview build logs identified the missing `previews` block in wrangler.jsonc; branch builds use `npx wrangler preview`, and the config now declares preview-safe variables with enquiries disabled. Cloud-browser homepage/planner navigation verified on the branch preview. The separate staging planner reached review; full browser submission remains unverified because the external Turnstile script did not finish loading in this browser. Domain, indexing and live enquiry gates remain unchanged.
 
 ### Verifying the live preview
 
