@@ -83,6 +83,28 @@ test("all internal links resolve", async ({ page, request }) => {
   }
 });
 
+test("planner provides a readable Instagram fallback without JavaScript", async ({
+  browser,
+  baseURL,
+}) => {
+  if (!baseURL) throw new Error("Playwright base URL is required for this test");
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
+  try {
+    const page = await context.newPage();
+    await page.goto("/plan-your-event/");
+    const fallback = page.locator(".planner .planner-panel");
+    await expect(fallback).toBeVisible();
+    await expect(fallback).toContainText(/Instagram\s+in the meantime\./);
+    await expect(fallback.getByRole("link", { name: "Instagram" })).toHaveAttribute(
+      "href",
+      "https://www.instagram.com/twn.events/",
+    );
+    await expect(page.locator("[data-planner-form]")).toBeHidden();
+  } finally {
+    await context.close();
+  }
+});
+
 test("skip link moves focus to main content", async ({ page }) => {
   await page.goto("/");
   await page.keyboard.press("Tab");
