@@ -253,9 +253,7 @@ describe("local draft (privacy)", () => {
       { services: ["catering", "catering"] },
       { styles: ["heritage", "heritage"] },
     ]) {
-      expect(
-        restoreDraft({ ...saved, data: { ...saved.data, ...data } }, 1_001),
-      ).toBeNull();
+      expect(restoreDraft({ ...saved, data: { ...saved.data, ...data } }, 1_001)).toBeNull();
     }
   });
 
