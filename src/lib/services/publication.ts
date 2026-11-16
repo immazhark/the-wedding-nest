@@ -85,10 +85,7 @@ const sources = import.meta.glob("../../content/services/*.json", {
 export const publishedServicePages = buildPublishedServicePages(sources);
 
 /** Prefer a published, verified detail page; otherwise retain the planner path. */
-export function servicePageHref(
-  service: ServiceId,
-  pages: readonly ApprovedServicePage[],
-): string {
+export function servicePageHref(service: ServiceId, pages: readonly ApprovedServicePage[]): string {
   const match = pages.find((page) => page.plannerService === service);
   return match ? `/services/${match.slug}/` : `/plan-your-event/?service=${service}`;
 }
