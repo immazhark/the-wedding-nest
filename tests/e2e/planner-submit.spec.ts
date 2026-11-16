@@ -49,6 +49,7 @@ test("navigation and reset stay locked until a pending send finishes", async ({ 
   await toReview(page);
   await page.getByRole("button", { name: "Send enquiry" }).click();
   await expect(page.locator("[data-back]")).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Edit occasion" })).toBeDisabled();
   await expect(page.locator("[data-reset]")).toBeDisabled();
   await expect(page.getByRole("button", { name: "Sending…" })).toBeDisabled();
   await expect.poll(() => Boolean(finish)).toBe(true);
