@@ -53,3 +53,18 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 7
+
+  editorial-fixtures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright Chromium for editorial templates
+        run: npx playwright install --with-deps chromium
+      - name: Verify populated editorial pages with disposable synthetic CI fixtures
+        run: npm run test:editorial-fixtures
