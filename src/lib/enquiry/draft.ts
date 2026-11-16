@@ -35,7 +35,10 @@ export function toDraft(s: EnquiryState, now: number): Draft {
   // be carried into localStorage, even if a caller bypasses TypeScript's types.
   const occasions = s.occasions.filter((id) => isOneOf(OCCASIONS, id));
   const allowedServices = new Set<string>(serviceOptionsFor(occasions).map((item) => item.id));
-  const services = s.services.filter((id) => typeof id === "string" && allowedServices.has(id));
+  const services =
+    scope === "specific-services"
+      ? s.services.filter((id) => typeof id === "string" && allowedServices.has(id))
+      : [];
   const styles = s.styles.filter((id) => isOneOf(STYLES, id));
   const savedDate: EventDate =
     date?.kind === "date" && typeof date.value === "string" && isValidDate(date.value)

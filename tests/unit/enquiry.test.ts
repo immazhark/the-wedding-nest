@@ -265,6 +265,18 @@ describe("local draft (privacy)", () => {
     expect(draft.data.styles).toEqual(["heritage"]);
   });
 
+  it("never stores hidden specific-service choices when scope is full planning", () => {
+    const state = { ...complete(), scope: "full-planning" as const };
+    // Changing scope may precede the UI's conditional checkbox cleanup.
+    expect(state.services).toEqual(["catering", "decor"]);
+    const draft = toDraft(state, 1_000);
+    expect(draft.data.scope).toBe("full-planning");
+    expect(draft.data.services).toEqual([]);
+
+    const specific = toDraft(complete(), 1_000);
+    expect(specific.data.services).toEqual(["catering", "decor"]);
+  });
+
   it("does not persist unexpected objects in draft scalar fields", () => {
     const contaminated = {
       phone: "PRIVATE PHONE",
