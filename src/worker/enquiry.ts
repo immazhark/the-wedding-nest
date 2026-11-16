@@ -185,9 +185,7 @@ export async function handleEnquiry(
   // Checking only the key could return a 200 for a different name, phone or
   // consent choice and falsely imply those changed details were saved.
   // We can safely skip single-use Turnstile on an exact retry, but not content checks.
-  const acknowledgeExisting = (
-    existing: { id: string; payload_json: string },
-  ): Response => {
+  const acknowledgeExisting = (existing: { id: string; payload_json: string }): Response => {
     const incoming = validateEnquiry((body as Record<string, unknown>)["enquiry"]);
     if (!incoming.ok) {
       deps.log({ event: "enquiry", outcome: "invalid", status: 422 });
