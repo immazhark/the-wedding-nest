@@ -69,6 +69,10 @@ test("preview reviews a plan without contact details", async ({ page }) => {
   await expect(page.locator("[data-summary]")).toContainText("Nikah");
   await expect(page.getByText(/nothing has been sent/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Send enquiry" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Edit occasion" }).click();
+  await expect(heading(page)).toHaveText("What are you celebrating?");
+  await page.getByRole("button", { name: "Return to review" }).click();
+  await expect(heading(page)).toHaveText("Review your plan");
   expect(posts).toEqual([]);
   expect(await page.evaluate(() => localStorage.getItem("twn:enquiry-draft") ?? "")).not.toContain(
     "phone",
