@@ -125,6 +125,56 @@ test("keeps choices after reload but never stores contact details", async ({ pag
   expect(await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"))).toBeNull();
 });
 
+test("purges expired or corrupt local drafts on page load", async ({ page }) => {
+  const draft = await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"));
+  expect(draft).toBeNull();
+  const expired = JSON.stringify({
+    v: 1,
+    savedAt: Date.now() - 8 * 24 * 60 * 60 * 1_000,
+    data: { occasions: ["nikah"] },
+  });
+  for (const raw of [expired, "{bad json"]) {
+    await page.evaluate((value) => localStorage.setItem("twn:enquiry-draft", value), raw);
+    await page.reload();
+    expect(await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"))).toBeNull();
+  }
+});
+
+test("scrubs unapproved fields from valid legacy drafts without resetting expiry", async ({
+  page,
+}) => {
+  const savedAt = Date.now() - 60_000;
+  await page.evaluate(
+    (timestamp) =>
+      localStorage.setItem(
+        "twn:enquiry-draft",
+        JSON.stringify({
+          v: 1,
+          savedAt: timestamp,
+          data: {
+            occasions: ["nikah"],
+            scope: null,
+            services: [],
+            styles: [],
+            date: { kind: "undecided" },
+            guestCount: "",
+            budget: null,
+            location: "PRIVATE HOME ADDRESS",
+          },
+          phone: "PRIVATE PHONE",
+        }),
+      ),
+    savedAt,
+  );
+  await page.reload();
+  await expect(page.getByRole("checkbox", { name: "Nikah" })).toBeChecked();
+  const cleaned = await page.evaluate(() => localStorage.getItem("twn:enquiry-draft") ?? "");
+  expect(cleaned).toContain('"nikah"');
+  expect(cleaned).not.toContain("PRIVATE HOME ADDRESS");
+  expect(cleaned).not.toContain("PRIVATE PHONE");
+  expect(JSON.parse(cleaned).savedAt).toBe(savedAt);
+});
+
 test("can be completed with the keyboard alone", async ({ page }) => {
   await page.getByRole("checkbox", { name: "Walima" }).focus();
   await page.keyboard.press("Space");
