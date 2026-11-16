@@ -182,11 +182,7 @@ try {
   };
   process.stdout.write("\nSynthetic CI-only editorial fixture build; not for deployment.\n");
   await run("npm", ["run", "build"], testEnv);
-  await run(
-    "npx",
-    ["playwright", "test", "--config=playwright.editorial.config.ts"],
-    testEnv,
-  );
+  await run("npx", ["playwright", "test", "--config=playwright.editorial.config.ts"], testEnv);
 } finally {
   for (const file of created.reverse()) {
     await rm(file, { force: true });
