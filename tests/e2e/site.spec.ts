@@ -54,6 +54,19 @@ for (const path of PAGES) {
   });
 }
 
+test("structured data contains only the verified Organization identity", async ({ page }) => {
+  await page.goto("/");
+  const schema = page.locator('script[type="application/ld+json"]');
+  await expect(schema).toHaveCount(1);
+  const organization = JSON.parse((await schema.textContent()) ?? "");
+  expect(organization["@type"]).toBe("Organization");
+  expect(organization.name).toBe("The Wedding Nest");
+  expect(organization.url).toBe("https://theweddingnest.in");
+  expect(organization.sameAs).toEqual(["https://www.instagram.com/twn.events/"]);
+  expect(organization).not.toHaveProperty("aggregateRating");
+  expect(organization).not.toHaveProperty("address");
+});
+
 test("all internal links resolve", async ({ page, request }) => {
   await page.goto("/");
   const hrefs = await page.$$eval("a[href^='/']", (as) => [
