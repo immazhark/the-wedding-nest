@@ -334,7 +334,9 @@ export function initPlanner(form: HTMLFormElement) {
           ? "name"
           : stageError("contact", { ...s, consent: true })
             ? "phone"
-            : null
+            : s.consent
+              ? null
+              : "consent"
         : stage === "logistics"
           ? s.date.kind === "date" && stageError("logistics", { ...s, guestCount: "" })
             ? "date"
@@ -392,8 +394,13 @@ export function initPlanner(form: HTMLFormElement) {
       current !== "sent" &&
       errorEl.textContent &&
       !stageError(current, readState(form))
-    )
+    ) {
       errorEl.textContent = "";
+      form.querySelectorAll<HTMLElement>("[aria-invalid]").forEach((field) => {
+        field.removeAttribute("aria-invalid");
+        field.removeAttribute("aria-describedby");
+      });
+    }
   });
   form.addEventListener("input", (event) => {
     const target = event.target;
