@@ -52,7 +52,7 @@ test("walks through all five stages to a review, without sending anything", asyn
   expect(requests).toEqual([]);
 });
 
-test("preview allows reviewing a plan without entering private contact details", async ({ page }) => {
+test("preview reviews a plan without contact details", async ({ page }) => {
   const posts: string[] = [];
   page.on("request", (request) => {
     if (request.method() === "POST") posts.push(request.url());
