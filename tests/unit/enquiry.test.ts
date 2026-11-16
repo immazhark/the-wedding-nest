@@ -14,6 +14,7 @@ import {
 } from "../../src/lib/enquiry/flow";
 import { validateEnquiry, LIMITS } from "../../src/lib/enquiry/validate";
 import { DRAFT_TTL_MS, restoreDraft, toDraft } from "../../src/lib/enquiry/draft";
+import { previewPlanText } from "../../src/lib/enquiry/share";
 
 const complete = (): EnquiryState => ({
   ...emptyEnquiry(),
@@ -30,6 +31,39 @@ const complete = (): EnquiryState => ({
   phone: "+91 98765 43210",
   contactChannel: "whatsapp",
   consent: true,
+});
+
+describe("preview planning-choice sharing", () => {
+  it("copies only approved planning choices, excluding private fields and hidden services", () => {
+    const state = {
+      ...complete(),
+      scope: "full-planning" as const,
+      name: "PRIVATE FULL NAME",
+      phone: "PRIVATE PHONE",
+      location: "PRIVATE HOME ADDRESS",
+      notes: "PRIVATE FAMILY NOTES",
+    };
+    const text = previewPlanText(state);
+    expect(text).toContain("The Wedding Nest — Planning choices");
+    expect(text).toContain("Occasion: Nikah, Walima");
+    expect(text).toContain("Help needed: End-to-end planning");
+    expect(text).toContain("Guests: 350");
+    expect(text).toContain("14 February 2027");
+    expect(text).toContain("Budget: Prefer to discuss");
+    expect(text).not.toContain("Specific services");
+    for (const privateValue of ["PRIVATE", "Contact:", "Name:", "Location:", "Notes:"]) {
+      expect(text).not.toContain(privateValue);
+    }
+  });
+
+  it("includes allowed individual services but never unknown runtime data", () => {
+    const value = previewPlanText({
+      ...complete(),
+      services: ["catering", "decor", { name: "PRIVATE" }] as unknown as EnquiryState["services"],
+    });
+    expect(value).toContain("Specific services: Catering & menus, Décor, florals & staging");
+    expect(value).not.toContain("PRIVATE");
+  });
 });
 
 describe("question tree", () => {
