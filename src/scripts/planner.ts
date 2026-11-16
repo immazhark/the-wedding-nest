@@ -354,8 +354,25 @@ export function initPlanner(form: HTMLFormElement) {
             ? "date"
             : "guestCount"
           : null;
-    const el = field ? form.elements.namedItem(field) : null;
+
+    // Grouped checkboxes/radios return a RadioNodeList from form.elements,
+    // so find a real input to focus when a selection stage is incomplete.
+    const choice =
+      stage === "occasion"
+        ? form.querySelector<HTMLInputElement>('input[name="occasions"]')
+        : stage === "scope"
+          ? s.scope === "specific-services"
+            ? [...form.querySelectorAll<HTMLInputElement>('input[name="services"]')].find(
+                (input) => !input.closest<HTMLElement>(".choice")?.hidden,
+              )
+            : form.querySelector<HTMLInputElement>('input[name="scope"]')
+          : null;
+    const el = choice ?? (field ? form.elements.namedItem(field) : null);
     if (el instanceof HTMLElement) {
+      form.querySelectorAll<HTMLElement>("[aria-invalid]").forEach((input) => {
+        input.removeAttribute("aria-invalid");
+        input.removeAttribute("aria-describedby");
+      });
       el.setAttribute("aria-invalid", "true");
       el.setAttribute("aria-describedby", "planner-error-msg");
       el.focus();
