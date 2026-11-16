@@ -41,6 +41,17 @@ test("conditional service link waits for a compatible occasion without guessing 
   await expect(page.getByRole("checkbox", { name: "Mehndi artist" })).toBeChecked();
 });
 
+test("start again discards a pending service link before any occasion is chosen", async ({
+  page,
+}) => {
+  await page.goto("/plan-your-event/?service=mehndi-artist");
+  await page.getByRole("button", { name: "Start again" }).click();
+  await expect(page).not.toHaveURL(/service=/);
+  await page.getByRole("checkbox", { name: "Mehndi" }).check();
+  await next(page);
+  await expect(page.getByRole("radio", { name: /Specific services/ })).not.toBeChecked();
+});
+
 test("explicit full-planning choice overrides an earlier conditional service link", async ({
   page,
 }) => {
