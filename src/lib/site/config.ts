@@ -35,6 +35,22 @@ export function pageTitle(page?: string): string {
   return page ? `${page} · ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
 }
 
+/** Minimal, owner-verified Organization data. Contact, location, ratings and
+ * service-specific LocalBusiness claims stay absent until explicitly approved.
+ * Escaping '<' makes the generated JSON safe for an inline JSON-LD script.
+ */
+export function organizationJsonLd(): string {
+  const facts = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${SITE.url}/#organization`,
+    name: SITE.name,
+    url: SITE.url,
+    sameAs: [SITE.instagram],
+  };
+  return JSON.stringify(facts).replace(/</g, "\\u003c");
+}
+
 export function canonicalUrl(path: string): string {
   const url = new URL(path, SITE.url);
   url.search = "";
