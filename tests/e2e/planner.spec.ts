@@ -139,6 +139,24 @@ test("unknown planner intent never selects an occasion or a service", async ({ p
   expect(await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"))).toBeNull();
 });
 
+test("mobile progressbar announces step changes to assistive technology", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/plan-your-event/");
+  const progress = page.getByRole("progressbar", { name: "Planner completion" });
+  await expect(progress).toHaveAttribute("aria-valuemin", "0");
+  await expect(progress).toHaveAttribute("aria-valuemax", "5");
+  await expect(progress).toHaveAttribute("aria-valuenow", "1");
+  await expect(progress).toHaveAttribute("aria-valuetext", "Step 1 of 5");
+
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await expect(progress).toHaveAttribute("aria-valuenow", "2");
+  await expect(progress).toHaveAttribute("aria-valuetext", "Step 2 of 5");
+  await page.getByRole("button", { name: "← Back" }).click();
+  await expect(progress).toHaveAttribute("aria-valuenow", "1");
+  await expect(progress).toHaveAttribute("aria-valuetext", "Step 1 of 5");
+});
+
 test("mobile planner shows the first question in the initial viewport", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/plan-your-event/");
