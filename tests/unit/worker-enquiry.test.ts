@@ -20,9 +20,9 @@ function fakeD1() {
           return stmt;
         },
         async first<T>() {
-          if (sql.startsWith("SELECT id FROM enquiries")) {
+          if (sql.startsWith("SELECT id, payload_json FROM enquiries")) {
             const row = enquiries.get(String(stmt.args[0]));
-            return (row ? { id: row.id } : null) as T | null;
+            return (row ? { id: row.id, payload_json: row.payload } : null) as T | null;
           }
           return null;
         },
