@@ -16,8 +16,9 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 | Privacy | Browser drafts exclude names, numbers, locations, notes and consent. Enquiries and an outbox event are stored atomically. No lead notifications or marketing are sent. Production retention and recipient decisions remain open. |
 | CI | Formatting, strict type checks, unit tests, production/test builds, desktop/mobile Playwright and axe, and the local Cloudflare Workers runtime. Separate deployed staging browser tests use real dummy-key verification and the live API without mocks. |
 | Release gates | Production domain, indexing, real enquiry intake and unapproved business content remain owner-gated. |
-| Authentic media | Build-time exact photo/manifest pairing with permission and private release references. New #37 rejects unreviewed files of any normally enumerated type from the event directory; no approved event originals are yet published. |
-| SEO foundation | Canonicals, robots, launch-gated sitemap and verified Organization JSON-LD (#38). Unapproved LocalBusiness details, reviews, ratings and contact facts are not added. |
+**Authentic media:** Build-time exact photo/manifest pairing with permission and private release references. PR #37 rejects unreviewed files of normally enumerated types from the event directory; no approved event originals are yet published.
+
+**SEO foundation:** Canonicals, robots, launch-gated sitemap and verified Organization JSON-LD (#38). Unapproved LocalBusiness details, reviews, ratings and contact facts are not added.
 
 ## Latest work
 
