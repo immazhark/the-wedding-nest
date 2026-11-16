@@ -4,10 +4,39 @@
  * disagree. Default (unset) = preview = noindex everywhere.
  */
 
-export function robotsTxt(indexable: boolean): string {
+export function robotsTxt(indexable: boolean, siteUrl: string): string {
   return indexable
-    ? "User-agent: *\nAllow: /\n"
+    ? `User-agent: *\nAllow: /\nSitemap: ${new URL("/sitemap.xml", siteUrl).toString()}\n`
     : "# Preview: indexing disabled until the owner approves production launch.\nUser-agent: *\nDisallow: /\n";
+}
+
+/** Only generated into an explicitly indexable build. No unpublished routes or 404 pages. */
+export function sitemapXml(siteUrl: string, paths: readonly string[]): string {
+  const origin = new URL(siteUrl).origin;
+  const urls = new Set<string>();
+  for (const path of paths) {
+    const url = new URL(path, siteUrl);
+    if (url.origin !== origin || ["/404", "/404/", "/404.html"].includes(url.pathname)) continue;
+    url.search = "";
+    url.hash = "";
+    if (!url.pathname.endsWith("/")) url.pathname += "/";
+    urls.add(url.toString());
+  }
+
+  const xmlEscape = (value: string) =>
+    value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&apos;");
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...[...urls].sort().map((url) => `  <url><loc>${xmlEscape(url)}</loc></url>`),
+    "</urlset>",
+    "",
+  ].join("\n");
 }
 
 const SECURITY_HEADERS = [
