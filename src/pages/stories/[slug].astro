@@ -3,6 +3,7 @@ import type { GetStaticPaths } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Frame from "../../components/media/Frame.astro";
 import { publishedStories, type ApprovedStory } from "../../lib/stories/publication";
+import { storyPlannerHref } from "../../lib/stories/planner-link";
 
 // No case-study pages exist without owner-reviewed written facts and real photographs.
 export const getStaticPaths = (() =>
@@ -16,6 +17,7 @@ interface Props {
 }
 const { story } = Astro.props;
 const [hero, ...gallery] = story.photos;
+const plannerHref = storyPlannerHref(story.occasion);
 ---
 
 <BaseLayout title={story.title} description={story.introduction}>
@@ -70,7 +72,7 @@ const [hero, ...gallery] = story.photos;
       <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20">
         <p class="eyebrow text-brass-deep">Your own occasion</p>
         <h2 class="mt-5 text-[length:var(--text-headline)]">Tell us what you're planning.</h2>
-        <a class="btn btn-solid mt-9" href="/plan-your-event/">
+        <a class="btn btn-solid mt-9" href={plannerHref}>
           Start planning
         </a>
       </div>
