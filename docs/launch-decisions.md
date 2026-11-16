@@ -1,0 +1,18 @@
+# Launch decisions — owner review required
+
+The site remains a noindex design preview. Staging accepts fictional data only. These decisions
+must be recorded before connecting the production domain or enabling real customer enquiries.
+
+| Decision | Current position | Needed from the business |
+| --- | --- | --- |
+| Enquiry handling | D1 stores the enquiry and its outbox event; no notifications are sent. | Name the responsible team member and choose the notification channel and recipient. |
+| Privacy contact | No business privacy contact is approved. | Provide an approved business contact for access, correction and deletion requests. |
+| Retention | No production retention period is agreed or implemented. | Decide how long unsuccessful enquiries are kept, how booked clients are handled, and who authorises deletion. |
+| Marketing | Optional consent is separate; no marketing delivery exists. | Confirm whether marketing is needed at launch. Default remains no marketing. |
+| Public business details | Logo and Instagram profile are approved; other details are not publication-ready. | Confirm service coverage, contact number, address/hours and any public business/legal name. |
+| Photography and reviews | Authentic assets only; placeholders stay labelled. | Supply permission-cleared originals and approve specific quotes, names and likenesses. |
+| Production launch | Domain, indexing and real enquiry intake remain off. | Review the release preview and give explicit approval for each launch gate. |
+
+No retention duration, recipient address, service claim or privacy promise is assumed by this
+document. After these choices are approved, implementation still needs production Turnstile,
+abuse controls, notification delivery/retries, retention/deletion handling and a final release check.

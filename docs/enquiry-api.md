@@ -31,7 +31,7 @@ Every response: `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`. Lo
 
 ## Staging (isolated, test data only)
 
-**16 Nov 2026:** D1 `twn-enquiries-staging` created in APAC and schema applied. The separate Worker is deployed at https://the-wedding-nest-staging.mazharkhan-it.workers.dev. Its dedicated Workers Builds trigger watches `codex/staging-enquiry-validation`, builds with `PUBLIC_ENQUIRIES_ENABLED=true` and Cloudflare's public dummy site key, then deploys `--env staging`. The matching public dummy secret is stored in the staging Worker's secret binding; no production widget or secret is used. A persistent test-environment notice requires fictional details only.
+**16 Nov 2026:** D1 `twn-enquiries-staging` created in APAC and schema applied. The separate Worker is deployed at https://the-wedding-nest-staging.mazharkhan-it.workers.dev. Its dedicated Workers Builds trigger watches `main`, builds with `PUBLIC_ENQUIRIES_ENABLED=true` and Cloudflare's public dummy site key, then deploys `--env staging`. The matching public dummy secret is stored in the staging Worker's secret binding; no production widget or secret is used. A persistent test-environment notice requires fictional details only.
 
 Repeatable HTTP verification: `python scripts/verify_staging.py` (Python 3 and curl). It writes one fictional record per run and checks idempotent retries; inspect the D1 enquiry/outbox rows for durability. It does not send WhatsApp messages or notifications. Real desktop/mobile browser submission also passed in GitHub Actions (`staging-browser`, run `43778044811`); the workflow is repeatable via manual dispatch. Production intake remains off.
 
@@ -60,6 +60,11 @@ npx wrangler deploy --env staging
 ```
 
 Use Cloudflare's Turnstile **test** keys in staging. Never point staging at production data.
+
+## Verification deadlines
+
+- Server: Siteverify fetch and response-body consumption share a 10-second deadline. Timeout aborts the request and returns `verification_unavailable` (503) before D1 writes, even if the transport ignores abort. Late completion is not acknowledged as success.
+- Browser: a stalled or failed Turnstile script is removed after 10 seconds and produces a clear recovery message. Back → Review starts a fresh load; late loads cannot render a widget in a hidden review panel. Verification is never bypassed.
 
 ## Planner integration (browser)
 

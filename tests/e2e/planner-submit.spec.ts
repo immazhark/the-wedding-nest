@@ -73,6 +73,73 @@ async function toReview(page: Page) {
   await expect(page.getByRole("heading", { name: "Review your plan" })).toBeVisible();
 }
 
+test("a stalled verification script times out and can be retried from review", async ({ page }) => {
+  const calls = await setup(page, () => ({ status: 201, body: { id: "accepted123" } }));
+  await page.clock.install();
+  // Hold the first script request open to model a transport that never completes.
+  // Keep the Route so we can release it before the retry: an unresolved Playwright
+  // interception otherwise blocks the subsequent request in Chromium.
+  let stalledRoute: Route | undefined;
+  const stall = (route: Route) => {
+    stalledRoute = route;
+  };
+  await page.route("https://challenges.cloudflare.com/**", stall);
+  await toReview(page);
+  await expect.poll(() => Boolean(stalledRoute)).toBe(true);
+  await page.clock.fastForward(10_001);
+  await expect(page.getByRole("status")).toContainText("Go back and return to review");
+  expect(calls).toHaveLength(0);
+  await expect(page.locator('script[src*="challenges.cloudflare.com"]')).toHaveCount(0);
+  await page.unroute("https://challenges.cloudflare.com/**", stall);
+  // Release the old interception only after the timeout and cleanup are observed.
+  // Aborting it models an eventual network error, without allowing a stale API
+  // script to race with the new request.
+  await stalledRoute!.abort("failed");
+  await page.getByRole("button", { name: "← Back" }).click();
+  await next(page);
+  await expect.poll(() => page.evaluate(() => Boolean(window.turnstile))).toBe(true);
+  await page.clock.fastForward(31);
+  await page.getByRole("button", { name: "Send enquiry" }).click();
+  await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toBeVisible();
+  expect(calls).toHaveLength(1);
+});
+
+test("a script finishing after leaving review does not render a hidden widget", async ({
+  page,
+}) => {
+  await setup(page, () => ({ status: 201, body: { id: "accepted123" } }));
+  let script: Route | undefined;
+  await page.route("https://challenges.cloudflare.com/**", (route) => {
+    script = route;
+  });
+  await toReview(page);
+  await expect.poll(() => Boolean(script)).toBe(true);
+  await page.getByRole("button", { name: "← Back" }).click();
+  await script!.fulfill({
+    contentType: "text/javascript",
+    body: FAKE_TURNSTILE.replace(
+      "render(el, opts) {",
+      "render(el, opts) { window.__renders = (window.__renders || 0) + 1;",
+    ).replace(
+      'opts.callback("test-token")',
+      '(opts.callback("test-token"), window.__verified = true)',
+    ),
+  });
+  await expect.poll(() => page.evaluate(() => Boolean(window.turnstile))).toBe(true);
+  const renderCount = () =>
+    page.evaluate(() => (window as Window & { __renders?: number }).__renders ?? 0);
+  expect(await renderCount()).toBe(0);
+  await next(page);
+  await expect.poll(renderCount).toBe(1);
+  await expect
+    .poll(() =>
+      page.evaluate(() => Boolean((window as Window & { __verified?: boolean }).__verified)),
+    )
+    .toBe(true);
+  await page.getByRole("button", { name: "Send enquiry" }).click();
+  await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toBeVisible();
+});
+
 test("with sending on, the 'can't send yet' preview disclosure is gone", async ({ page }) => {
   await setup(page, () => ({ status: 201, body: { id: "x" } }));
   await expect(page.locator("#planner-disclosure")).toHaveCount(0);

@@ -29,7 +29,38 @@ export interface EnquiryDeps {
 
 export const MAX_BODY_BYTES = 16 * 1024;
 const SITEVERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+const SITEVERIFY_TIMEOUT_MS = 10_000;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Bound both the network request and response body, even if the transport ignores abort. */
+async function verifyTurnstile(
+  form: FormData,
+  fetcher: typeof fetch,
+): Promise<{ success?: boolean }> {
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(() => {
+      reject(new Error("verification_timeout"));
+      controller.abort();
+    }, SITEVERIFY_TIMEOUT_MS);
+  });
+  const verification = (async () => {
+    const response = await fetcher(SITEVERIFY, {
+      method: "POST",
+      body: form,
+      signal: controller.signal,
+    });
+    // A transport that ignores cancellation must not start consuming a late response.
+    if (controller.signal.aborted) throw new Error("verification_timeout");
+    return (await response.json()) as { success?: boolean };
+  })();
+  try {
+    return await Promise.race([verification, deadline]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 /** Enforce the byte limit while consuming the stream, before buffering or decoding it. */
 async function readBody(request: Request): Promise<string | null> {
@@ -146,8 +177,7 @@ export async function handleEnquiry(
     form.set("response", token);
     if (ip) form.set("remoteip", ip);
     form.set("idempotency_key", key);
-    const res = await deps.fetch(SITEVERIFY, { method: "POST", body: form });
-    const outcome = (await res.json()) as { success?: boolean };
+    const outcome = await verifyTurnstile(form, deps.fetch);
     if (outcome.success !== true) return fail(403, "verification_failed");
   } catch {
     return fail(503, "verification_unavailable");

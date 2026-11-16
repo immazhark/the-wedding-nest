@@ -1,6 +1,6 @@
 # Deployment — Cloudflare Workers Static Assets
 
-**Status (16 Nov 2026):** Cloudflare MCP management is connected. Preview fix merged in #11 as `8e24166`; main deployed successfully (the earlier `2417182` build was `7efe712d-36ed-40e2-b144-c84638317145`) to https://the-wedding-nest.mazharkhan-it.workers.dev. Live HTTP checks confirm disallow-all robots.txt and noindex/security headers. Preview build logs identified the missing `previews` block in wrangler.jsonc; branch builds use `npx wrangler preview`, and the config now declares preview-safe variables with enquiries disabled. Deployed branch homepage/planner navigation passed in the cloud browser. Real staging desktop/mobile submission passed in GitHub Actions (`43778044811`), using the actual dummy-key widget and API; the cloud browser's third-party script did not complete. Domain, indexing and live enquiry gates remain unchanged.
+**Status (16 Nov 2026):** Cloudflare MCP is connected. Main and branch previews work with intake disabled; the separate staging Worker accepts fictional test submissions only. Main includes #10–#12 (latest baseline `79f9e42`), with successful Cloudflare deployment and real desktop/mobile staging checks. Production domain, indexing and live enquiry gates remain unchanged.
 
 ### Verifying the live preview
 
@@ -30,6 +30,12 @@ Cloudflare builds directly from GitHub, so no Cloudflare API token is stored in 
 4. Do **not** add a custom domain or route for `theweddingnest.in` yet.
 
 Result: `main` deploys to `the-wedding-nest.<account-subdomain>.workers.dev`; each PR branch gets an isolated Worker Preview URL.
+
+## Staging build continuity
+
+The separate `the-wedding-nest-staging` build configuration watches `main`, rather than a temporary PR branch. Its command builds with the public Turnstile dummy site key and `PUBLIC_ENQUIRIES_ENABLED=true`, then runs `npx wrangler deploy --env staging`. Only staging receives its isolated D1 and dummy secret binding. Runtime build-path filters avoid redeploying for documentation-only changes. Branch previews and main continue using disabled intake.
+
+After a staging deployment, run the synthetic HTTP script or the manually runnable `Deployed staging verification` workflow. Those tests write fictional records and do not send messages or notifications.
 
 ## Node version
 
