@@ -47,6 +47,8 @@ test("walks through all five stages to a review, without sending anything", asyn
   await expect(summary).toContainText("Specific services: Mehndi artist");
   await expect(summary).toContainText("14 February 2027");
   await expect(summary).toContainText("Not shared");
+  await expect(summary).toContainText("Test Visitor");
+  await expect(summary).toContainText("+91 98765 43210");
   await expect(page.getByText(/so nothing has been sent/)).toBeVisible();
   await expect(page.getByRole("button", { name: /send/i })).toHaveCount(0);
   expect(requests).toEqual([]);
@@ -67,6 +69,8 @@ test("preview reviews a plan without contact details", async ({ page }) => {
   await page.getByRole("button", { name: "Skip contact — preview only" }).click();
   await expect(heading(page)).toHaveText("Review your plan");
   await expect(page.locator("[data-summary]")).toContainText("Nikah");
+  const contactRows = page.locator("[data-summary] dt").filter({ hasText: /^(Name|Contact)$/ });
+  await expect(contactRows).toHaveCount(0);
   await expect(page.getByText(/nothing has been sent/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Send enquiry" })).toHaveCount(0);
   await page.getByRole("button", { name: "Edit occasion" }).click();
