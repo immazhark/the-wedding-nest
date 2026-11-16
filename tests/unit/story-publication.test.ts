@@ -50,9 +50,9 @@ describe("owner-gated event stories", () => {
     expect(() =>
       buildPublishedStories({ [pagePath]: { ...record, publicationApproved: false } }, photos),
     ).toThrow();
-    expect(() => buildPublishedStories({ [pagePath]: record }, { [fileA]: photos[fileA]! })).toThrow(
-      /photo|image/i,
-    );
+    expect(() =>
+      buildPublishedStories({ [pagePath]: record }, { [fileA]: photos[fileA]! }),
+    ).toThrow(/photo|image/i);
     expect(() =>
       buildPublishedStories(
         { [pagePath]: record },
@@ -66,10 +66,9 @@ describe("owner-gated event stories", () => {
       buildPublishedStories({ "../../content/stories/other.json": record }, photos),
     ).toThrow(/slug|filename/i);
     expect(storySchema.safeParse({ ...record, images: [fileA, fileA] }).success).toBe(false);
-    expect(storySchema.safeParse({ ...record, clientName: "Private Client" }).success).toBe(
-      false,
-    );
-    expect(storySchema.safeParse({ ...record, approvalRef: "https://secret.example" }).success)
-      .toBe(false);
+    expect(storySchema.safeParse({ ...record, clientName: "Private Client" }).success).toBe(false);
+    expect(
+      storySchema.safeParse({ ...record, approvalRef: "https://secret.example" }).success,
+    ).toBe(false);
   });
 });
