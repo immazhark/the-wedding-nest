@@ -185,6 +185,22 @@ test.describe("mobile navigation", () => {
       .toBeGreaterThanOrEqual(header.y + header.height);
   });
 
+  test("focus moves to the section after following a same-page menu link", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Menu" }).click();
+    const nav = page.getByRole("navigation", { name: "Primary" });
+    const link = nav.getByRole("link", { name: "Occasions" });
+    await link.focus();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/#occasions$/);
+    await expect(page.locator("#occasions")).toBeFocused();
+    await expect(page.getByRole("button", { name: "Menu" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+    await expect(page.locator("main")).not.toHaveAttribute("inert");
+  });
+
   test("closes after choosing a link", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Menu" }).click();
@@ -195,6 +211,21 @@ test.describe("mobile navigation", () => {
     await expect(page).toHaveURL(/#occasions$/);
     await expect(page.locator("[data-menu-toggle]")).toHaveAttribute("aria-expanded", "false");
   });
+});
+
+test("homepage and planner reflow without horizontal scrolling at 320 CSS pixels", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const route of ["/", "/plan-your-event/"]) {
+    await page.goto(route);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow, route).toBeLessThanOrEqual(1);
+  }
 });
 
 test.describe("desktop navigation", () => {
