@@ -138,6 +138,28 @@ test("tailors services to the chosen occasions", async ({ page }) => {
   await expect(page.getByRole("checkbox", { name: "Mehndi artist" })).toBeVisible();
 });
 
+test("correcting guest count clears validation feedback before the field loses focus", async ({
+  page,
+}) => {
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await next(page);
+  await next(page);
+  const guests = page.getByLabel(/Approximate guests/);
+  await guests.fill("abc");
+  await next(page);
+  await expect(page.getByRole("alert")).toContainText("whole number");
+  await expect(guests).toHaveAttribute("aria-invalid", "true");
+  await expect(guests).toBeFocused();
+
+  await guests.fill("250");
+  await expect(guests).toBeFocused();
+  await expect(page.getByRole("alert")).toBeEmpty();
+  await expect(guests).not.toHaveAttribute("aria-invalid");
+  await expect(guests).not.toHaveAttribute("aria-describedby");
+});
+
 test("requires explicit consent and a valid phone number", async ({ page }) => {
   await completeToContact(page);
   await page.getByLabel("Your name").fill("Test Visitor");
