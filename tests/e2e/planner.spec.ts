@@ -52,6 +52,39 @@ test("walks through all five stages to a review, without sending anything", asyn
   expect(requests).toEqual([]);
 });
 
+test("homepage occasion links open the planner with only the chosen occasion selected", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: /Nikah.*start planning/i }).click();
+  await expect(page).toHaveURL(/\/plan-your-event\/\?occasion=nikah$/);
+  await expect(page.getByRole("checkbox", { name: "Nikah" })).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: "Walima" })).not.toBeChecked();
+  await expect(page.getByLabel("Your name")).toHaveValue("");
+  expect(await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"))).not.toContain(
+    "phone",
+  );
+});
+
+test("homepage service links begin a specific-service enquiry without skipping occasion", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Catering & menus" }).click();
+  await expect(page).toHaveURL(/\/plan-your-event\/\?service=catering$/);
+  await expect(page.getByRole("checkbox", { name: "Nikah" })).not.toBeChecked();
+  await page.getByRole("checkbox", { name: "Walima" }).check();
+  await next(page);
+  await expect(page.getByRole("radio", { name: /Specific services/ })).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: "Catering & menus" })).toBeChecked();
+});
+
+test("unknown planner intent never selects an occasion or a service", async ({ page }) => {
+  await page.goto("/plan-your-event/?occasion=%3Cscript%3E&service=unknown");
+  await expect(page.getByRole("checkbox", { name: "Nikah" })).not.toBeChecked();
+  expect(await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"))).toBeNull();
+});
+
 test("discloses before the first step that sending is off and real details shouldn't be entered", async ({
   page,
 }) => {
