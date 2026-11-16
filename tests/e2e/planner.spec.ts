@@ -67,6 +67,7 @@ test("preview reviews a plan without contact details", async ({ page }) => {
   await page.getByRole("button", { name: "Skip contact — preview only" }).click();
   await expect(heading(page)).toHaveText("Review your plan");
   await expect(page.locator("[data-summary]")).toContainText("Nikah");
+  await expect(page.locator("[data-summary] dt")).not.toContainText(["Name", "Contact"]);
   await expect(page.getByText(/nothing has been sent/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Send enquiry" })).toHaveCount(0);
   await page.getByRole("button", { name: "Edit occasion" }).click();
