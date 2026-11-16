@@ -7,8 +7,6 @@ describe("page transfer budget accounting", () => {
   });
 
   it("counts transfer overhead when it exceeds encoded payload size", () => {
-    expect(accountedResourceBytes({ transferSize: 10_100, encodedBodySize: 10_000 })).toBe(
-      10_100,
-    );
+    expect(accountedResourceBytes({ transferSize: 10_100, encodedBodySize: 10_000 })).toBe(10_100);
   });
 });
