@@ -23,7 +23,12 @@ each reviewed JSON manifest entry to an **exact matching imported local asset**.
 The `Frame.astro` component accepts only that paired `photo`; image and
 approval metadata cannot be supplied independently. The build rejects a
 manifest with a missing file, any undeclared original in `src/assets/events/`,
-duplicate photos across manifests, or duplicate homepage placements. Frames
+duplicate photos across manifests, or duplicate homepage placements. An
+additional build-time directory scan detects **every** staged event file,
+including GIF/SVG/video/document formats that are not part of the approved
+image glob, and fails closed. Keep consent scans, videos, and working drafts
+outside `src/assets/events/` until an explicitly reviewed media pipeline
+is built. Frames
 render approved alt text, focal point, caption and credit; missing slots keep
 honestly labelled placeholders.
 
