@@ -178,6 +178,21 @@ test("keeps choices after reload but never stores contact details", async ({ pag
   expect(await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"))).toBeNull();
 });
 
+test("start again clears URL preselection so reload stays reset", async ({ page }) => {
+  await page.goto("/plan-your-event/?occasion=nikah&service=catering&utm_source=instagram");
+  await expect(page.getByRole("checkbox", { name: "Nikah" })).toBeChecked();
+  await page.getByRole("button", { name: "Start again" }).click();
+  await expect(page.getByRole("checkbox", { name: "Nikah" })).not.toBeChecked();
+  await expect(page).toHaveURL(/[?]utm_source=instagram$/);
+  expect(await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"))).toBeNull();
+
+  await page.reload();
+  await expect(page.getByRole("checkbox", { name: "Nikah" })).not.toBeChecked();
+  await page.getByRole("checkbox", { name: "Walima" }).check();
+  await page.getByRole("button", { name: /^Continue/ }).click();
+  await expect(page.getByRole("radio", { name: /Specific services/ })).not.toBeChecked();
+});
+
 test("purges expired or corrupt local drafts on page load", async ({ page }) => {
   const draft = await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"));
   expect(draft).toBeNull();

@@ -449,6 +449,14 @@ export function initPlanner(form: HTMLFormElement) {
     form.reset();
     applyState(form, emptyEnquiry());
     syncConditional();
+    // A reset must remain a reset after reload, even if the visitor arrived
+    // through a preselected occasion/service link. Keep unrelated URL context.
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("occasion") || url.searchParams.has("service")) {
+      url.searchParams.delete("occasion");
+      url.searchParams.delete("service");
+      window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+    }
     show("occasion");
   });
 
