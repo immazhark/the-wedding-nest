@@ -247,6 +247,34 @@ describe("POST /api/enquiry", () => {
     expect(res.headers.get("cache-control")).toBe("no-store");
   });
 
+  it("rejects malformed selections before storage and on duplicate retries", async () => {
+    for (const field of ["services", "styles"] as const) {
+      const malformed = { ...ok(), enquiry: { ...validEnquiry, [field]: "private-invalid-choice" } };
+      const response = await call(request(malformed));
+      expect(response.status).toBe(422);
+      expect(await response.json()).toEqual({
+        error: "invalid_enquiry",
+        errors: { [field]: "invalid" },
+      });
+    }
+    expect(db.enquiries.size).toBe(0);
+    expect(db.outbox).toHaveLength(0);
+
+    expect((await call(request(ok()))).status).toBe(201);
+    turnstile.mockClear();
+    const retry = await call(
+      request({ ...ok(), enquiry: { ...validEnquiry, styles: { choice: "heritage" } } }),
+    );
+    expect(retry.status).toBe(422);
+    expect(await retry.json()).toEqual({
+      error: "invalid_enquiry",
+      errors: { styles: "invalid" },
+    });
+    expect(turnstile).not.toHaveBeenCalled();
+    expect(db.enquiries.size).toBe(1);
+    expect(db.outbox).toHaveLength(1);
+  });
+
   it("is idempotent: a retry with the same key returns the same id without a duplicate", async () => {
     const first = (await (await call(request(ok()))).json()) as { id: string };
     const res = await call(request(ok()));
