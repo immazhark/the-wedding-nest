@@ -21,7 +21,13 @@ const seoFiles = {
       await writeFile(new URL("robots.txt", dir), robotsTxt(indexable, siteUrl));
       const sitemap = new URL("sitemap.xml", dir);
       if (indexable) {
-        await writeFile(sitemap, sitemapXml(siteUrl, pages.map((page) => page.pathname)));
+        await writeFile(
+          sitemap,
+          sitemapXml(
+            siteUrl,
+            pages.map((page) => page.pathname),
+          ),
+        );
       } else {
         // A reused build directory must not retain a previous indexable sitemap.
         await rm(sitemap, { force: true });
