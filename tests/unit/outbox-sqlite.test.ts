@@ -109,7 +109,9 @@ describe("dormant outbox lease and retry primitives", () => {
       const claim = await claimNextOutbox(d1, instant);
       expect(claim?.attempt).toBe(attempt);
       expect(await releaseFailedOutboxClaim(d1, claim!, instant)).toBe(true);
-      const row = db.prepare("SELECT next_attempt_at, attempts, delivered_at FROM outbox").get() as {
+      const row = db
+        .prepare("SELECT next_attempt_at, attempts, delivered_at FROM outbox")
+        .get() as {
         next_attempt_at: string;
         attempts: number;
         delivered_at: string | null;
@@ -132,7 +134,9 @@ describe("dormant outbox lease and retry primitives", () => {
     }
     const claim = await claimNextOutbox(d1, NOW);
     expect(await completeOutboxClaim(d1, claim!, "2026-11-16T12:02:01.000Z")).toBe(false);
-    const row = db.prepare("SELECT delivered_at FROM outbox").get() as {delivered_at: string | null};
+    const row = db.prepare("SELECT delivered_at FROM outbox").get() as {
+      delivered_at: string | null;
+    };
     expect(row.delivered_at).toBeNull();
     db.prepare("UPDATE outbox SET kind = 'unapproved.kind'").run();
     expect(await claimNextOutbox(d1, "2026-11-16T12:05:00.000Z")).toBeNull();
