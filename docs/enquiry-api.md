@@ -39,7 +39,15 @@ future notification. A real-SQLite regression verifies that other leads,
 their associated outbox events, and malformed IDs are protected.
 
 **This helper is not exposed by any HTTP route, UI or scheduled job, and
-is not run automatically.** Before using it on real customer data, the
+is not run automatically.**
+
+The same module now includes `previewRetentionImpact(db, cutoffIso)`, which
+queries only aggregate counts for enquiries before an explicitly provided
+UTC timestamp: total candidates, non-new status candidates, and candidates
+with pending outbox notifications. It does not select personal details or
+mutate any record, and a cutoff **must not** be interpreted as a business-approved
+deletion policy. It is intentionally internal with no route, cron, batch delete
+or public reporting surface. Its SQLite regression verifies no rows change. Before using it on real customer data, the
 business must approve a retention period, privacy contact, identity and
 authority verification, audit procedure, and authenticated operator access.
 No customer records are deleted merely by deploying this code.

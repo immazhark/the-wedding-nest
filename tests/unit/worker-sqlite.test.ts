@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 import { handleEnquiry } from "../../src/worker/enquiry";
-import { deleteEnquiryRecord } from "../../src/worker/privacy";
+import { deleteEnquiryRecord, previewRetentionImpact } from "../../src/worker/privacy";
 import type { D1Like, D1PreparedLike } from "../../src/worker/types";
 
 function sqliteD1(): { d1: D1Like; db: DatabaseSync } {
@@ -140,5 +140,56 @@ describe("explicit enquiry deletion using the real D1 migration", () => {
     await expect(deleteEnquiryRecord(d1, "' OR 1=1 --")).rejects.toThrow("Invalid enquiry id");
     expect(db.prepare("SELECT COUNT(*) AS c FROM enquiries").get()).toEqual({ c: 1 });
     expect(db.prepare("SELECT COUNT(*) AS c FROM outbox").get()).toEqual({ c: 1 });
+  });
+});
+
+describe("read-only retention planning against real SQLite/D1 migration", () => {
+  it("counts only pre-cutoff records, including queued notifications, without exposing personal data", async () => {
+    const { d1, db } = sqliteD1();
+    const add = (id: string, at: string, status: string, name: string) => {
+      db.prepare(
+        "INSERT INTO enquiries " +
+          "(id, idempotency_key, created_at, payload_json, consent_at, marketing_consent, status) " +
+          "VALUES (?1, ?1, ?2, ?3, ?2, 0, ?4)",
+      ).run(id, at, JSON.stringify({ name, phone: "+91 9000000000" }), status);
+    };
+    const oldNew = "11111111-2222-4333-8444-111111111111";
+    const oldBooked = "22222222-3333-4444-8555-222222222222";
+    const recent = "33333333-4444-4555-8666-333333333333";
+    add(oldNew, "2026-01-01T00:00:00.000Z", "new", "Private A");
+    add(oldBooked, "2026-01-02T00:00:00.000Z", "booked", "Private B");
+    add(recent, "2026-07-01T00:00:00.000Z", "new", "Private C");
+    db.prepare(
+      "INSERT INTO outbox (id, enquiry_id, kind, created_at) VALUES (?1, ?2, 'enquiry.created', ?3)",
+    ).run("aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", oldNew, "2026-01-01T00:00:00.000Z");
+
+    const preview = await previewRetentionImpact(d1, "2026-06-01T00:00:00.000Z");
+    expect(preview).toEqual({
+      candidateCount: 2,
+      nonNewCount: 1,
+      pendingOutboxCount: 1,
+    });
+    expect(JSON.stringify(preview)).not.toContain("Private");
+    expect(JSON.stringify(preview)).not.toContain("9000000000");
+    expect(db.prepare("SELECT COUNT(*) AS c FROM enquiries").get()).toEqual({ c: 3 });
+    expect(db.prepare("SELECT COUNT(*) AS c FROM outbox").get()).toEqual({ c: 1 });
+  });
+
+  it("has zero counts with no rows and refuses malformed date cutoffs", async () => {
+    const { d1 } = sqliteD1();
+    expect(await previewRetentionImpact(d1, "2026-06-01T00:00:00.000Z")).toEqual({
+      candidateCount: 0,
+      nonNewCount: 0,
+      pendingOutboxCount: 0,
+    });
+    for (const cutoff of [
+      "",
+      "2026-02-30T00:00:00.000Z",
+      "2026-06-01",
+      "2026-06-01T00:00:00Z",
+      "2026-06-01T00:00:00.000Z' OR 1=1 --",
+    ]) {
+      await expect(previewRetentionImpact(d1, cutoff)).rejects.toThrow(/Invalid retention cutoff/);
+    }
   });
 });
