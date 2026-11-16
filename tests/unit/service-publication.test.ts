@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildPublishedServicePages,
-  servicePageSchema,
-} from "../../src/lib/services/publication";
+import { buildPublishedServicePages, servicePageSchema } from "../../src/lib/services/publication";
 
 const example = {
   slug: "hyderabadi-wedding-catering",
@@ -45,14 +42,14 @@ describe("owner-gated service publication", () => {
     }
 
     expect(() =>
-      buildPublishedServicePages({ "../../content/services/nikah-decoration-hyderabad.json": example }),
+      buildPublishedServicePages({
+        "../../content/services/nikah-decoration-hyderabad.json": example,
+      }),
     ).toThrow(/slug|filename/i);
   });
 
   it("rejects arbitrary routes, unverified statements and unknown fields", () => {
-    expect(servicePageSchema.safeParse({ ...example, slug: "random-service" }).success).toBe(
-      false,
-    );
+    expect(servicePageSchema.safeParse({ ...example, slug: "random-service" }).success).toBe(false);
     expect(servicePageSchema.safeParse({ ...example, approvalRef: "family-name" }).success).toBe(
       false,
     );
