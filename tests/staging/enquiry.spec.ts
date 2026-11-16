@@ -25,6 +25,10 @@ test("fictional enquiry completes the deployed browser-to-D1 path", async ({ pag
   );
   await page.getByRole("button", { name: "Send enquiry", exact: true }).click();
   const response = await accepted;
+  // Record the browser-generated Origin without mocking or changing the request.
+  // Staging only permits its own exact origin; synthetic proxy browsers may differ.
+  const requestHeaders = await response.request().allHeaders();
+  expect(requestHeaders["origin"]).toBe(new URL(page.url()).origin);
   expect(response.status()).toBe(201);
   const body = (await response.json()) as { id: string };
   expect(body.id).toMatch(/^[a-f0-9-]{36}$/);
