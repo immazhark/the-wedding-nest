@@ -78,6 +78,19 @@ test("blocks progress with an announced message until required answers are given
   await expect(page.getByRole("alert")).toHaveText("Please choose at least one service.");
 });
 
+test("switching to full planning clears specific services from the browser draft", async ({
+  page,
+}) => {
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await page.getByRole("radio", { name: /Specific services/ }).check();
+  await page.getByRole("checkbox", { name: "Catering & menus" }).check();
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await expect(page.locator('input[name="services"][value="catering"]')).not.toBeChecked();
+  const saved = await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"));
+  expect(JSON.parse(saved!).data.services).toEqual([]);
+});
+
 test("tailors services to the chosen occasions", async ({ page }) => {
   await page.getByRole("checkbox", { name: "Corporate event" }).check();
   await next(page);

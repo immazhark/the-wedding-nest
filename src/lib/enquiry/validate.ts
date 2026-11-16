@@ -86,6 +86,9 @@ export function validateEnquiry(input: unknown): ValidationResult {
       : "invalid";
   } else if (new Set(services).size !== services.length) {
     errors.services = "invalid";
+  } else if (scope === "full-planning" && services.length > 0) {
+    // Hidden service choices must never become a silently persisted preference.
+    errors.services = "invalid";
   } else if (scope === "specific-services" && services.length === 0) {
     errors.services = "required";
   }

@@ -246,8 +246,8 @@ export function initPlanner(form: HTMLFormElement) {
     const allowed = new Set<string>(serviceOptionsFor(s.occasions).map((o) => o.id));
     servicesBox.querySelectorAll<HTMLElement>(".choice").forEach((label) => {
       const input = label.querySelector<HTMLInputElement>("input")!;
-      const show = allowed.has(input.value);
-      label.hidden = !show;
+      const show = s.scope === "specific-services" && allowed.has(input.value);
+      label.hidden = !allowed.has(input.value);
       if (!show) input.checked = false;
     });
     dateField.hidden = s.date.kind !== "date";
