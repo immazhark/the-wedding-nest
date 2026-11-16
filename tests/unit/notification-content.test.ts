@@ -57,7 +57,6 @@ describe("dormant owner-only operational notice", () => {
     expect(alert.text).toContain("Notes: hi From: forged@example.invalid");
   });
 
-
   it("strips invisible Unicode direction controls from private operational text", () => {
     const unsafe = {
       ...enquiry,
