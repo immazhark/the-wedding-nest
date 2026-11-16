@@ -302,6 +302,11 @@ export function initPlanner(form: HTMLFormElement) {
   const order: Panel[] = [...STAGES.map((s) => s.id), "review"];
 
   function show(panel: Panel, focus = true) {
+    // A previous copy acknowledgement must not describe an edited plan.
+    if (panel !== current) {
+      const status = form.querySelector<HTMLElement>("[data-copy-status]");
+      if (status) status.textContent = "";
+    }
     if (panel === "review" || panel === "sent") editingReview = false;
     // Only real navigation animates; the initial render stays still.
     if (focus)
