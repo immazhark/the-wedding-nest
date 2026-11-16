@@ -217,6 +217,19 @@ describe("validateEnquiry (server-grade, accepts unknown input)", () => {
     expect(validateEnquiry({ ...complete(), guestCount: "999999" }).ok).toBe(false);
   });
 
+  it("rejects explicit malformed guest counts while preserving optional blanks", () => {
+    for (const guestCount of [200, { count: 200 }, false, []]) {
+      const result = validateEnquiry({ ...complete(), guestCount });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.errors.guestCount).toBe("invalid");
+    }
+    for (const guestCount of [undefined, null, "", "  "]) {
+      const result = validateEnquiry({ ...complete(), guestCount });
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.value.guestCount).toBe("");
+    }
+  });
+
   it("validates dates and allows an undecided date", () => {
     expect(validateEnquiry({ ...complete(), date: { kind: "undecided" } }).ok).toBe(true);
     expect(validateEnquiry({ ...complete(), date: { kind: "date", value: "2027-13-40" } }).ok).toBe(
