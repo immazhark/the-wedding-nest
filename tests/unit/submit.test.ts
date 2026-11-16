@@ -90,6 +90,55 @@ describe("submitEnquiry", () => {
     }
   });
 
+  it("returns a retryable result when a fetch ignores abort entirely", async () => {
+    vi.useFakeTimers();
+    try {
+      let signal: AbortSignal | undefined;
+      let finishFetch: ((response: Response) => void) | undefined;
+      const ignoresAbort = vi.fn(
+        (_url: string, init: RequestInit) =>
+          new Promise<Response>((resolve) => {
+            signal = init.signal as AbortSignal;
+            finishFetch = resolve;
+          }),
+      );
+      const pending = submitEnquiry(state(), "t", KEY, ignoresAbort as never);
+      await vi.advanceTimersByTimeAsync(SUBMIT_TIMEOUT_MS);
+      expect(await pending).toEqual({ kind: "retryable" });
+      expect(signal?.aborted).toBe(true);
+      finishFetch!(Response.json({ id: "too-late" }, { status: 201 }));
+      await vi.advanceTimersByTimeAsync(0);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("returns after the deadline even when response-body decoding ignores abort", async () => {
+    vi.useFakeTimers();
+    try {
+      let signal: AbortSignal | undefined;
+      let finishBody: ((body: unknown) => void) | undefined;
+      const stuckBody = vi.fn(async (_url: string, init: RequestInit) => {
+        signal = init.signal as AbortSignal;
+        return {
+          status: 201,
+          ok: true,
+          json: () => new Promise((resolve) => (finishBody = resolve)),
+        };
+      });
+      const pending = submitEnquiry(state(), "t", KEY, stuckBody as never);
+      await vi.advanceTimersByTimeAsync(SUBMIT_TIMEOUT_MS);
+      expect(await pending).toEqual({ kind: "retryable" });
+      expect(signal?.aborted).toBe(true);
+      finishBody!({ id: "too-late" });
+      await vi.advanceTimersByTimeAsync(0);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("posts JSON with the idempotency key and Turnstile token", async () => {
     const fetch = respond(201, { id: "abc" });
     await submitEnquiry(state(), "tok", KEY, fetch as unknown as typeof globalThis.fetch);
