@@ -1,19 +1,41 @@
 import { describe, expect, it } from "vitest";
-import { headersFile, robotsTxt } from "../../src/lib/site/seo-files";
-import { robotsContent } from "../../src/lib/site/config";
+import { headersFile, robotsTxt, sitemapXml } from "../../src/lib/site/seo-files";
+import { robotsContent, SITE } from "../../src/lib/site/config";
 
 describe("indexing switch keeps robots.txt, X-Robots-Tag and meta robots in step", () => {
   it("preview (default): everything says noindex", () => {
-    expect(robotsTxt(false)).toMatch(/Disallow: \/\s*$/m);
+    expect(robotsTxt(false, SITE.url)).toMatch(/Disallow: \/\s*$/m);
     expect(headersFile(false)).toContain("X-Robots-Tag: noindex, nofollow");
     expect(robotsContent(false)).toBe("noindex, nofollow");
   });
 
   it("approved production: everything allows indexing", () => {
-    expect(robotsTxt(true)).toMatch(/Allow: \//);
-    expect(robotsTxt(true)).not.toMatch(/Disallow: \/\s*$/m);
+    expect(robotsTxt(true, SITE.url)).toMatch(/Allow: \//);
+    expect(robotsTxt(true, SITE.url)).not.toMatch(/Disallow: \/\s*$/m);
     expect(headersFile(true)).not.toContain("X-Robots-Tag");
     expect(robotsContent(true)).toBe("index, follow");
+  });
+
+  it("mentions a sitemap only after indexing is explicitly enabled", () => {
+    expect(robotsTxt(false, SITE.url)).not.toContain("Sitemap:");
+    expect(robotsTxt(true, SITE.url)).toContain(`Sitemap: ${SITE.url}/sitemap.xml`);
+  });
+
+  it("generates canonical same-origin sitemap URLs and omits the 404 page", () => {
+    const xml = sitemapXml(SITE.url, [
+      "/",
+      "/plan-your-event",
+      "/plan-your-event/",
+      "/404",
+      "/404.html",
+      "https://untrusted.example/",
+    ]);
+    expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>');
+    expect(xml).toContain(`<loc>${SITE.url}/</loc>`);
+    expect(xml).toContain(`<loc>${SITE.url}/plan-your-event/</loc>`);
+    expect(xml).not.toContain("404");
+    expect(xml).not.toContain("untrusted");
+    expect(xml.match(/<loc>/g)).toHaveLength(2);
   });
 
   it("keeps security headers in both modes", () => {
