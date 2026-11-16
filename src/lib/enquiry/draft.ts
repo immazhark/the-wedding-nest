@@ -26,7 +26,13 @@ type DraftData = Pick<
 export type Draft = { v: 1; savedAt: number; data: DraftData };
 
 export function toDraft(s: EnquiryState, now: number): Draft {
-  const { occasions, scope, services, styles, date, guestCount, budget } = s;
+  const { scope, date, guestCount, budget } = s;
+  // Create a standalone allow-listed snapshot. Unexpected runtime objects must not
+  // be carried into localStorage, even if a caller bypasses TypeScript's types.
+  const occasions = s.occasions.filter((id) => isOneOf(OCCASIONS, id));
+  const allowedServices = new Set<string>(serviceOptionsFor(occasions).map((item) => item.id));
+  const services = s.services.filter((id) => typeof id === "string" && allowedServices.has(id));
+  const styles = s.styles.filter((id) => isOneOf(STYLES, id));
   const savedDate: EventDate =
     date.kind === "date" ? { kind: "date", value: date.value } : { kind: "undecided" };
   return {
