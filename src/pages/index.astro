@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ArchFrame from "../components/ArchFrame.astro";
 import Frame from "../components/media/Frame.astro";
+import { approvedHomePhotos } from "../lib/media/catalog";
 import { OCCASIONS, SERVICES, STAGES } from "../lib/enquiry/schema";
 import { ENQUIRIES } from "../lib/site/config";
 
@@ -66,6 +67,7 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
     </div>
     <div class="mx-auto max-w-[110rem] mt-10 md:mt-16 sm:px-8 lg:px-12">
       <Frame
+        photo={approvedHomePhotos["home-hero"]}
         aspectClass="aspect-[4/5] sm:aspect-[3/2] lg:aspect-[21/9]"
         placeholder="The opening photograph — a wide moment from a TWN wedding"
         priority
@@ -199,18 +201,21 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
       </div>
       <div class="work-grid mt-16">
         <Frame
+          photo={approvedHomePhotos["home-work-portrait"]}
           ratio="portrait"
           placeholder="A portrait moment from a wedding"
           sizes="(min-width: 768px) 42vw, 100vw"
           class="work-a"
         />
         <Frame
+          photo={approvedHomePhotos["home-work-wide"]}
           ratio="landscape"
           placeholder="A wide view of a stage or venue"
           sizes="(min-width: 768px) 55vw, 100vw"
           class="work-b"
         />
         <Frame
+          photo={approvedHomePhotos["home-work-detail"]}
           ratio="square"
           placeholder="A detail: florals, food or textiles"
           sizes="(min-width: 768px) 25vw, 100vw"

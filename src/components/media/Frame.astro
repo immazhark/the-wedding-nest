@@ -1,27 +1,24 @@
 ---
 /**
- * Photography-ready frame. With `image`, renders responsive AVIF/WebP via astro:assets at the
+ * Photography-ready frame. With an approved catalog `photo`, renders responsive AVIF/WebP via astro:assets at the
  * photograph's chosen ratio and focal point. Without it, renders a quiet, clearly labelled
  * placeholder — never stock or generated imagery presented as TWN work.
  *
  * `ratio` may differ per breakpoint by passing a class (e.g. "aspect-[4/5] md:aspect-[21/9]").
  */
-import type { ImageMetadata } from "astro";
+import type { ApprovedPhoto } from "../../lib/media/catalog";
 import { Picture } from "astro:assets";
 import {
   RATIOS,
   focalClass,
   publishedMediaForFrame,
   type Focal,
-  type MediaEntry,
   type Ratio,
 } from "../../lib/media/schema";
 
 interface Props {
-  image?: ImageMetadata | undefined;
-  /** Required when image is supplied: approved manifest metadata, not arbitrary captions. */
-  entry?: MediaEntry | undefined;
-  alt?: string;
+  /** Inseparable image + reviewed manifest entry, supplied by the build-time catalog. */
+  photo?: ApprovedPhoto | undefined;
   ratio?: Ratio | undefined;
   /** Overrides `ratio` with explicit (responsive) aspect classes. */
   aspectClass?: string | undefined;
@@ -40,9 +37,7 @@ interface Props {
 }
 
 const {
-  image,
-  entry,
-  alt = "",
+  photo,
   ratio = "landscape",
   aspectClass,
   focal = "center",
@@ -56,8 +51,9 @@ const {
   mediaClass = "",
 } = Astro.props;
 // Fail the build instead of silently publishing a photograph without a reviewed manifest.
-const published = publishedMediaForFrame(Boolean(image), entry);
-const effectiveAlt = published?.alt ?? alt;
+const image = photo?.image;
+const published = publishedMediaForFrame(Boolean(image), photo?.entry);
+const effectiveAlt = published?.alt ?? "";
 const effectiveFocal = published?.focal ?? focal;
 const effectiveCaption = image ? published?.caption : caption;
 const effectiveCredit = image ? published?.credit : credit;

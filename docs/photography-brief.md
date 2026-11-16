@@ -18,10 +18,20 @@ be a local file under `../../assets/events/<category>/<event-slug>/<image>.jpg`
 the metadata. External URLs, parent-directory traversal, unsupported formats and
 duplicate image entries are rejected.
 
-A photograph supplied to `Frame.astro` must also have its validated metadata
-passed as `entry`; missing or invalid entries fail the Astro build. The frame
-renders the declared alt text, focal point, caption and credit, rather than
-unreviewed image props. Placeholder frames still work without entries.
+Homepage photography is selected from `src/lib/media/catalog.ts`, which joins
+each reviewed JSON manifest entry to an **exact matching imported local asset**.
+The `Frame.astro` component accepts only that paired `photo`; image and
+approval metadata cannot be supplied independently. The build rejects a
+manifest with a missing file, any undeclared original in `src/assets/events/`,
+duplicate photos across manifests, or duplicate homepage placements. Frames
+render approved alt text, focal point, caption and credit; missing slots keep
+honestly labelled placeholders.
+
+The optional `slot` chooses an approved homepage placement:
+`home-hero`, `home-work-portrait`, `home-work-wide`, or
+`home-work-detail`. An approved photograph without a slot is not placed
+on the homepage. **Never commit an unreviewed original to the event
+asset directory**; keep working files outside the published build.
 
 **Important:** `"permission": true` is an editor's declaration, not evidence
 that consent exists. Each photo must additionally include an opaque
@@ -32,8 +42,9 @@ consent document itself to the public source manifest. Before committing any
 photo, confirm the release covers that image and intended use, verify
 attribution, and obtain the owner's explicit approval. The format of a
 release reference is checked automatically; the underlying consent must
-still be verified by an authorised human. The manifest directory is a
-handover convention, not an automatic gallery-loader yet.
+still be verified by an authorised human. A correctly formatted reference
+alone never authorises publication; only add a manifest and original to the
+repository after the owner approves that exact image for its intended use.
 
 ```json
 {
@@ -42,6 +53,7 @@ handover convention, not an automatic gallery-loader yet.
       "file": "../../assets/events/walima/2025-12-garden-walima/01-stage-wide.jpg",
       "alt": "Describe what is actually in the photo, plainly.",
       "category": "walima",
+      "slot": "home-work-wide",
       "focal": "center",
       "orientation": "landscape",
       "caption": "Optional, factual.",
