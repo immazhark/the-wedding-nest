@@ -433,7 +433,8 @@ export function initPlanner(form: HTMLFormElement) {
   });
 
   // Copying is an explicit user action. No network call or contact data is involved.
-  form.querySelector<HTMLButtonElement>("[data-copy-choices]")?.addEventListener("click", async () => {
+  const copyChoices = form.querySelector<HTMLButtonElement>("[data-copy-choices]");
+  copyChoices?.addEventListener("click", async () => {
     const status = form.querySelector<HTMLElement>("[data-copy-status]");
     if (!status || sending || current !== "review") return;
     try {
