@@ -76,18 +76,25 @@ async function toReview(page: Page) {
 test("a stalled verification script times out and can be retried from review", async ({ page }) => {
   const calls = await setup(page, () => ({ status: 201, body: { id: "accepted123" } }));
   await page.clock.install();
-  let stalled = false;
-  const stall = () => {
-    stalled = true;
+  // Hold the first script request open to model a transport that never completes.
+  // Keep the Route so we can release it before the retry: an unresolved Playwright
+  // interception otherwise blocks the subsequent request in Chromium.
+  let stalledRoute: Route | undefined;
+  const stall = (route: Route) => {
+    stalledRoute = route;
   };
   await page.route("https://challenges.cloudflare.com/**", stall);
   await toReview(page);
-  await expect.poll(() => stalled).toBe(true);
+  await expect.poll(() => Boolean(stalledRoute)).toBe(true);
   await page.clock.fastForward(10_001);
   await expect(page.getByRole("status")).toContainText("Go back and return to review");
   expect(calls).toHaveLength(0);
   await expect(page.locator('script[src*="challenges.cloudflare.com"]')).toHaveCount(0);
   await page.unroute("https://challenges.cloudflare.com/**", stall);
+  // Release the old interception only after the timeout and cleanup are observed.
+  // Aborting it models an eventual network error, without allowing a stale API
+  // script to race with the new request.
+  await stalledRoute!.abort("failed");
   await page.getByRole("button", { name: "← Back" }).click();
   await next(page);
   await expect.poll(() => page.evaluate(() => Boolean(window.turnstile))).toBe(true);
