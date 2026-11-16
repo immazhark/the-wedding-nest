@@ -101,7 +101,9 @@ test.describe("mobile navigation", () => {
     await expect(page.locator("[data-menu-toggle]")).toBeFocused();
   });
 
-  test("keeps keyboard focus inside the open menu and restores the page on close", async ({ page }) => {
+  test("keeps keyboard focus inside the open menu and restores the page on close", async ({
+    page,
+  }) => {
     await page.goto("/");
     const toggle = page.getByRole("button", { name: "Menu" });
     const homeLink = page.locator("[data-site-header] a[href='/']").first();
