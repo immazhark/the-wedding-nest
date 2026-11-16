@@ -4,20 +4,20 @@ import { robotsContent, SITE } from "../../src/lib/site/config";
 
 describe("indexing switch keeps robots.txt, X-Robots-Tag and meta robots in step", () => {
   it("preview (default): everything says noindex", () => {
-    expect(robotsTxt(false)).toMatch(/Disallow: \/\s*$/m);
+    expect(robotsTxt(false, SITE.url)).toMatch(/Disallow: \/\s*$/m);
     expect(headersFile(false)).toContain("X-Robots-Tag: noindex, nofollow");
     expect(robotsContent(false)).toBe("noindex, nofollow");
   });
 
   it("approved production: everything allows indexing", () => {
-    expect(robotsTxt(true)).toMatch(/Allow: \//);
-    expect(robotsTxt(true)).not.toMatch(/Disallow: \/\s*$/m);
+    expect(robotsTxt(true, SITE.url)).toMatch(/Allow: \//);
+    expect(robotsTxt(true, SITE.url)).not.toMatch(/Disallow: \/\s*$/m);
     expect(headersFile(true)).not.toContain("X-Robots-Tag");
     expect(robotsContent(true)).toBe("index, follow");
   });
 
   it("mentions a sitemap only after indexing is explicitly enabled", () => {
-    expect(robotsTxt(false)).not.toContain("Sitemap:");
+    expect(robotsTxt(false, SITE.url)).not.toContain("Sitemap:");
     expect(robotsTxt(true, SITE.url)).toContain(`Sitemap: ${SITE.url}/sitemap.xml`);
   });
 
