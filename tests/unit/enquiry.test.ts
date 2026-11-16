@@ -244,6 +244,27 @@ describe("validateEnquiry (server-grade, accepts unknown input)", () => {
 });
 
 describe("local draft (privacy)", () => {
+  it("copies only valid selection identifiers into a privacy-safe snapshot", () => {
+    const state = complete();
+    const sensitive = { id: "nikah", phone: "PRIVATE PHONE", address: "PRIVATE ADDRESS" };
+    state.occasions = ["nikah", sensitive] as unknown as EnquiryState["occasions"];
+    state.services = ["catering", sensitive] as unknown as EnquiryState["services"];
+    state.styles = ["heritage", sensitive] as unknown as EnquiryState["styles"];
+
+    const draft = toDraft(state, 1_000);
+    expect(draft.data.occasions).toEqual(["nikah"]);
+    expect(draft.data.services).toEqual(["catering"]);
+    expect(draft.data.styles).toEqual(["heritage"]);
+    expect(JSON.stringify(draft)).not.toContain("PRIVATE");
+
+    state.occasions.push("walima");
+    state.services.push("decor");
+    state.styles.push("garden");
+    expect(draft.data.occasions).toEqual(["nikah"]);
+    expect(draft.data.services).toEqual(["catering"]);
+    expect(draft.data.styles).toEqual(["heritage"]);
+  });
+
   it("serializes only approved date fields from a contaminated runtime object", () => {
     const date = {
       kind: "date" as const,
