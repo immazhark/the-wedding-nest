@@ -33,6 +33,8 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 
 ## Latest work
 
+- #62: browser draft date serialization/restoration now reconstructs only approved date keys and restores only string date values. Unit regressions cover contaminated runtime objects, legacy rewrite and coercible malformed values; the browser regression checks reload scrubbing without changing the valid event date or expiry. A direct Node runtime reproduction confirmed nested private fields survived before the fix. Final CI must pass before merge; release gates are unchanged.
+
 - #61: server-rejected field feedback stays visible across unrelated edits. Its memory-only answer snapshot clears on navigation/reset; correction must change that answer and pass shared field validation before the error clears. Regression-first CI `43947853218` reproduced the disappearing message on desktop and mobile; final CI must pass before merge. No production launch gate changed.
 
 - #60: server validation feedback now identifies and focuses the exact visible rejected control, including field-level ARIA error association. The new browser regression failed on desktop and mobile before implementation (CI run `43943270721`); final CI remains to be checked before merge. Intake and launch gates are unchanged.
