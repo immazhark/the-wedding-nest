@@ -154,11 +154,15 @@ describe("submitEnquiry", () => {
   });
 
   it("treats 201 and 200 (safe retry) as accepted, with the id", async () => {
-    expect(await submitEnquiry(state(), "t", KEY, respond(201, { id: STORED_ID }) as never)).toEqual({
+    expect(
+      await submitEnquiry(state(), "t", KEY, respond(201, { id: STORED_ID }) as never),
+    ).toEqual({
       kind: "accepted",
       id: STORED_ID,
     });
-    expect(await submitEnquiry(state(), "t", KEY, respond(200, { id: STORED_ID }) as never)).toEqual({
+    expect(
+      await submitEnquiry(state(), "t", KEY, respond(200, { id: STORED_ID }) as never),
+    ).toEqual({
       kind: "accepted",
       id: STORED_ID,
     });
