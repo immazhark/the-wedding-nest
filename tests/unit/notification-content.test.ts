@@ -57,6 +57,17 @@ describe("dormant owner-only operational notice", () => {
     expect(alert.text).toContain("Notes: hi From: forged@example.invalid");
   });
 
+
+  it("strips invisible Unicode direction controls from private operational text", () => {
+    const unsafe = {
+      ...enquiry,
+      notes: "Start\u200e\u200f\u061c\u206a\u206fEnd",
+    };
+    const notice = buildOperatorNotice(ID, unsafe);
+    expect(notice.text).toContain("Notes: Start End");
+    expect(notice.text).not.toMatch(/[\u061c\u200e\u200f\u206a-\u206f]/u);
+  });
+
   it("rejects invalid IDs, unconsented enquiries and unsupported service choices", () => {
     expect(() => buildOperatorNotice("not-an-id", enquiry)).toThrow("Invalid enquiry reference");
     expect(() => buildOperatorNotice(ID, { ...enquiry, consent: false })).toThrow(
