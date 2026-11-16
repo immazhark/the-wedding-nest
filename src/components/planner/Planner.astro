@@ -374,6 +374,9 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
         <button type="button" class="link-underline nav-back" data-back hidden>
           ← Back
         </button>
+        <button type="button" class="link-underline nav-back" data-review-return hidden>
+          Return to review
+        </button>
         <span class="flex-1"></span>
         <button type="button" class="link-underline text-sm text-muted" data-reset>
           Start again
@@ -611,6 +614,27 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
     color: var(--color-muted);
     font-size: 0.875rem;
     padding-right: 1rem;
+  }
+  .summary :global(dd) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    min-width: 0;
+  }
+  .summary :global(.summary-value) {
+    overflow-wrap: anywhere;
+  }
+  .summary :global(.summary-edit) {
+    color: var(--color-brass-deep);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    min-height: 2.75rem;
+  }
+  .summary :global(.summary-edit:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
   .notice {
     padding: 1.5rem;
