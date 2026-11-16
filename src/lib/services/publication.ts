@@ -55,8 +55,7 @@ export type ApprovedServicePage = z.infer<typeof servicePageSchema> & {
   plannerService: ServiceId;
 };
 
-const SOURCE_PATH =
-  /^\.\.\/\.\.\/content\/services\/([a-z0-9]+(?:-[a-z0-9]+)*)\.json$/;
+const SOURCE_PATH = /^\.\.\/\.\.\/content\/services\/([a-z0-9]+(?:-[a-z0-9]+)*)\.json$/;
 
 /**
  * Fail closed: unapproved, malformed or misnamed files break the build.
