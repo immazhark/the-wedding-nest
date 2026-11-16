@@ -101,6 +101,30 @@ test.describe("mobile navigation", () => {
     await expect(page.locator("[data-menu-toggle]")).toBeFocused();
   });
 
+  test("keeps keyboard focus inside the open menu and restores the page on close", async ({ page }) => {
+    await page.goto("/");
+    const toggle = page.getByRole("button", { name: "Menu" });
+    const homeLink = page.locator("[data-site-header] a[href='/']").first();
+    const lastLink = page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
+      name: "Plan your event",
+    });
+
+    await toggle.click();
+    await expect(page.locator("main")).toHaveAttribute("inert", "");
+    await expect(page.locator("footer")).toHaveAttribute("inert", "");
+    await lastLink.focus();
+    await page.keyboard.press("Tab");
+    await expect(homeLink).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(lastLink).toBeFocused();
+
+    await page.getByRole("button", { name: "Close" }).click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator("main")).not.toHaveAttribute("inert");
+    await expect(page.locator("footer")).not.toHaveAttribute("inert");
+    await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
+  });
+
   test("open menu panel covers the viewport below the header and shows every link", async ({
     page,
   }) => {
