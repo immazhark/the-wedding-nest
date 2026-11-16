@@ -19,6 +19,15 @@ export const MEDIA_CATEGORIES = [
   "details",
 ] as const;
 
+/** Fixed editorial slots. They select placements, not permission or publication approval. */
+export const HOME_MEDIA_SLOTS = [
+  "home-hero",
+  "home-work-portrait",
+  "home-work-wide",
+  "home-work-detail",
+] as const;
+export type HomeMediaSlot = (typeof HOME_MEDIA_SLOTS)[number];
+
 export const FOCAL_POINTS = [
   "center",
   "top",
@@ -42,6 +51,7 @@ export const mediaEntrySchema = z
     file: z.string().regex(EVENT_FILE, "Use a local image in assets/events/<category>/<event>/"),
     alt: z.string().min(8, "Describe what is actually in the photo"),
     category: z.enum(MEDIA_CATEGORIES),
+    slot: z.enum(HOME_MEDIA_SLOTS).optional(),
     focal: z.enum(FOCAL_POINTS).default("center"),
     orientation: z.enum(["portrait", "landscape", "square"]),
     caption: z.string().optional(),
