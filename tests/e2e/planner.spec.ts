@@ -83,7 +83,9 @@ test("preview reviews a plan without contact details", async ({ page }) => {
   );
 });
 
-test("preview copies planning choices without contact, venue or private notes", async ({ page }) => {
+test("preview copies planning choices without contact, venue or private notes", async ({
+  page,
+}) => {
   await page.getByRole("checkbox", { name: "Nikah" }).check();
   await next(page);
   await page.getByRole("radio", { name: /End-to-end planning/ }).check();
