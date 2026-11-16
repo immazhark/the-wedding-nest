@@ -33,13 +33,17 @@ export function toDraft(s: EnquiryState, now: number): Draft {
     typeof s.guestCount === "string" && isValidGuestCount(s.guestCount) ? s.guestCount : "";
   // Create a standalone allow-listed snapshot. Unexpected runtime objects must not
   // be carried into localStorage, even if a caller bypasses TypeScript's types.
-  const occasions = s.occasions.filter((id) => isOneOf(OCCASIONS, id));
+  const occasions = Array.isArray(s.occasions)
+    ? s.occasions.filter((id) => isOneOf(OCCASIONS, id))
+    : [];
   const allowedServices = new Set<string>(serviceOptionsFor(occasions).map((item) => item.id));
   const services =
     scope === "specific-services"
-      ? s.services.filter((id) => typeof id === "string" && allowedServices.has(id))
+      ? Array.isArray(s.services)
+        ? s.services.filter((id) => typeof id === "string" && allowedServices.has(id))
+        : []
       : [];
-  const styles = s.styles.filter((id) => isOneOf(STYLES, id));
+  const styles = Array.isArray(s.styles) ? s.styles.filter((id) => isOneOf(STYLES, id)) : [];
   const savedDate: EventDate =
     date?.kind === "date" && typeof date.value === "string" && isValidDate(date.value)
       ? { kind: "date", value: date.value }

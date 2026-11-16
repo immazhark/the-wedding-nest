@@ -265,6 +265,24 @@ describe("local draft (privacy)", () => {
     expect(draft.data.styles).toEqual(["heritage"]);
   });
 
+  it("safely drops malformed runtime selection collections before local draft storage", () => {
+    const contaminated = { phone: "PRIVATE PHONE", address: "PRIVATE ADDRESS" };
+    const baseline = complete();
+    for (const field of ["occasions", "services", "styles"] as const) {
+      for (const value of [contaminated, "nikah", null, 5]) {
+        const state = { ...baseline, [field]: value } as unknown as EnquiryState;
+        expect(() => toDraft(state, 1_000)).not.toThrow();
+        const draft = toDraft(state, 1_000);
+        expect(draft.data[field]).toEqual([]);
+        expect(JSON.stringify(draft)).not.toContain("PRIVATE");
+      }
+    }
+    const valid = toDraft(baseline, 1_000);
+    expect(valid.data.occasions).toEqual(["nikah", "walima"]);
+    expect(valid.data.services).toEqual(["catering", "decor"]);
+    expect(valid.data.styles).toEqual(["heritage"]);
+  });
+
   it("never stores hidden specific-service choices when scope is full planning", () => {
     const state = { ...complete(), scope: "full-planning" as const };
     // Changing scope may precede the UI's conditional checkbox cleanup.
