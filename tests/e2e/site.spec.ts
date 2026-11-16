@@ -225,6 +225,10 @@ test("robots.txt and X-Robots-Tag are in preview (noindex) mode", async ({ reque
   }
 });
 
+test("unapproved preview builds do not publish a sitemap", async ({ request }) => {
+  expect((await request.get("/sitemap.xml")).status()).toBe(404);
+});
+
 test("unknown routes return the 404 page", async ({ page }) => {
   const res = await page.goto("/does-not-exist/");
   expect(res?.status()).toBe(404);
