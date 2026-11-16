@@ -15,6 +15,7 @@ Request: `POST /api/enquiry`, `Content-Type: application/json`, `Origin` on the 
 | 201    | `{ "id" }`                                              | Stored in D1 with its outbox event (one transaction). Not "notification sent". |
 | 200    | `{ "id" }`                                              | Same `Idempotency-Key` seen before; original id returned, nothing duplicated. |
 | 400    | `invalid_json` / `invalid_idempotency_key`              | Malformed request.                                                            |
+| 408    | `request_timeout`                                       | Request body did not finish within 10 seconds; no enquiry was stored.         |
 | 403    | `forbidden_origin` / `verification_failed`              | Origin not allowed, or Turnstile failed/missing.                              |
 | 405    | `method_not_allowed` (+ `Allow: POST`)                  | Not POST.                                                                     |
 | 413    | `payload_too_large`                                     | Body > 16 KB.                                                                 |
@@ -63,6 +64,7 @@ Use Cloudflare's Turnstile **test** keys in staging. Never point staging at prod
 
 ## Verification deadlines
 
+- Inbound uploads: the entire streamed JSON body must arrive within 10 seconds. Stalled or deliberately slow streams receive `408 request_timeout` and never reach Turnstile or D1. Stream cancellation is best effort and cannot stall the rejection; the existing 16 KiB cap remains unchanged.
 - Server: Siteverify fetch and response-body consumption share a 10-second deadline. Timeout aborts the request and returns `verification_unavailable` (503) before D1 writes, even if the transport ignores abort. Late completion is not acknowledged as success.
 - Browser: a stalled or failed Turnstile script is removed after 10 seconds and produces a clear recovery message. Back → Review starts a fresh load; late loads cannot render a widget in a hidden review panel. Verification is never bypassed.
 
