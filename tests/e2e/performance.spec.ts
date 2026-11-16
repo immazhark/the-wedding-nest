@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { accountedResourceBytes } from "../../src/lib/site/resource-budget";
 
 for (const path of ["/", "/plan-your-event/"]) {
   test(`preview ${path} uses only first-party resources and stays within a lightweight JS budget`, async ({
@@ -19,20 +20,23 @@ for (const path of ["/", "/plan-your-event/"]) {
 
     await page.goto(path, { waitUntil: "networkidle" });
 
-    const resources = await page.evaluate(() => {
-      const entries = performance.getEntriesByType("resource") as PerformanceResourceTiming[];
-      const bytes = (suffix: RegExp) =>
-        entries
-          .filter((entry) => suffix.test(new URL(entry.name).pathname))
-          .reduce((total, entry) => total + entry.transferSize, 0);
-
-      return {
-        javascriptBytes: bytes(/\.js$/i),
-        cssBytes: bytes(/\.css$/i),
-        fontBytes: bytes(/\.(?:woff2?|ttf|otf)$/i),
-        resourceCount: entries.length,
-      };
-    });
+    const entries = await page.evaluate(() =>
+      (performance.getEntriesByType("resource") as PerformanceResourceTiming[]).map((entry) => ({
+        pathname: new URL(entry.name).pathname,
+        transferSize: entry.transferSize,
+        encodedBodySize: entry.encodedBodySize,
+      })),
+    );
+    const bytes = (suffix: RegExp) =>
+      entries
+        .filter((entry) => suffix.test(entry.pathname))
+        .reduce((total, entry) => total + accountedResourceBytes(entry), 0);
+    const resources = {
+      javascriptBytes: bytes(/\.js$/i),
+      cssBytes: bytes(/\.css$/i),
+      fontBytes: bytes(/\.(?:woff2?|ttf|otf)$/i),
+      resourceCount: entries.length,
+    };
 
     test.info().annotations.push({
       type: "performance",
