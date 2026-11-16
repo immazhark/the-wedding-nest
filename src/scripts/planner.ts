@@ -396,11 +396,9 @@ export function initPlanner(form: HTMLFormElement) {
     "guestCount",
     "budget",
   ]);
-  form.addEventListener("change", (event) => {
-    syncConditional();
-    const target = event.target;
-    if (target instanceof HTMLInputElement && draftFields.has(target.name))
-      storage.save(readState(form));
+  // Clear resolved validation feedback as soon as typed answers become valid,
+  // without waiting for blur/change on mobile keyboards.
+  function clearResolvedError() {
     if (
       current !== "review" &&
       current !== "sent" &&
@@ -413,12 +411,21 @@ export function initPlanner(form: HTMLFormElement) {
         field.removeAttribute("aria-describedby");
       });
     }
+  }
+
+  form.addEventListener("change", (event) => {
+    syncConditional();
+    const target = event.target;
+    if (target instanceof HTMLInputElement && draftFields.has(target.name))
+      storage.save(readState(form));
+    clearResolvedError();
   });
   form.addEventListener("input", (event) => {
     const target = event.target;
     // Keep free-form count/date edits resumable before they lose focus.
     if (target instanceof HTMLInputElement && ["guestCount", "date"].includes(target.name))
       storage.save(readState(form));
+    clearResolvedError();
   });
 
   summaryEl.addEventListener("click", (event) => {
