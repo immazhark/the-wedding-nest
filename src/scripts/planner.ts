@@ -321,7 +321,10 @@ export function initPlanner(form: HTMLFormElement) {
     resetBtn.closest<HTMLElement>(".planner-nav")!.hidden = panel === "sent";
     nextLabel.textContent = panel === "contact" ? "Review" : "Continue";
     errorEl.textContent = "";
-    form.querySelectorAll("[aria-invalid]").forEach((el) => el.removeAttribute("aria-invalid"));
+    form.querySelectorAll("[aria-invalid]").forEach((el) => {
+      el.removeAttribute("aria-invalid");
+      el.removeAttribute("aria-describedby");
+    });
     if (panel === "review") {
       renderSummary();
       sending?.enterReview();
