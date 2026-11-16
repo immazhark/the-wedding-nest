@@ -6,6 +6,8 @@
 import { expect, test, type Page, type Route } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+const STORED_ID = "f11e8989-1a22-4e2f-bc91-609acc25ef0e";
+
 const FAKE_TURNSTILE = `window.turnstile = {
   render(el, opts) { window.__ts = opts; setTimeout(() => opts.callback("test-token"), 30); return "w1"; },
   reset() { setTimeout(() => window.__ts.callback("test-token-2"), 30); }
@@ -34,7 +36,7 @@ async function setup(page: Page, responder: (n: number) => { status: number; bod
 const next = (page: Page) => page.getByRole("button", { name: /^(Continue|Review)/ }).click();
 
 test("navigation and reset stay locked until a pending send finishes", async ({ page }) => {
-  await setup(page, () => ({ status: 201, body: { id: "accepted123" } }));
+  await setup(page, () => ({ status: 201, body: { id: STORED_ID } }));
   let finish: (() => void) | undefined;
   await page.route("**/api/enquiry", async (route) => {
     await new Promise<void>((resolve) => {
@@ -75,7 +77,7 @@ async function toReview(page: Page) {
 }
 
 test("a stalled verification script times out and can be retried from review", async ({ page }) => {
-  const calls = await setup(page, () => ({ status: 201, body: { id: "accepted123" } }));
+  const calls = await setup(page, () => ({ status: 201, body: { id: STORED_ID } }));
   await page.clock.install();
   // Hold the first script request open to model a transport that never completes.
   // Keep the Route so we can release it before the retry: an unresolved Playwright
@@ -108,7 +110,7 @@ test("a stalled verification script times out and can be retried from review", a
 test("a script finishing after leaving review does not render a hidden widget", async ({
   page,
 }) => {
-  await setup(page, () => ({ status: 201, body: { id: "accepted123" } }));
+  await setup(page, () => ({ status: 201, body: { id: STORED_ID } }));
   let script: Route | undefined;
   await page.route("https://challenges.cloudflare.com/**", (route) => {
     script = route;
@@ -170,7 +172,7 @@ test("an outage keeps the answers, and the retry reuses the same idempotency key
   const calls = await setup(page, (n) =>
     n === 1
       ? { status: 503, body: { error: "storage_unavailable" } }
-      : { status: 201, body: { id: "abcdef12" } },
+      : { status: 201, body: { id: STORED_ID } },
   );
   await toReview(page);
   await page.getByRole("button", { name: "Send enquiry" }).click();
@@ -181,6 +183,16 @@ test("an outage keeps the answers, and the retry reuses the same idempotency key
   await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toBeVisible();
   expect(calls).toHaveLength(2);
   expect(calls[1]!.key).toBe(calls[0]!.key);
+});
+
+test("does not report Sent for a malformed positive acknowledgement", async ({ page }) => {
+  const calls = await setup(page, () => ({ status: 201, body: { id: "accepted123" } }));
+  await toReview(page);
+  await page.getByRole("button", { name: "Send enquiry" }).click();
+  await expect(page.getByRole("status")).toContainText("couldn’t send");
+  await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toHaveCount(0);
+  await expect(page.locator("[data-summary]")).toContainText("Sample Person");
+  expect(calls).toHaveLength(1);
 });
 
 test("server validation errors take the visitor to the right step with a clear message", async ({
@@ -218,7 +230,7 @@ test("nothing is sent before the human check completes", async ({ page }) => {
 });
 
 test("review and confirmation steps have no serious accessibility violations", async ({ page }) => {
-  await setup(page, () => ({ status: 201, body: { id: "abcdef1234" } }));
+  await setup(page, () => ({ status: 201, body: { id: STORED_ID } }));
   await toReview(page);
   const audit = async () =>
     (
