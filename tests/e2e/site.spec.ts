@@ -356,9 +356,11 @@ test("official logo is used in the header and footer with accessible names", asy
 
 test("preview contact fields do not invite personal-data autofill", async ({ page }) => {
   await page.goto("/plan-your-event/");
-  await expect(page.locator('[data-planner-form]')).toHaveAttribute("data-submit", "off");
-  await expect(page.locator('input[name="name"]')).toHaveAttribute("autocomplete", "off");
-  await expect(page.locator('input[name="phone"]')).toHaveAttribute("autocomplete", "off");
+  const form = page.locator("[data-planner-form]");
+  await expect(form).toHaveAttribute("data-submit", "off");
+  for (const name of ["name", "phone"]) {
+    await expect(form.locator(`input[name="${name}"]`)).toHaveAttribute("autocomplete", "off");
+  }
 });
 
 test("non-sending preview clearly discloses that enquiries are disabled", async ({ page }) => {
