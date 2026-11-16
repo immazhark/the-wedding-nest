@@ -163,3 +163,8 @@ test("review and confirmation steps have no serious accessibility violations", a
   await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toBeVisible();
   expect(await audit()).toEqual([]);
 });
+
+test("submission-enabled homepage does not claim enquiries are disabled", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByText("Preview: the planner can’t send enquiries yet.")).toHaveCount(0);
+});
