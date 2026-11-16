@@ -260,6 +260,7 @@ export async function handleEnquiry(
     return fail(503, "storage_unavailable");
   }
 
-  deps.log({ event: "enquiry", outcome: "accepted", status: 201, id });
+  // Keep the durable identifier in the response/DB, not operational logs.
+  deps.log({ event: "enquiry", outcome: "accepted", status: 201 });
   return json(201, { id });
 }
