@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { SITE, canonicalUrl, pageTitle, robotsContent, organizationJsonLd } from "../../src/lib/site/config";
+import {
+  SITE,
+  canonicalUrl,
+  pageTitle,
+  robotsContent,
+  organizationJsonLd,
+} from "../../src/lib/site/config";
 
 describe("site metadata", () => {
   it("uses the registered production domain", () => {
@@ -35,7 +41,14 @@ describe("site metadata", () => {
       url: "https://theweddingnest.in",
       sameAs: ["https://www.instagram.com/twn.events/"],
     });
-    for (const unapproved of ["telephone", "address", "email", "aggregateRating", "review", "priceRange"]) {
+    for (const unapproved of [
+      "telephone",
+      "address",
+      "email",
+      "aggregateRating",
+      "review",
+      "priceRange",
+    ]) {
       expect(json).not.toHaveProperty(unapproved);
     }
   });
