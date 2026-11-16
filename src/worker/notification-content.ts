@@ -20,7 +20,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** Prevent user supplied CR/LF, bidi and HTML-like delimiters becoming markup/headers. */
 const safeLine = (value: string): string =>
   value
-    .replace(/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g, " ")
+    .replace(/[\u0000-\u001f\u007f-\u009f\u061c\u200e\u200f\u202a-\u202e\u2066-\u206f]/g, " ")
     .replace(/\s+/g, " ")
     .replace(/</g, "‹")
     .replace(/>/g, "›")
