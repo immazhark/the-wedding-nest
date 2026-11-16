@@ -14,6 +14,7 @@ import { firstIncompleteStage, nextStage, previousStage, stageError } from "../l
 import { DRAFT_STORAGE_KEY, restoreDraft, toDraft } from "../lib/enquiry/draft";
 import { applyPlannerIntent, readPlannerIntent } from "../lib/enquiry/intent";
 import { summarise } from "../lib/enquiry/summary";
+import { previewPlanText } from "../lib/enquiry/share";
 import { FIELD_STAGE, fieldMessage, submitEnquiry } from "../lib/enquiry/submit";
 import { createTurnstileLoader } from "../lib/enquiry/turnstile";
 import { validateEnquiry } from "../lib/enquiry/validate";
@@ -429,6 +430,19 @@ export function initPlanner(form: HTMLFormElement) {
       if (field instanceof HTMLInputElement) field.checked = false;
     }
     show("review");
+  });
+
+  // Copying is an explicit user action. No network call or contact data is involved.
+  const copyChoices = form.querySelector<HTMLButtonElement>("[data-copy-choices]");
+  copyChoices?.addEventListener("click", async () => {
+    const status = form.querySelector<HTMLElement>("[data-copy-status]");
+    if (!status || sending || current !== "review") return;
+    try {
+      await navigator.clipboard.writeText(previewPlanText(readState(form)));
+      status.textContent = "Planning choices copied. You can paste them into a message.";
+    } catch {
+      status.textContent = "Copy unavailable in this browser. No details were sent.";
+    }
   });
 
   backBtn.addEventListener("click", () => {

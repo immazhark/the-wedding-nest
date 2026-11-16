@@ -54,6 +54,13 @@ async function waitForFakeCheck(page: Page) {
   await expect(page.locator("html")).toHaveAttribute("data-test-check-ready", "true");
 }
 
+test("submission-enabled planner never displays preview-only copy controls", async ({ page }) => {
+  await setup(page, () => ({ status: 201, body: { id: STORED_ID } }));
+  await toReview(page);
+  await expect(page.getByRole("button", { name: "Copy planning choices" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Send enquiry" })).toBeVisible();
+});
+
 test("navigation and reset stay locked until a pending send finishes", async ({ page }) => {
   await setup(page, () => ({ status: 201, body: { id: STORED_ID } }));
   let finish: (() => void) | undefined;
