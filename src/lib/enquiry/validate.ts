@@ -65,7 +65,11 @@ export function validateEnquiry(input: unknown): ValidationResult {
   const occasionsRaw = arr(i["occasions"]);
   const occasions = (occasionsRaw ?? []).filter((o): o is OccasionId => isOneOf(OCCASIONS, o));
   if (!occasionsRaw || occasionsRaw.length === 0) errors.occasions = "required";
-  else if (occasions.length !== occasionsRaw.length || occasionsRaw.length > OCCASIONS.length)
+  else if (
+    occasions.length !== occasionsRaw.length ||
+    occasionsRaw.length > OCCASIONS.length ||
+    new Set(occasions).size !== occasions.length
+  )
     errors.occasions = "invalid";
 
   const scope = isOneOf(SCOPES, i["scope"]) ? i["scope"] : null;
@@ -80,11 +84,13 @@ export function validateEnquiry(input: unknown): ValidationResult {
     errors.services = servicesRaw.every((s) => typeof s === "string")
       ? "not_available_for_occasion"
       : "invalid";
-  } else if (scope === "specific-services" && services.length === 0) errors.services = "required";
+  } else if (new Set(services).size !== services.length) errors.services = "invalid";
+  else if (scope === "specific-services" && services.length === 0) errors.services = "required";
 
   const stylesRaw = arr(i["styles"]) ?? [];
   const styles = stylesRaw.filter((s): s is StyleId => isOneOf(STYLES, s));
-  if (styles.length !== stylesRaw.length) errors.styles = "invalid";
+  if (styles.length !== stylesRaw.length || new Set(styles).size !== styles.length)
+    errors.styles = "invalid";
 
   let date: EventDate = { kind: "undecided" };
   const d = i["date"] as Record<string, unknown> | undefined;
