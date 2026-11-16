@@ -120,8 +120,10 @@ export async function handleEnquiry(
   const origin = request.headers.get("origin");
   if (!origin || !origins.includes(origin)) return fail(403, "forbidden_origin");
 
-  if (!(request.headers.get("content-type") ?? "").toLowerCase().startsWith("application/json"))
-    return fail(415, "unsupported_media_type");
+  // Compare the actual MIME type, not a prefix (application/jsonp is not JSON).
+  // Parameterised values such as application/json; charset=UTF-8 remain valid.
+  const mediaType = request.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase();
+  if (mediaType !== "application/json") return fail(415, "unsupported_media_type");
 
   const declared = Number(request.headers.get("content-length") ?? "0");
   if (declared > MAX_BODY_BYTES) return fail(413, "payload_too_large");
