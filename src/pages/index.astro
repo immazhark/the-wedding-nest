@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import ArchFrame from "../components/ArchFrame.astro";
 import Frame from "../components/media/Frame.astro";
 import { OCCASIONS, SERVICES, STAGES } from "../lib/enquiry/schema";
+import { ENQUIRIES } from "../lib/site/config";
 
 // DRAFT COPY — editorial working draft pending owner approval (docs/creative-excellence-standards.md).
 // No claims about prices, clients, venues, awards or guarantees.
@@ -178,7 +179,9 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
             →
           </span>
         </a>
-        <p class="mt-4 text-sm text-sand/80">Preview: the planner can’t send enquiries yet.</p>
+        {!ENQUIRIES.enabled && (
+          <p class="mt-4 text-sm text-sand/80">Preview: the planner can’t send enquiries yet.</p>
+        )}
       </div>
     </div>
   </section>
