@@ -95,7 +95,7 @@ test("skipping preview contact clears previously typed private answers", async (
   await expect(heading(page)).toHaveText("Review your plan");
   await expect(page.locator("[data-summary]")).not.toContainText("Private Visitor");
   await expect(page.locator("[data-summary]")).not.toContainText("9876543210");
-  await page.getByRole("button", { name: "Edit name" }).click();
+  await page.getByRole("button", { name: "← Back" }).click();
   await expect(page.getByLabel("Your name")).toHaveValue("");
   await expect(page.getByLabel("Phone or WhatsApp number")).toHaveValue("");
   await expect(page.getByRole("checkbox", { name: /I agree/ })).not.toBeChecked();
