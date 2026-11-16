@@ -30,49 +30,62 @@ export async function submitEnquiry(
   fetchFn: typeof fetch = fetch,
 ): Promise<SubmitResult> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), SUBMIT_TIMEOUT_MS);
-  try {
-    const res = await fetchFn("/api/enquiry", {
-      method: "POST",
-      headers: { "content-type": "application/json", "idempotency-key": idempotencyKey },
-      body: JSON.stringify({ turnstileToken, enquiry }),
-      credentials: "same-origin",
-      signal: controller.signal,
-    });
-    let body: unknown;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  // Aborting fetch is advisory: some transports or body decoders ignore the
+  // signal. Race the entire request/response path so the UI always recovers.
+  const deadline = new Promise<SubmitResult>((resolve) => {
+    timeout = setTimeout(() => {
+      controller.abort();
+      resolve({ kind: "retryable" });
+    }, SUBMIT_TIMEOUT_MS);
+  });
+  const request = async (): Promise<SubmitResult> => {
     try {
-      body = await res.json();
+      const res = await fetchFn("/api/enquiry", {
+        method: "POST",
+        headers: { "content-type": "application/json", "idempotency-key": idempotencyKey },
+        body: JSON.stringify({ turnstileToken, enquiry }),
+        credentials: "same-origin",
+        signal: controller.signal,
+      });
+      let body: unknown;
+      try {
+        body = await res.json();
+      } catch {
+        return { kind: "retryable" };
+      }
+      if (!isRecord(body)) return { kind: "retryable" };
+      if (res.ok) {
+        return typeof body["id"] === "string" && body["id"].trim().length > 0
+          ? { kind: "accepted", id: body["id"] }
+          : { kind: "retryable" };
+      }
+      if (res.status === 422) {
+        const errors = body["errors"];
+        if (!isRecord(errors)) return { kind: "retryable" };
+        const entries = Object.entries(errors);
+        if (
+          entries.length === 0 ||
+          !entries.every(
+            ([field, code]) =>
+              Object.hasOwn(FIELD_STAGE, field) &&
+              typeof code === "string" &&
+              ERROR_CODES.includes(code as ErrorCode),
+          )
+        )
+          return { kind: "retryable" };
+        return { kind: "invalid", errors: errors as Partial<Record<keyof EnquiryState, ErrorCode>> };
+      }
+      if (res.status === 403 && body["error"] === "verification_failed")
+        return { kind: "verification" };
+      if (res.status === 429 || res.status >= 500) return { kind: "retryable" };
+      return { kind: "rejected" };
     } catch {
       return { kind: "retryable" };
     }
-    if (!isRecord(body)) return { kind: "retryable" };
-    if (res.ok) {
-      return typeof body["id"] === "string" && body["id"].trim().length > 0
-        ? { kind: "accepted", id: body["id"] }
-        : { kind: "retryable" };
-    }
-    if (res.status === 422) {
-      const errors = body["errors"];
-      if (!isRecord(errors)) return { kind: "retryable" };
-      const entries = Object.entries(errors);
-      if (
-        entries.length === 0 ||
-        !entries.every(
-          ([field, code]) =>
-            Object.hasOwn(FIELD_STAGE, field) &&
-            typeof code === "string" &&
-            ERROR_CODES.includes(code as ErrorCode),
-        )
-      )
-        return { kind: "retryable" };
-      return { kind: "invalid", errors: errors as Partial<Record<keyof EnquiryState, ErrorCode>> };
-    }
-    if (res.status === 403 && body["error"] === "verification_failed")
-      return { kind: "verification" };
-    if (res.status === 429 || res.status >= 500) return { kind: "retryable" };
-    return { kind: "rejected" };
-  } catch {
-    return { kind: "retryable" };
+  };
+  try {
+    return await Promise.race([request(), deadline]);
   } finally {
     clearTimeout(timeout);
   }
