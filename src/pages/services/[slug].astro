@@ -1,10 +1,7 @@
 ---
 import type { GetStaticPaths } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import {
-  publishedServicePages,
-  type ApprovedServicePage,
-} from "../../lib/services/publication";
+import { publishedServicePages, type ApprovedServicePage } from "../../lib/services/publication";
 
 // Zero pages are generated until individual factual records are owner-approved.
 export const getStaticPaths = (() =>
@@ -34,10 +31,7 @@ const plannerHref = `/plan-your-event/?service=${page.plannerService}`;
       </div>
     </header>
 
-    <section
-      class="border-y border-ink/15 bg-paper"
-      aria-labelledby="service-details-heading"
-    >
+    <section class="border-y border-ink/15 bg-paper" aria-labelledby="service-details-heading">
       <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-28">
         <p class="eyebrow text-brass-deep">Details to discuss</p>
         <h2
@@ -52,9 +46,7 @@ const plannerHref = `/plan-your-event/?service=${page.plannerService}`;
               <span class="eyebrow text-brass-deep md:col-span-1">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <h3 class="text-[length:var(--text-title)] md:col-span-4">
-                {section.title}
-              </h3>
+              <h3 class="text-[length:var(--text-title)] md:col-span-4">{section.title}</h3>
               <p class="text-charcoal max-w-2xl md:col-span-7">{section.body}</p>
             </div>
           ))}
@@ -69,10 +61,12 @@ const plannerHref = `/plan-your-event/?service=${page.plannerService}`;
           Tell us what you're considering.
         </h2>
         <p class="mt-6 text-stone max-w-xl">
-          Start the five-step planner with this topic selected. Your date and budget can
-          remain undecided, and availability is discussed before anything is confirmed.
+          Start the five-step planner with this topic selected. Your date and budget can remain
+          undecided, and availability is discussed before anything is confirmed.
         </p>
-        <a class="btn btn-light mt-10" href={plannerHref}>Explore in the planner</a>
+        <a class="btn btn-light mt-10" href={plannerHref}>
+          Explore in the planner
+        </a>
       </div>
     </aside>
   </article>
