@@ -83,8 +83,11 @@ test("all internal links resolve", async ({ page, request }) => {
   }
 });
 
-test("planner provides a readable Instagram fallback without JavaScript", async ({ browser }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false });
+test("planner provides a readable Instagram fallback without JavaScript", async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
   try {
     const page = await context.newPage();
     await page.goto("/plan-your-event/");
