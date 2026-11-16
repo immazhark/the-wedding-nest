@@ -80,7 +80,9 @@ export function validateEnquiry(input: unknown): ValidationResult {
   const services = servicesRaw.filter(
     (s): s is ServiceId => typeof s === "string" && allowed.has(s),
   );
-  if (servicesRaw.length !== services.length) {
+  if (i["services"] != null && !Array.isArray(i["services"])) {
+    errors.services = "invalid";
+  } else if (servicesRaw.length !== services.length) {
     errors.services = servicesRaw.every((s) => typeof s === "string")
       ? "not_available_for_occasion"
       : "invalid";
@@ -95,7 +97,11 @@ export function validateEnquiry(input: unknown): ValidationResult {
 
   const stylesRaw = arr(i["styles"]) ?? [];
   const styles = stylesRaw.filter((s): s is StyleId => isOneOf(STYLES, s));
-  if (styles.length !== stylesRaw.length || new Set(styles).size !== styles.length)
+  if (
+    (i["styles"] != null && !Array.isArray(i["styles"])) ||
+    styles.length !== stylesRaw.length ||
+    new Set(styles).size !== styles.length
+  )
     errors.styles = "invalid";
 
   let date: EventDate = { kind: "undecided" };
