@@ -30,6 +30,20 @@ Every response: `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`. Lo
 
 `migrations/0001_enquiries.sql`: `enquiries` (id, unique idempotency_key, created_at, payload_json = validated enquiry, consent_at, marketing_consent, status) and `outbox` (one `enquiry.created` row per enquiry for later asynchronous notification).
 
+## Privacy deletion building block (not enabled)
+
+`src/worker/privacy.ts` contains a strictly parameterised,
+single-enquiry deletion helper. The migration's foreign-key cascade removes
+its associated outbox event as well, so a deleted lead cannot trigger a
+future notification. A real-SQLite regression verifies that other leads,
+their associated outbox events, and malformed IDs are protected.
+
+**This helper is not exposed by any HTTP route, UI or scheduled job, and
+is not run automatically.** Before using it on real customer data, the
+business must approve a retention period, privacy contact, identity and
+authority verification, audit procedure, and authenticated operator access.
+No customer records are deleted merely by deploying this code.
+
 ## Staging (isolated, test data only)
 
 **16 Nov 2026:** D1 `twn-enquiries-staging` created in APAC and schema applied. The separate Worker is deployed at https://the-wedding-nest-staging.mazharkhan-it.workers.dev. Its dedicated Workers Builds trigger watches `main`, builds with `PUBLIC_ENQUIRIES_ENABLED=true` and Cloudflare's public dummy site key, then deploys `--env staging`. The matching public dummy secret is stored in the staging Worker's secret binding; no production widget or secret is used. A persistent test-environment notice requires fictional details only.
