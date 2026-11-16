@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 import { handleEnquiry } from "../../src/worker/enquiry";
+import { deleteEnquiryRecord } from "../../src/worker/privacy";
 import type { D1Like, D1PreparedLike } from "../../src/worker/types";
 
 function sqliteD1(): { d1: D1Like; db: DatabaseSync } {
@@ -109,5 +110,35 @@ describe("enquiry handler against the real D1 schema (SQLite)", () => {
     expect(db.prepare("SELECT enquiry_id, kind FROM outbox").all()).toEqual([
       { enquiry_id: id, kind: "enquiry.created" },
     ]);
+  });
+});
+
+describe("explicit enquiry deletion using the real D1 migration", () => {
+  it("deletes only the authorised record and cascades to its pending outbox event", async () => {
+    const { d1, db } = sqliteD1();
+    const env = {
+      ENQUIRIES_ENABLED: "true",
+      ALLOWED_ORIGINS: "https://staging.example.test",
+      TURNSTILE_SECRET: "s",
+      DB: d1,
+    };
+    const deps = {
+      fetch: (async () => Response.json({ success: true })) as unknown as typeof fetch,
+      log: () => {},
+    };
+    const first = await handleEnquiry(req("11111111-2222-4333-8444-555555555555"), env, deps);
+    const second = await handleEnquiry(req("11111111-2222-4333-8444-666666666666"), env, deps);
+    expect(first.status).toBe(201);
+    expect(second.status).toBe(201);
+    const { id: firstId } = (await first.json()) as { id: string };
+    const { id: secondId } = (await second.json()) as { id: string };
+
+    expect(await deleteEnquiryRecord(d1, firstId)).toBe(true);
+    expect(db.prepare("SELECT id FROM enquiries").all()).toEqual([{ id: secondId }]);
+    expect(db.prepare("SELECT enquiry_id FROM outbox").all()).toEqual([{ enquiry_id: secondId }]);
+    expect(await deleteEnquiryRecord(d1, firstId)).toBe(false);
+    await expect(deleteEnquiryRecord(d1, "' OR 1=1 --")).rejects.toThrow("Invalid enquiry id");
+    expect(db.prepare("SELECT COUNT(*) AS c FROM enquiries").get()).toEqual({ c: 1 });
+    expect(db.prepare("SELECT COUNT(*) AS c FROM outbox").get()).toEqual({ c: 1 });
   });
 });
