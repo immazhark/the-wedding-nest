@@ -117,6 +117,30 @@ test("preview copies planning choices without contact, venue or private notes", 
   }
 });
 
+test("editing a copied plan clears the previous clipboard-success message", async ({ page }) => {
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await next(page);
+  await next(page);
+  await next(page);
+  await page.getByRole("button", { name: "Skip contact — preview only" }).click();
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async () => {} },
+    });
+  });
+
+  await page.getByRole("button", { name: "Copy planning choices" }).click();
+  await expect(page.locator("[data-copy-status]")).toContainText("Planning choices copied");
+  await page.getByRole("button", { name: "Edit occasion" }).click();
+  await page.getByRole("checkbox", { name: "Walima" }).check();
+  await page.getByRole("button", { name: "Return to review" }).click();
+  await expect(page.locator("[data-summary]")).toContainText("Walima");
+  await expect(page.locator("[data-copy-status]")).toBeEmpty();
+});
+
 test("skipping preview contact clears previously typed private answers", async ({ page }) => {
   await page.getByRole("checkbox", { name: "Nikah" }).check();
   await next(page);
