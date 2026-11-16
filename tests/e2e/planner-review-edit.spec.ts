@@ -57,3 +57,26 @@ test("review shortcuts cannot skip a required service after an occasion changes"
   await expect(stageHeading(page)).toHaveText("How can we help?");
   await expect(page.getByRole("alert")).toHaveText("Please choose at least one service.");
 });
+
+test("clears stale error-message associations when leaving and returning to a step", async ({
+  page,
+}) => {
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await next(page);
+  await next(page);
+  await next(page);
+
+  await next(page);
+  const name = page.getByLabel("Your name");
+  await expect(name).toHaveAttribute("aria-invalid", "true");
+  await expect(name).toHaveAttribute("aria-describedby", "planner-error-msg");
+
+  await page.getByRole("button", { name: "← Back" }).click();
+  await expect(name).not.toHaveAttribute("aria-invalid");
+  await expect(name).not.toHaveAttribute("aria-describedby");
+
+  await next(page);
+  await expect(name).not.toHaveAttribute("aria-describedby");
+});
