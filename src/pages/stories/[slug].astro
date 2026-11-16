@@ -24,9 +24,7 @@ const [hero, ...gallery] = story.photos;
       <div class="grid gap-8 md:grid-cols-12 md:items-end">
         <div class="md:col-span-8">
           <p class="eyebrow text-brass-deep">An event story · {story.occasion}</p>
-          <h1 class="mt-7 text-[length:var(--text-display)] max-w-[14ch]">
-            {story.title}
-          </h1>
+          <h1 class="mt-7 text-[length:var(--text-display)] max-w-[14ch]">{story.title}</h1>
         </div>
         <p class="md:col-span-4 text-[length:var(--text-lede)] text-charcoal">
           {story.introduction}
@@ -49,16 +47,12 @@ const [hero, ...gallery] = story.photos;
       <div class="grid gap-14 md:grid-cols-12">
         <div class="md:col-span-5">
           <p class="eyebrow text-brass-deep">The brief</p>
-          <h2 class="mt-5 text-[length:var(--text-headline)]">
-            What the hosts asked for.
-          </h2>
+          <h2 class="mt-5 text-[length:var(--text-headline)]">What the hosts asked for.</h2>
           <p class="mt-8 text-charcoal max-w-xl">{story.brief}</p>
         </div>
         <div class="md:col-span-6 md:col-start-7">
           <p class="eyebrow text-brass-deep">Our contribution</p>
-          <h2 class="mt-5 text-[length:var(--text-headline)]">
-            The part we delivered.
-          </h2>
+          <h2 class="mt-5 text-[length:var(--text-headline)]">The part we delivered.</h2>
           <p class="mt-8 text-charcoal max-w-xl">{story.contribution}</p>
         </div>
       </div>
@@ -75,10 +69,10 @@ const [hero, ...gallery] = story.photos;
     <aside class="border-t border-ink/15 bg-paper">
       <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20">
         <p class="eyebrow text-brass-deep">Your own occasion</p>
-        <h2 class="mt-5 text-[length:var(--text-headline)]">
-          Tell us what you're planning.
-        </h2>
-        <a class="btn btn-solid mt-9" href="/plan-your-event/">Start planning</a>
+        <h2 class="mt-5 text-[length:var(--text-headline)]">Tell us what you're planning.</h2>
+        <a class="btn btn-solid mt-9" href="/plan-your-event/">
+          Start planning
+        </a>
       </div>
     </aside>
   </article>
