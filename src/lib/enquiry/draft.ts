@@ -59,14 +59,15 @@ export function restoreDraft(raw: unknown, now: number): EnquiryState | null {
     return null;
 
   const base = emptyEnquiry();
+  const scope = isOneOf(SCOPES, data.scope) ? data.scope : null;
   const date = data.date?.kind === "date" && isValidDate(data.date.value) ? data.date : base.date;
   return {
     ...base,
     occasions,
-    services,
+    services: scope === "specific-services" ? services : [],
     styles,
     date,
-    scope: isOneOf(SCOPES, data.scope) ? data.scope : null,
+    scope,
     budget: isOneOf(BUDGETS, data.budget) ? data.budget : null,
     guestCount:
       typeof data.guestCount === "string" && isValidGuestCount(data.guestCount)
