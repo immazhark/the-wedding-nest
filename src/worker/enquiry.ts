@@ -74,8 +74,9 @@ async function readBody(request: Request): Promise<string | null> {
       if (done) break;
       size += value.byteLength;
       if (size > MAX_BODY_BYTES) {
-        // A cancellation failure must not turn an oversized body into an accepted one.
-        await reader.cancel().catch(() => {});
+        // Cancellation is best effort: a hostile stream can leave cancel() pending
+        // indefinitely. Never delay our 413 response while waiting for it.
+        void reader.cancel().catch(() => {});
         return null;
       }
       chunks.push(value);

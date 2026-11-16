@@ -151,6 +151,28 @@ describe("POST /api/enquiry", () => {
     expect(turnstile).not.toHaveBeenCalled();
   });
 
+  it("rejects an oversized request even if stream cancellation never settles", async () => {
+    let cancelled = false;
+    const stream = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        controller.enqueue(new Uint8Array(9_000));
+      },
+      cancel() {
+        cancelled = true;
+        return new Promise<void>(() => {}); // Deliberately ignores cancellation.
+      },
+    });
+    const req = new Request(request(ok()), {
+      body: stream,
+      duplex: "half",
+    } as RequestInit);
+    const response = await call(req);
+    expect(response.status).toBe(413);
+    expect(cancelled).toBe(true);
+    expect(turnstile).not.toHaveBeenCalled();
+    expect(db.enquiries.size).toBe(0);
+  }, 1_000);
+
   it("returns a safe error when the request body stream fails", async () => {
     const req = new Request(request(ok()), {
       body: new ReadableStream({
