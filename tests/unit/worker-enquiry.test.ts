@@ -247,6 +247,21 @@ describe("POST /api/enquiry", () => {
     expect(res.headers.get("cache-control")).toBe("no-store");
   });
 
+  it("never logs a stored enquiry identifier or private contact fields", async () => {
+    const events: Record<string, string | number | boolean>[] = [];
+    const response = await handleEnquiry(request(ok()), env, {
+      fetch: turnstile as unknown as typeof fetch,
+      log: (event) => events.push(event),
+    });
+    expect(response.status).toBe(201);
+    const { id } = (await response.json()) as { id: string };
+    const logOutput = JSON.stringify(events);
+    expect(events).toContainEqual({ event: "enquiry", outcome: "accepted", status: 201 });
+    expect(logOutput).not.toContain(id);
+    expect(logOutput).not.toContain(validEnquiry.phone);
+    expect(logOutput).not.toContain(validEnquiry.name);
+  });
+
   it("rejects malformed selections before storage and on duplicate retries", async () => {
     for (const field of ["services", "styles"] as const) {
       const malformed = {
