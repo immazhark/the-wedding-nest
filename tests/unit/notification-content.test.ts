@@ -49,8 +49,8 @@ describe("dormant owner-only operational notice", () => {
     const alert = buildOperatorNotice(ID, malicious);
     expect(alert.subject).toBe("The Wedding Nest | New enquiry 11111111");
     expect(alert.text).not.toContain("\r");
-    expect(alert.text).not.toContain("Bcc: attacker@example.invalid\n");
-    expect(alert.text).not.toContain("\nFrom: forged");
+    expect(alert.text).not.toMatch(/^Bcc: /m);
+    expect(alert.text).not.toMatch(/^From: /m);
     expect(alert.text).not.toContain("<script>");
     expect(alert.text).not.toContain("\u202e");
     expect(alert.text).toContain("Name: Test Bcc: attacker@example.invalid");
