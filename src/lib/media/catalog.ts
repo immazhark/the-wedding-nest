@@ -18,6 +18,7 @@ const manifestPath = /^\.\.\/\.\.\/content\/media\/[a-z0-9]+(?:-[a-z0-9]+)*\.jso
 export function buildApprovedMediaCatalog(
   manifests: Record<string, unknown>,
   images: Record<string, ImageMetadata>,
+  eventPaths: readonly string[] = Object.keys(images),
 ): HomePhotoCatalog {
   const result: HomePhotoCatalog = {};
   const files = new Set<string>();
@@ -47,8 +48,11 @@ export function buildApprovedMediaCatalog(
   }
   // An original sitting in the import directory without a verified declaration
   // must never slip through the build as an unnoticed, publicly bundled asset.
-  for (const path of Object.keys(images)) {
-    if (!files.has(path)) throw new Error("Unreviewed local event image: " + path);
+  // Scan every file in the event directory, not just supported image types.
+  // Even an SVG, GIF, PDF or differently cased extension must not slip in
+  // without a reviewed manifest (which only permits safe image formats).
+  for (const path of new Set([...Object.keys(images), ...eventPaths])) {
+    if (!files.has(path)) throw new Error("Unreviewed local event asset: " + path);
   }
   return result;
 }
@@ -65,4 +69,10 @@ const assets = import.meta.glob<ImageMetadata>(
   { eager: true, import: "default" },
 );
 
-export const approvedHomePhotos = buildApprovedMediaCatalog(manifests, assets);
+// Lazy, URL-mode imports enumerate names only: no unsupported file is
+// imported into a page or published. An accidental file still fails the build.
+const allEventPaths = Object.keys(
+  import.meta.glob("../../assets/events/**/*", { query: "?url" }),
+);
+
+export const approvedHomePhotos = buildApprovedMediaCatalog(manifests, assets, allEventPaths);
