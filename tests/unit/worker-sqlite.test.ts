@@ -189,9 +189,7 @@ describe("read-only retention planning against real SQLite/D1 migration", () => 
       "2026-06-01T00:00:00Z",
       "2026-06-01T00:00:00.000Z' OR 1=1 --",
     ]) {
-      await expect(previewRetentionImpact(d1, cutoff)).rejects.toThrow(
-        /Invalid retention cutoff/,
-      );
+      await expect(previewRetentionImpact(d1, cutoff)).rejects.toThrow(/Invalid retention cutoff/);
     }
   });
 });
