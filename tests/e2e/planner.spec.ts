@@ -111,6 +111,33 @@ test("blocks progress with an announced message until required answers are given
   await expect(page.getByRole("alert")).toHaveText("Please choose at least one service.");
 });
 
+test("focuses the missing occasion or service choice after a blocked step", async ({ page }) => {
+  const nikah = page.getByRole("checkbox", { name: "Nikah" });
+  await next(page);
+  await expect(nikah).toBeFocused();
+  await expect(nikah).toHaveAttribute("aria-invalid", "true");
+  await expect(nikah).toHaveAttribute("aria-describedby", "planner-error-msg");
+
+  await nikah.check();
+  await expect(nikah).not.toHaveAttribute("aria-invalid");
+  await next(page);
+  const full = page.getByRole("radio", { name: /End-to-end planning/ });
+  await next(page);
+  await expect(full).toBeFocused();
+  await expect(full).toHaveAttribute("aria-describedby", "planner-error-msg");
+
+  await page.getByRole("radio", { name: /Specific services/ }).check();
+  await next(page);
+  const catering = page.getByRole("checkbox", { name: "Catering & menus" });
+  await expect(catering).toBeFocused();
+  await expect(catering).toHaveAttribute("aria-invalid", "true");
+  await expect(catering).toHaveAttribute("aria-describedby", "planner-error-msg");
+
+  await catering.check();
+  await expect(catering).not.toHaveAttribute("aria-invalid");
+  await expect(catering).not.toHaveAttribute("aria-describedby");
+});
+
 test("switching to full planning clears specific services from the browser draft", async ({
   page,
 }) => {
