@@ -12,7 +12,8 @@ export function previewPlanText(state: EnquiryState): string {
   const rows = summarise({ ...emptyEnquiry(), ...selections }).filter(
     (row) => row.stage !== "contact" && row.label !== "Location",
   );
-  return ["The Wedding Nest — Planning choices", ...rows.map((row) => `${row.label}: ${row.value}`)].join(
-    "\n",
-  );
+  return [
+    "The Wedding Nest — Planning choices",
+    ...rows.map((row) => `${row.label}: ${row.value}`),
+  ].join("\n");
 }
