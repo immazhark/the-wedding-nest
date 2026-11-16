@@ -231,7 +231,6 @@ describe("validateEnquiry (server-grade, accepts unknown input)", () => {
 });
 
 describe("local draft (privacy)", () => {
-
   it("serializes only approved date fields from a contaminated runtime object", () => {
     const date = {
       kind: "date" as const,
