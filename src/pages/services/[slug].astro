@@ -1,0 +1,73 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { publishedServicePages, type ApprovedServicePage } from "../../lib/services/publication";
+
+// Zero pages are generated until individual factual records are owner-approved.
+export const getStaticPaths = (() =>
+  publishedServicePages.map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  page: ApprovedServicePage;
+}
+const { page } = Astro.props;
+const plannerHref = `/plan-your-event/?service=${page.plannerService}`;
+---
+
+<BaseLayout title={page.title} description={page.description}>
+  <article>
+    <header class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-16 pb-20 md:pt-28 md:pb-28">
+      <div class="grid gap-10 md:grid-cols-12 md:items-end">
+        <div class="md:col-span-8">
+          <p class="eyebrow text-brass-deep">Explore an event service</p>
+          <h1 class="mt-7 text-[length:var(--text-display)] max-w-[13ch]">{page.title}</h1>
+        </div>
+        <p class="text-[length:var(--text-lede)] text-charcoal md:col-span-4">
+          {page.introduction}
+        </p>
+      </div>
+    </header>
+
+    <section class="border-y border-ink/15 bg-paper" aria-labelledby="service-details-heading">
+      <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-28">
+        <p class="eyebrow text-brass-deep">Details to discuss</p>
+        <h2
+          id="service-details-heading"
+          class="mt-6 text-[length:var(--text-headline)] max-w-[16ch]"
+        >
+          Begin with the particulars.
+        </h2>
+        <div class="mt-14 md:mt-20 border-t border-ink/15">
+          {page.sections.map((section, index) => (
+            <div class="grid gap-6 py-10 border-b border-ink/15 md:grid-cols-12">
+              <span class="eyebrow text-brass-deep md:col-span-1">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h3 class="text-[length:var(--text-title)] md:col-span-4">{section.title}</h3>
+              <p class="text-charcoal max-w-2xl md:col-span-7">{section.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <aside class="bg-kohl text-ivory on-dark" aria-labelledby="service-planner-title">
+      <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-28">
+        <p class="eyebrow text-sand">Start a conversation</p>
+        <h2 id="service-planner-title" class="mt-6 text-[length:var(--text-headline)]">
+          Tell us what you're considering.
+        </h2>
+        <p class="mt-6 text-stone max-w-xl">
+          Start the five-step planner with this topic selected. Your date and budget can remain
+          undecided, and availability is discussed before anything is confirmed.
+        </p>
+        <a class="btn btn-light mt-10" href={plannerHref}>
+          Explore in the planner
+        </a>
+      </div>
+    </aside>
+  </article>
+</BaseLayout>
