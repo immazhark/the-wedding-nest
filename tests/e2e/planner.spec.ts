@@ -183,7 +183,7 @@ test("start again clears URL preselection so reload stays reset", async ({ page 
   await expect(page.getByRole("checkbox", { name: "Nikah" })).toBeChecked();
   await page.getByRole("button", { name: "Start again" }).click();
   await expect(page.getByRole("checkbox", { name: "Nikah" })).not.toBeChecked();
-  await expect(page).toHaveURL(/\\?utm_source=instagram$/);
+  await expect(page).toHaveURL(/[?]utm_source=instagram$/);
   expect(await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"))).toBeNull();
 
   await page.reload();
