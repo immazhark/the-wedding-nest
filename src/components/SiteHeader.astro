@@ -133,6 +133,12 @@ const current = Astro.url.pathname;
   const menu = document.querySelector<HTMLElement>("[data-menu]");
   const label = toggle?.querySelector<HTMLElement>("[data-menu-label]");
   const mobile = window.matchMedia("(max-width: 47.99rem)");
+  const homeLink = document.querySelector<HTMLAnchorElement>("[data-site-header] a[href='/']");
+  // A full-screen mobile navigation must not leave underlying page controls tabbable.
+  const background = [
+    document.querySelector<HTMLElement>("main"),
+    document.querySelector<HTMLElement>("footer"),
+  ];
 
   function setOpen(open: boolean, restoreFocus = false) {
     if (!toggle || !menu) return;
@@ -144,6 +150,7 @@ const current = Astro.url.pathname;
     if (label) label.textContent = open ? "Close" : "Menu";
     menu.toggleAttribute("data-open", open);
     menu.toggleAttribute("inert", mobile.matches && !open);
+    background.forEach((region) => region?.toggleAttribute("inert", open && mobile.matches));
     document.body.style.overflow = open ? "hidden" : "";
     if (open) menu.querySelector<HTMLElement>("a")?.focus();
     else if (restoreFocus) toggle.focus();
@@ -155,8 +162,32 @@ const current = Astro.url.pathname;
       setOpen(toggle.getAttribute("aria-expanded") !== "true"),
     );
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && toggle.getAttribute("aria-expanded") === "true")
+      if (toggle.getAttribute("aria-expanded") !== "true") return;
+      if (e.key === "Escape") {
         setOpen(false, true);
+        return;
+      }
+      if (e.key !== "Tab" || !mobile.matches) return;
+      // Keep keyboard users within the visible header/navigation until they close it.
+      // Include the brand link and toggle, which remain visible above the overlay.
+      const first = homeLink ?? toggle;
+      const links = menu.querySelectorAll<HTMLAnchorElement>("a[href]");
+      const last = links.item(links.length - 1) ?? toggle;
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (
+        document.activeElement !== first &&
+        document.activeElement !== toggle &&
+        !menu.contains(document.activeElement)
+      ) {
+        // Recover if focus was moved behind the overlay programmatically.
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+      }
     });
     menu.addEventListener("click", (e) => {
       if ((e.target as HTMLElement).closest("a")) setOpen(false);
