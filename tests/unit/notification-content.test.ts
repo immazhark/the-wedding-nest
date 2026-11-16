@@ -26,7 +26,9 @@ describe("dormant owner-only operational notice", () => {
     expect(alert.subject).toBe("The Wedding Nest | New enquiry 11111111");
     expect(alert.text).toContain("Reference: " + ID);
     expect(alert.text).toContain("Occasion: Nikah, Walima");
-    expect(alert.text).toContain("Help needed: Specific services: Catering & menus, Décor, florals & staging");
+    expect(alert.text).toContain(
+      "Help needed: Specific services: Catering & menus, Décor, florals & staging",
+    );
     expect(alert.text).toContain("Name: Sample Customer");
     expect(alert.text).toContain("Contact: +91 98765 43210 · WhatsApp");
     expect(alert.text).toContain("Notes: Please plan a family-friendly celebration.");
