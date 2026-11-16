@@ -71,8 +71,6 @@ const assets = import.meta.glob<ImageMetadata>(
 
 // Lazy, URL-mode imports enumerate names only: no unsupported file is
 // imported into a page or published. An accidental file still fails the build.
-const allEventPaths = Object.keys(
-  import.meta.glob("../../assets/events/**/*", { query: "?url" }),
-);
+const allEventPaths = Object.keys(import.meta.glob("../../assets/events/**/*", { query: "?url" }));
 
 export const approvedHomePhotos = buildApprovedMediaCatalog(manifests, assets, allEventPaths);
