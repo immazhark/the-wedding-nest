@@ -33,7 +33,7 @@ Every response: `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`. Lo
 
 **16 Nov 2026:** D1 `twn-enquiries-staging` created in APAC and schema applied. The separate Worker is deployed at https://the-wedding-nest-staging.mazharkhan-it.workers.dev. Its dedicated Workers Builds trigger watches `codex/staging-enquiry-validation`, builds with `PUBLIC_ENQUIRIES_ENABLED=true` and Cloudflare's public dummy site key, then deploys `--env staging`. The matching public dummy secret is stored in the staging Worker's secret binding; no production widget or secret is used. A persistent test-environment notice requires fictional details only.
 
-Repeatable HTTP verification: `python scripts/verify_staging.py` (Python 3 and curl). It writes one fictional record per run and checks idempotent retries; inspect the D1 enquiry/outbox rows for durability. It does not send WhatsApp messages or notifications. Production intake remains off.
+Repeatable HTTP verification: `python scripts/verify_staging.py` (Python 3 and curl). It writes one fictional record per run and checks idempotent retries; inspect the D1 enquiry/outbox rows for durability. It does not send WhatsApp messages or notifications. Real desktop/mobile browser submission also passed in GitHub Actions (`staging-browser`, run `43778044811`); the workflow is repeatable via manual dispatch. Production intake remains off.
 
 The commands below are the setup procedure for a fresh environment; do not recreate the existing database.
 
