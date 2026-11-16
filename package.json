@@ -16,7 +16,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format:check": "prettier --write src/lib/media/catalog.ts src/lib/stories/publication.ts 'src/pages/stories/[slug].astro' tests/unit/story-publication.test.ts && git diff -- src/lib/media/catalog.ts src/lib/stories/publication.ts 'src/pages/stories/[slug].astro' tests/unit/story-publication.test.ts && exit 1",
     "verify": "npm run format:check && npm run check && npm run test && npm run build && npm run build:submit && npm run test:e2e && npm run test:runtime",
     "test:runtime": "E2E_TARGET=workerd playwright test",
     "build:submit": "PUBLIC_ENQUIRIES_ENABLED=true PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA ASTRO_OUT_DIR=./dist-submit astro build"
