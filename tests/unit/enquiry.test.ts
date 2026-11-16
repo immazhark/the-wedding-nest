@@ -138,12 +138,15 @@ describe("validateEnquiry (server-grade, accepts unknown input)", () => {
   });
 
   it("rejects hidden service selections when the visitor chooses full planning", () => {
-    const result = validateEnquiry({ ...complete(), scope: "full-planning", services: ["catering"] });
+    const result = validateEnquiry({
+      ...complete(),
+      scope: "full-planning",
+      services: ["catering"],
+    });
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.errors.services).toBe("invalid");
-    expect(validateEnquiry({ ...complete(), scope: "full-planning", services: [] }).ok).toBe(
-      true,
-    );
+    const clean = validateEnquiry({ ...complete(), scope: "full-planning", services: [] });
+    expect(clean.ok).toBe(true);
   });
 
   it("rejects a service that is not offered for the chosen occasions", () => {
