@@ -81,7 +81,8 @@ export async function submitEnquiry(
       }
       if (res.status === 403 && body["error"] === "verification_failed")
         return { kind: "verification" };
-      if (res.status === 429 || res.status >= 500) return { kind: "retryable" };
+      if (res.status === 408 || res.status === 429 || res.status >= 500)
+        return { kind: "retryable" };
       return { kind: "rejected" };
     } catch {
       return { kind: "retryable" };

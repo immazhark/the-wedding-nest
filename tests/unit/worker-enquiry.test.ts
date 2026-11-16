@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { handleEnquiry, type EnquiryEnv } from "../../src/worker/enquiry";
+import { BODY_READ_TIMEOUT_MS, handleEnquiry, type EnquiryEnv } from "../../src/worker/enquiry";
 import type { D1Like } from "../../src/worker/types";
 
 /** Minimal in-memory D1 stand-in supporting the statements the handler uses. */
@@ -172,6 +172,36 @@ describe("POST /api/enquiry", () => {
     expect(turnstile).not.toHaveBeenCalled();
     expect(db.enquiries.size).toBe(0);
   }, 1_000);
+
+  it("times out a never-finishing body stream without verification or storage", async () => {
+    vi.useFakeTimers();
+    try {
+      let cancelled = false;
+      const stream = new ReadableStream<Uint8Array>({
+        pull: () => new Promise<void>(() => {}),
+        cancel: () => {
+          cancelled = true;
+          return new Promise<void>(() => {}); // Cancellation deliberately never settles.
+        },
+      });
+      const req = new Request(request(ok()), {
+        body: stream,
+        duplex: "half",
+      } as RequestInit);
+      const pending = call(req);
+      await vi.advanceTimersByTimeAsync(BODY_READ_TIMEOUT_MS);
+      const response = await pending;
+      expect(response.status).toBe(408);
+      expect(await response.json()).toEqual({ error: "request_timeout" });
+      expect(cancelled).toBe(true);
+      expect(turnstile).not.toHaveBeenCalled();
+      expect(db.enquiries.size).toBe(0);
+      expect(db.outbox).toHaveLength(0);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 
   it("returns a safe error when the request body stream fails", async () => {
     const req = new Request(request(ok()), {

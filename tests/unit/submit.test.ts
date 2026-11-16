@@ -173,8 +173,8 @@ describe("submitEnquiry", () => {
     expect(r).toEqual({ kind: "invalid", errors: { phone: "invalid" } });
   });
 
-  it("marks outages, rate limits and network failures as retryable", async () => {
-    for (const status of [503, 429, 500]) {
+  it("marks upload timeouts, outages, rate limits and network failures as retryable", async () => {
+    for (const status of [408, 503, 429, 500]) {
       expect(
         (await submitEnquiry(state(), "t", KEY, respond(status, { error: "x" }) as never)).kind,
       ).toBe("retryable");
