@@ -208,6 +208,31 @@ test("an outage keeps the answers, and the retry reuses the same idempotency key
   expect(calls[1]!.key).toBe(calls[0]!.key);
 });
 
+test("a conflicting send keeps answers and uses a new key only after another explicit send", async ({
+  page,
+}) => {
+  const calls = await setup(page, (n) =>
+    n === 1
+      ? { status: 409, body: { error: "idempotency_conflict" } }
+      : { status: 201, body: { id: STORED_ID } },
+  );
+  await toReview(page);
+  await waitForFakeCheck(page);
+  await page.getByRole("button", { name: "Send enquiry" }).click();
+  await expect(page.getByRole("status")).toContainText("earlier enquiry");
+  await expect(page.locator("[data-summary]")).toContainText("Sample Person");
+  await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toHaveCount(0);
+  expect(calls).toHaveLength(1);
+
+  await waitForFakeCheck(page);
+  await page.getByRole("button", { name: "Send enquiry" }).click();
+  await expect(page.getByRole("heading", { name: /your enquiry has reached us/ })).toBeVisible();
+  expect(calls).toHaveLength(2);
+  expect(calls[0]?.key).not.toBeNull();
+  expect(calls[1]?.key).not.toBeNull();
+  expect(calls[1]?.key).not.toBe(calls[0]?.key);
+});
+
 test("does not report Sent for a malformed positive acknowledgement", async ({ page }) => {
   const calls = await setup(page, () => ({ status: 201, body: { id: "accepted123" } }));
   await toReview(page);
