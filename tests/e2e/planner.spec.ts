@@ -85,6 +85,18 @@ test("unknown planner intent never selects an occasion or a service", async ({ p
   expect(await page.evaluate(() => localStorage.getItem("twn:enquiry-draft"))).toBeNull();
 });
 
+test("mobile planner shows the first question in the initial viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/plan-your-event/");
+  const disclosure = page.locator("#planner-disclosure");
+  await expect(disclosure).toBeVisible();
+  await expect(disclosure).toContainText("don’t enter real contact details");
+  const question = page.getByRole("heading", { name: "What are you celebrating?" });
+  const bounds = await question.boundingBox();
+  expect(bounds).not.toBeNull();
+  expect(bounds!.y).toBeLessThan(844);
+});
+
 test("discloses before the first step that sending is off and real details shouldn't be entered", async ({
   page,
 }) => {
