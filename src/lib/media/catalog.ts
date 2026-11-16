@@ -15,12 +15,18 @@ export type HomePhotoCatalog = Partial<Record<HomeMediaSlot, ApprovedPhoto>>;
 
 const manifestPath = /^\.\.\/\.\.\/content\/media\/[a-z0-9]+(?:-[a-z0-9]+)*\.json$/;
 
-export function buildApprovedMediaCatalog(
+export interface ApprovedMediaCollection {
+  readonly home: HomePhotoCatalog;
+  readonly photosByFile: Readonly<Record<string, ApprovedPhoto>>;
+}
+
+export function buildApprovedMediaCollection(
   manifests: Record<string, unknown>,
   images: Record<string, ImageMetadata>,
   eventPaths: readonly string[] = Object.keys(images),
-): HomePhotoCatalog {
+): ApprovedMediaCollection {
   const result: HomePhotoCatalog = {};
+  const byFile: Record<string, ApprovedPhoto> = {};
   const files = new Set<string>();
   for (const [path, raw] of Object.entries(manifests).sort(([a], [b]) => a.localeCompare(b))) {
     if (!manifestPath.test(path)) throw new Error("Invalid reviewed media manifest path");
@@ -40,9 +46,11 @@ export function buildApprovedMediaCatalog(
       ) {
         throw new Error("Invalid local image metadata");
       }
+      const approved = { image, entry };
+      byFile[entry.file] = approved;
       if (entry.slot) {
         if (result[entry.slot]) throw new Error("Duplicate editorial photo slot: " + entry.slot);
-        result[entry.slot] = { image, entry };
+        result[entry.slot] = approved;
       }
     }
   }
@@ -54,7 +62,16 @@ export function buildApprovedMediaCatalog(
   for (const path of new Set([...Object.keys(images), ...eventPaths])) {
     if (!files.has(path)) throw new Error("Unreviewed local event asset: " + path);
   }
-  return result;
+  return { home: result, photosByFile: byFile };
+}
+
+/** Retain the existing homepage API while also supporting verified case studies. */
+export function buildApprovedMediaCatalog(
+  manifests: Record<string, unknown>,
+  images: Record<string, ImageMetadata>,
+  eventPaths: readonly string[] = Object.keys(images),
+): HomePhotoCatalog {
+  return buildApprovedMediaCollection(manifests, images, eventPaths).home;
 }
 
 // Eager imports are safe only because *every* imported original is required to
@@ -73,4 +90,7 @@ const assets = import.meta.glob<ImageMetadata>(
 // imported into a page or published. An accidental file still fails the build.
 const allEventPaths = Object.keys(import.meta.glob("../../assets/events/**/*", { query: "?url" }));
 
-export const approvedHomePhotos = buildApprovedMediaCatalog(manifests, assets, allEventPaths);
+const approvedMedia = buildApprovedMediaCollection(manifests, assets, allEventPaths);
+
+export const approvedHomePhotos = approvedMedia.home;
+export const approvedEventPhotos = approvedMedia.photosByFile;

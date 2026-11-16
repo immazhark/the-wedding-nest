@@ -1,0 +1,79 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Frame from "../../components/media/Frame.astro";
+import { publishedStories, type ApprovedStory } from "../../lib/stories/publication";
+
+// No case-study pages exist without owner-reviewed written facts and real photographs.
+export const getStaticPaths = (() =>
+  publishedStories.map((story) => ({
+    params: { slug: story.slug },
+    props: { story },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  story: ApprovedStory;
+}
+const { story } = Astro.props;
+const [hero, ...gallery] = story.photos;
+---
+
+<BaseLayout title={story.title} description={story.introduction}>
+  <article>
+    <header class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-16 md:py-28">
+      <div class="grid gap-8 md:grid-cols-12 md:items-end">
+        <div class="md:col-span-8">
+          <p class="eyebrow text-brass-deep">An event story · {story.occasion}</p>
+          <h1 class="mt-7 text-[length:var(--text-display)] max-w-[14ch]">{story.title}</h1>
+        </div>
+        <p class="md:col-span-4 text-[length:var(--text-lede)] text-charcoal">
+          {story.introduction}
+        </p>
+      </div>
+    </header>
+
+    <div class="mx-auto max-w-[110rem] sm:px-8 lg:px-12">
+      {hero && (
+        <Frame
+          photo={hero}
+          ratio={hero.entry.orientation}
+          sizes="(min-width: 1024px) 90vw, 100vw"
+          priority
+        />
+      )}
+    </div>
+
+    <section class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-32">
+      <div class="grid gap-14 md:grid-cols-12">
+        <div class="md:col-span-5">
+          <p class="eyebrow text-brass-deep">The brief</p>
+          <h2 class="mt-5 text-[length:var(--text-headline)]">What the hosts asked for.</h2>
+          <p class="mt-8 text-charcoal max-w-xl">{story.brief}</p>
+        </div>
+        <div class="md:col-span-6 md:col-start-7">
+          <p class="eyebrow text-brass-deep">Our contribution</p>
+          <h2 class="mt-5 text-[length:var(--text-headline)]">The part we delivered.</h2>
+          <p class="mt-8 text-charcoal max-w-xl">{story.contribution}</p>
+        </div>
+      </div>
+      <div class="mt-20 md:mt-28 grid gap-10 md:grid-cols-2 md:gap-12">
+        {gallery.map((photo) => (
+          <Frame
+            photo={photo}
+            ratio={photo.entry.orientation}
+            sizes="(min-width: 768px) 47vw, 100vw"
+          />
+        ))}
+      </div>
+    </section>
+    <aside class="border-t border-ink/15 bg-paper">
+      <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20">
+        <p class="eyebrow text-brass-deep">Your own occasion</p>
+        <h2 class="mt-5 text-[length:var(--text-headline)]">Tell us what you're planning.</h2>
+        <a class="btn btn-solid mt-9" href="/plan-your-event/">
+          Start planning
+        </a>
+      </div>
+    </aside>
+  </article>
+</BaseLayout>
