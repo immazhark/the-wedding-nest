@@ -103,7 +103,9 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
             <ul class="service-index mt-6" aria-label="Services you can ask about">
               {coreServices.map((s, i) => (
                 <li>
-                  <a href={`/plan-your-event/?service=${s.id}`} class="link-underline">{s.label}</a>
+                  <a href={`/plan-your-event/?service=${s.id}`} class="link-underline">
+                    {s.label}
+                  </a>
                   {i < coreServices.length - 1 && (
                     <span class="text-brass" aria-hidden="true">
                       &nbsp;/
