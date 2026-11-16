@@ -12,7 +12,12 @@ const entry = {
   permission: true,
   releaseRef: "TWN-REL-2026-A001",
 };
-const image = { src: "/_astro/01-stage-wide.hash.jpg", width: 3200, height: 1800, format: "jpg" } as ImageMetadata;
+const image = {
+  src: "/_astro/01-stage-wide.hash.jpg",
+  width: 3200,
+  height: 1800,
+  format: "jpg",
+} as ImageMetadata;
 const manifestPath = "../../content/media/walima.json";
 
 describe("approved event media catalog", () => {
