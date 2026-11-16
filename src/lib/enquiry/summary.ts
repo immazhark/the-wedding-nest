@@ -30,19 +30,33 @@ export function summarise(s: EnquiryState): SummaryRow[] {
       : s.scope
         ? labelOf(SCOPES, s.scope)
         : "—";
+  const notes = s.notes.trim();
+  const notesRows: SummaryRow[] = notes ? [{ label: "Notes", value: notes, stage: "logistics" }] : [];
   return [
-    { label: "Occasion", value: s.occasions.map((id) => labelOf(OCCASIONS, id)).join(", ") || "—", stage: "occasion" },
+    {
+      label: "Occasion",
+      value: s.occasions.map((id) => labelOf(OCCASIONS, id)).join(", ") || "—",
+      stage: "occasion",
+    },
     { label: "Help needed", value: scope, stage: "scope" },
     {
       label: "Style",
       value: s.styles.map((id) => labelOf(STYLES, id)).join(", ") || "No preference yet",
       stage: "style",
     },
-    { label: "Date", value: s.date.kind === "date" ? formatDate(s.date.value) : "Not decided yet", stage: "logistics" },
+    {
+      label: "Date",
+      value: s.date.kind === "date" ? formatDate(s.date.value) : "Not decided yet",
+      stage: "logistics",
+    },
     { label: "Guests", value: s.guestCount.trim() || "Not sure yet", stage: "logistics" },
     { label: "Location", value: s.location.trim() || "Not decided yet", stage: "logistics" },
-    { label: "Budget", value: s.budget ? labelOf(BUDGETS, s.budget) : "Not shared", stage: "logistics" },
-    ...(s.notes.trim() ? [{ label: "Notes", value: s.notes.trim(), stage: "logistics" as const }] : []),
+    {
+      label: "Budget",
+      value: s.budget ? labelOf(BUDGETS, s.budget) : "Not shared",
+      stage: "logistics",
+    },
+    ...notesRows,
     { label: "Name", value: s.name.trim() || "—", stage: "contact" },
     {
       label: "Contact",
