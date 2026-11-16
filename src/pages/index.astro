@@ -5,6 +5,8 @@ import Frame from "../components/media/Frame.astro";
 import { approvedHomePhotos } from "../lib/media/catalog";
 import { OCCASIONS, SERVICES, STAGES } from "../lib/enquiry/schema";
 import { ENQUIRIES } from "../lib/site/config";
+import { publishedServicePages, servicePageHref } from "../lib/services/publication";
+import { publishedStories, featuredStoryPath } from "../lib/stories/publication";
 
 // DRAFT COPY — editorial working draft pending owner approval (docs/creative-excellence-standards.md).
 // No claims about prices, clients, venues, awards or guarantees.
@@ -21,6 +23,7 @@ const occasionNotes: Record<string, string> = {
   sangeet: "An evening of music and dance",
 };
 const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
+const featuredStory = featuredStoryPath(publishedStories);
 ---
 
 <BaseLayout>
@@ -103,7 +106,7 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
             <ul class="service-index mt-6" aria-label="Services you can ask about">
               {coreServices.map((s, i) => (
                 <li>
-                  <a href={`/plan-your-event/?service=${s.id}`} class="link-underline">
+                  <a href={servicePageHref(s.id, publishedServicePages)} class="link-underline">
                     {s.label}
                   </a>
                   {i < coreServices.length - 1 && (
@@ -201,10 +204,21 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
         <h2 id="work-title" class="md:col-span-7 text-[length:var(--text-headline)]">
           Real celebrations, shared with permission.
         </h2>
-        <p class="md:col-span-4 md:col-start-9 text-muted">
-          Project stories will appear here once the photographs and the families’ permission are
-          confirmed.
-        </p>
+        {featuredStory ? (
+          <div class="md:col-span-4 md:col-start-9">
+            <p class="text-muted">
+              A celebration documented with its hosts’ and photographer’s permission.
+            </p>
+            <a class="link-underline inline-block mt-6 font-medium" href={featuredStory}>
+              Read an event story
+            </a>
+          </div>
+        ) : (
+          <p class="md:col-span-4 md:col-start-9 text-muted">
+            Project stories will appear here once the photographs and the families’ permission are
+            confirmed.
+          </p>
+        )}
       </div>
       <div class="work-grid mt-16">
         <Frame
