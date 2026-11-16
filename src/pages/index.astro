@@ -131,13 +131,10 @@ const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
       <ul class="mt-16 border-t border-ink/15" role="list">
         {weddingOccasions.map((o) => (
           <li class="occasion-row scroll-rise">
-            <span class="occasion-name">
-              <a href={`/plan-your-event/?occasion=${o.id}`} class="occasion-link">
-                {o.label}
-                <span class="sr-only"> — start planning</span>
-                <span class="occasion-arrow" aria-hidden="true">↗</span>
-              </a>
-            </span>
+            <a href={`/plan-your-event/?occasion=${o.id}`} class="occasion-name occasion-link">
+              {o.label}
+              <span class="occasion-arrow" aria-hidden="true">↗</span>
+            </a>
             <span class="occasion-note">{occasionNotes[o.id]}</span>
           </li>
         ))}
