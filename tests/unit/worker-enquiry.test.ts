@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { handleEnquiry, type EnquiryEnv } from "../../src/worker/enquiry";
 import type { D1Like } from "../../src/worker/types";
 
@@ -268,6 +268,83 @@ describe("POST /api/enquiry", () => {
   it("treats a Turnstile network failure as a retryable 503, not success", async () => {
     turnstile.mockRejectedValueOnce(new Error("network"));
     expect((await call(request(ok()))).status).toBe(503);
+  });
+
+  describe("Turnstile verification deadline", () => {
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
+    it("aborts a stalled fetch and returns a retryable error without writing an enquiry", async () => {
+      let signal: AbortSignal | undefined;
+      turnstile.mockImplementationOnce((_url, init: RequestInit) => {
+        signal = init.signal ?? undefined;
+        return new Promise<Response>(() => {}); // Deliberately ignores abort.
+      });
+      let response: Response | undefined;
+      const pending = call(request(ok())).then((res) => (response = res));
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(response?.status).toBe(503);
+      await pending;
+      expect(await response!.json()).toEqual({ error: "verification_unavailable" });
+      expect(signal?.aborted).toBe(true);
+      expect(db.enquiries.size).toBe(0);
+      expect(db.outbox).toHaveLength(0);
+      expect(vi.getTimerCount()).toBe(0);
+    });
+
+    it("bounds a stalled response body and ignores a successful result arriving after timeout", async () => {
+      let finishBody: ((outcome: { success: boolean }) => void) | undefined;
+      let signal: AbortSignal | undefined;
+      turnstile.mockImplementationOnce((_url, init: RequestInit) => {
+        signal = init.signal ?? undefined;
+        return Promise.resolve({
+          json: () => new Promise((resolve) => (finishBody = resolve)),
+        });
+      });
+      let response: Response | undefined;
+      const pending = call(request(ok())).then((res) => (response = res));
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(response?.status).toBe(503);
+      await pending;
+      expect(signal?.aborted).toBe(true);
+      finishBody!({ success: true });
+      await vi.advanceTimersByTimeAsync(0);
+      expect(db.enquiries.size).toBe(0);
+      expect(db.outbox).toHaveLength(0);
+      expect(vi.getTimerCount()).toBe(0);
+    });
+
+    it("handles a fetch rejection arriving after the timeout without leaking private details", async () => {
+      let rejectFetch: ((error: Error) => void) | undefined;
+      turnstile.mockImplementationOnce(
+        () => new Promise<Response>((_resolve, reject) => (rejectFetch = reject)),
+      );
+      const logs: Record<string, string | number | boolean>[] = [];
+      let response: Response | undefined;
+      const pending = handleEnquiry(request(ok()), env, {
+        fetch: turnstile as unknown as typeof fetch,
+        log: (entry) => logs.push(entry),
+      }).then((res) => (response = res));
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(response?.status).toBe(503);
+      await pending;
+      rejectFetch!(new Error("private-token-and-transport-detail"));
+      await vi.advanceTimersByTimeAsync(0);
+      expect(logs).toEqual([
+        { event: "enquiry", outcome: "verification_unavailable", status: 503 },
+      ]);
+      expect(db.enquiries.size).toBe(0);
+      expect(vi.getTimerCount()).toBe(0);
+    });
+
+    it("clears its deadline after prompt verification succeeds", async () => {
+      const response = await call(request(ok()));
+      expect(response.status).toBe(201);
+      expect(vi.getTimerCount()).toBe(0);
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(db.enquiries.size).toBe(1);
+      expect(db.outbox).toHaveLength(1);
+    });
   });
 
   it("validates server-side and returns field error codes (422) without echoing input", async () => {

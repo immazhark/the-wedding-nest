@@ -14,35 +14,10 @@ import { nextStage, previousStage, stageError } from "../lib/enquiry/flow";
 import { DRAFT_STORAGE_KEY, restoreDraft, toDraft } from "../lib/enquiry/draft";
 import { summarise } from "../lib/enquiry/summary";
 import { FIELD_STAGE, fieldMessage, submitEnquiry } from "../lib/enquiry/submit";
+import { createTurnstileLoader } from "../lib/enquiry/turnstile";
 
-type TurnstileApi = {
-  render(el: HTMLElement, opts: Record<string, unknown>): string;
-  reset(id?: string): void;
-};
-declare global {
-  interface Window {
-    turnstile?: TurnstileApi;
-  }
-}
-
-let turnstileLoading: Promise<TurnstileApi> | null = null;
-/** Loads Cloudflare Turnstile only when a visitor reaches the review step with sending on. */
-function loadTurnstile(): Promise<TurnstileApi> {
-  turnstileLoading ??= new Promise((resolve, reject) => {
-    if (window.turnstile) return resolve(window.turnstile);
-    const script = document.createElement("script");
-    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-    script.async = true;
-    script.onload = () =>
-      window.turnstile ? resolve(window.turnstile) : reject(new Error("turnstile"));
-    script.onerror = () => {
-      turnstileLoading = null;
-      reject(new Error("turnstile"));
-    };
-    document.head.append(script);
-  });
-  return turnstileLoading;
-}
+// Loaded only when a visitor reaches review with sending on.
+const loadTurnstile = createTurnstileLoader();
 
 type Panel = StageId | "review" | "sent";
 
@@ -148,6 +123,8 @@ export function initPlanner(form: HTMLFormElement) {
     let token = "";
     let widgetId: string | undefined;
     let busy = false;
+    let reviewing = false;
+    let reviewAttempt = 0;
 
     const resetCheck = () => {
       token = "";
@@ -209,30 +186,41 @@ export function initPlanner(form: HTMLFormElement) {
 
     return {
       async enterReview() {
+        reviewing = true;
+        const attempt = ++reviewAttempt;
+        token = "";
         status.textContent = "";
         try {
           const ts = await loadTurnstile();
+          // A visitor may have gone back (and returned) while the external script loaded.
+          if (!reviewing || attempt !== reviewAttempt) return;
           if (widgetId === undefined) {
             widgetId = ts.render(widgetEl, {
               sitekey,
               theme: "light",
               callback: (t: string) => {
+                if (!reviewing) return;
                 token = t;
                 status.textContent = "";
               },
               "expired-callback": () => (token = ""),
               "error-callback": () => {
+                if (!reviewing) return;
                 token = "";
                 status.textContent = "The quick check couldn’t load. Please refresh the page.";
               },
             });
-          }
+          } else resetCheck();
         } catch {
+          if (!reviewing || attempt !== reviewAttempt) return;
           status.textContent =
-            "The quick check couldn’t load. Check your connection, or message us on Instagram @twn.events.";
+            "The quick check couldn’t load. Go back and return to review to try again, or message us on Instagram @twn.events.";
         }
       },
       leaveReview() {
+        reviewing = false;
+        reviewAttempt++;
+        token = "";
         key = null;
       },
     };
