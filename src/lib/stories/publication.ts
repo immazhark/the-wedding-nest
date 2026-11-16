@@ -92,3 +92,9 @@ const sources = import.meta.glob("../../content/stories/*.json", {
 });
 
 export const publishedStories = buildPublishedStories(sources, approvedEventPhotos);
+
+/** No public portfolio link exists until there is a verified real event story. */
+export function featuredStoryPath(stories: readonly ApprovedStory[]): string | null {
+  const story = stories[0];
+  return story ? `/stories/${story.slug}/` : null;
+}
