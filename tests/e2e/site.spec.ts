@@ -323,6 +323,14 @@ test("photo placeholders are labelled honestly and never use stock imagery", asy
   }
 });
 
+test("unapproved photo placeholders do not run image parallax or scroll-reveal transforms", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator('[data-frame="placeholder"] .parallax-media')).toHaveCount(0);
+  await expect(page.locator('[data-frame="placeholder"].scroll-frame')).toHaveCount(0);
+});
+
 test("official logo is used in the header and footer with accessible names", async ({ page }) => {
   await page.goto("/");
   const homeLink = page.locator("[data-site-header] a[href='/']").first();
