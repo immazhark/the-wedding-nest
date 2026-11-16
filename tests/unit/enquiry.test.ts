@@ -137,6 +137,37 @@ describe("validateEnquiry (server-grade, accepts unknown input)", () => {
     }
   });
 
+  it("rejects malformed optional selection collections instead of silently clearing them", () => {
+    for (const field of ["services", "styles"] as const) {
+      for (const value of ["catering", { choice: "heritage" }, 42, false]) {
+        const result = validateEnquiry({
+          ...complete(),
+          scope: "full-planning",
+          services: [],
+          [field]: value,
+        });
+        expect(result.ok).toBe(false);
+        if (!result.ok) expect(result.errors[field]).toBe("invalid");
+      }
+    }
+  });
+
+  it("preserves omitted or null optional collections as empty selections", () => {
+    for (const value of [undefined, null, []]) {
+      const result = validateEnquiry({
+        ...complete(),
+        scope: "full-planning",
+        services: value,
+        styles: value,
+      });
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.value.services).toEqual([]);
+        expect(result.value.styles).toEqual([]);
+      }
+    }
+  });
+
   it("rejects hidden service selections when the visitor chooses full planning", () => {
     const result = validateEnquiry({
       ...complete(),
