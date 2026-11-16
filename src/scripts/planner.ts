@@ -180,6 +180,10 @@ export function initPlanner(form: HTMLFormElement) {
           key = null; // the payload will change
           show(FIELD_STAGE[field]);
           errorEl.textContent = fieldMessage(field, code);
+          const input = [...form.querySelectorAll<HTMLElement>(`[name="${field}"]`)].find(
+            (el) => !el.closest("[hidden]"),
+          );
+          focusInvalid(input);
           return;
         }
         case "conflict":
@@ -339,6 +343,17 @@ export function initPlanner(form: HTMLFormElement) {
     }
   }
 
+  function focusInvalid(el: HTMLElement | undefined | null) {
+    if (!el) return;
+    form.querySelectorAll<HTMLElement>("[aria-invalid]").forEach((input) => {
+      input.removeAttribute("aria-invalid");
+      input.removeAttribute("aria-describedby");
+    });
+    el.setAttribute("aria-invalid", "true");
+    el.setAttribute("aria-describedby", "planner-error-msg");
+    el.focus();
+  }
+
   function markInvalid(stage: StageId, s: EnquiryState) {
     const field =
       stage === "contact"
@@ -368,15 +383,7 @@ export function initPlanner(form: HTMLFormElement) {
             : form.querySelector<HTMLInputElement>('input[name="scope"]')
           : null;
     const el = choice ?? (field ? form.elements.namedItem(field) : null);
-    if (el instanceof HTMLElement) {
-      form.querySelectorAll<HTMLElement>("[aria-invalid]").forEach((input) => {
-        input.removeAttribute("aria-invalid");
-        input.removeAttribute("aria-describedby");
-      });
-      el.setAttribute("aria-invalid", "true");
-      el.setAttribute("aria-describedby", "planner-error-msg");
-      el.focus();
-    }
+    if (el instanceof HTMLElement) focusInvalid(el);
   }
 
   errorEl.id = "planner-error-msg";
