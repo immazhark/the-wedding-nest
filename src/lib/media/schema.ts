@@ -48,6 +48,10 @@ export const mediaEntrySchema = z
     credit: z.string().optional(),
     /** Families and photographer agreed to publication. Anything but `true` is rejected. */
     permission: z.literal(true),
+    /** Opaque pointer to a private, independently checked permission record. Never a name or URL. */
+    releaseRef: z
+      .string()
+      .regex(/^TWN-REL-20\d{2}-[A-Z0-9]{4,10}$/, "Use an opaque TWN release reference"),
   })
   .superRefine((entry, context) => {
     const categoryFolder = EVENT_FILE.exec(entry.file)?.[1];
