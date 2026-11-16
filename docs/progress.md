@@ -28,7 +28,7 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 
 - Latest takeover baseline: `607aacbc` (#58), with no open PRs before this session. #53–#58 are already merged; do not repeat those planner and notification fixes.
 - #59 rejects explicit non-array service/style collections while preserving omitted/null optional selections. Regression-first CI `43943150239` reproduced the defect (one expected failing unit test); implementation and API/retry regressions require green final-head CI before merge.
-- Cloudflare live audit confirms both Workers remain noindex, no custom Worker domains, public intake off with no D1, and isolated staging intake on with test-only bindings. Deployment version annotations do not identify Git commit SHAs, so do not infer source provenance from version numbers alone.
+- Cloudflare live audit confirms both Workers remain noindex, no custom Worker domains, public intake off with no D1, and isolated staging intake on with test-only bindings. Cloudflare builds-by-version records independently confirm both current deployments were built from `607aacbc` (#58). Version annotations alone do not establish source provenance.
 - Production release gates and unresolved owner inputs below remain unchanged.
 
 ## Latest work
