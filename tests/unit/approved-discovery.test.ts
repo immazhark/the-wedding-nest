@@ -1,12 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-  servicePageHref,
-  type ApprovedServicePage,
-} from "../../src/lib/services/publication";
-import {
-  featuredStoryPath,
-  type ApprovedStory,
-} from "../../src/lib/stories/publication";
+import { servicePageHref, type ApprovedServicePage } from "../../src/lib/services/publication";
+import { featuredStoryPath, type ApprovedStory } from "../../src/lib/stories/publication";
 
 describe("published content discovery", () => {
   const catering = {
@@ -16,9 +10,7 @@ describe("published content discovery", () => {
 
   it("keeps the existing planner route until a service has an approved page", () => {
     expect(servicePageHref("catering", [])).toBe("/plan-your-event/?service=catering");
-    expect(servicePageHref("catering", [catering])).toBe(
-      "/services/hyderabadi-wedding-catering/",
-    );
+    expect(servicePageHref("catering", [catering])).toBe("/services/hyderabadi-wedding-catering/");
     expect(servicePageHref("decor", [catering])).toBe("/plan-your-event/?service=decor");
   });
 
