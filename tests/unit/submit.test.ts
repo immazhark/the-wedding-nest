@@ -16,6 +16,7 @@ const state = (): EnquiryState => ({
   consent: true,
 });
 const KEY = "3f2b8c1e-9d4a-4f6b-8e2a-1c5d7e9f0a1b";
+const STORED_ID = "f11e8989-1a22-4e2f-bc91-609acc25ef0e";
 
 const respond = (status: number, body: unknown) =>
   vi.fn(
@@ -153,14 +154,32 @@ describe("submitEnquiry", () => {
   });
 
   it("treats 201 and 200 (safe retry) as accepted, with the id", async () => {
-    expect(await submitEnquiry(state(), "t", KEY, respond(201, { id: "a1" }) as never)).toEqual({
+    expect(
+      await submitEnquiry(state(), "t", KEY, respond(201, { id: STORED_ID }) as never),
+    ).toEqual({
       kind: "accepted",
-      id: "a1",
+      id: STORED_ID,
     });
-    expect(await submitEnquiry(state(), "t", KEY, respond(200, { id: "a1" }) as never)).toEqual({
+    expect(
+      await submitEnquiry(state(), "t", KEY, respond(200, { id: STORED_ID }) as never),
+    ).toEqual({
       kind: "accepted",
-      id: "a1",
+      id: STORED_ID,
     });
+  });
+
+  it("rejects forged or incomplete success acknowledgements instead of showing Sent", async () => {
+    const storedId = STORED_ID;
+    for (const id of ["abc", "not-a-uuid", "  " + storedId, storedId + "  "]) {
+      expect(await submitEnquiry(state(), "t", KEY, respond(201, { id }) as never)).toEqual({
+        kind: "retryable",
+      });
+    }
+    for (const status of [202, 206]) {
+      expect(
+        await submitEnquiry(state(), "t", KEY, respond(status, { id: storedId }) as never),
+      ).toEqual({ kind: "retryable" });
+    }
   });
 
   it("maps 422 field errors so the visitor can fix them", async () => {

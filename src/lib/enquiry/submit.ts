@@ -20,6 +20,7 @@ const ERROR_CODES: readonly ErrorCode[] = [
   "not_available_for_occasion",
   "consent_required",
 ];
+const STORED_ENQUIRY_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
@@ -56,8 +57,13 @@ export async function submitEnquiry(
       }
       if (!isRecord(body)) return { kind: "retryable" };
       if (res.ok) {
-        return typeof body["id"] === "string" && body["id"].trim().length > 0
-          ? { kind: "accepted", id: body["id"] }
+        const id = body["id"];
+        // The Worker only confirms durable D1 storage with 201, or an exact
+        // idempotent retry with 200. Other 2xx or arbitrary strings are not proof.
+        return (res.status === 200 || res.status === 201) &&
+          typeof id === "string" &&
+          STORED_ENQUIRY_ID.test(id)
+          ? { kind: "accepted", id }
           : { kind: "retryable" };
       }
       if (res.status === 422) {
