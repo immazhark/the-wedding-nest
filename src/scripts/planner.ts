@@ -405,6 +405,13 @@ export function initPlanner(form: HTMLFormElement) {
     show(nextStage(current) ?? "review");
   });
 
+  // The non-sending design preview can be explored without entering fictional or
+  // real contact details. This control does not exist in submission-enabled builds.
+  const previewSkip = form.querySelector<HTMLButtonElement>("[data-preview-skip-contact]");
+  previewSkip?.addEventListener("click", () => {
+    if (!sending && current === "contact") show("review");
+  });
+
   backBtn.addEventListener("click", () => {
     if (current === "sent") return;
     if (current === "review") return show("contact");
@@ -474,7 +481,7 @@ export function initPlanner(form: HTMLFormElement) {
     if (!editingReview || current === "review" || current === "sent") return;
     const state = readState(form);
     const incomplete = firstIncompleteStage(state);
-    if (incomplete) {
+    if (incomplete && (sending || incomplete !== "contact")) {
       show(incomplete);
       errorEl.textContent = stageError(incomplete, state) ?? "Please review this step.";
       markInvalid(incomplete, state);

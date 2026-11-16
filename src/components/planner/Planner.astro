@@ -252,6 +252,15 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
             not saved.
           </p>
         )}
+        {!sending && (
+          <button
+            type="button"
+            class="link-underline mb-8 text-brass-deep"
+            data-preview-skip-contact
+          >
+            Skip contact — preview only
+          </button>
+        )}
         <div class="grid gap-6 sm:grid-cols-2">
           <div class="field">
             <label for="pl-name" class="field-label">
