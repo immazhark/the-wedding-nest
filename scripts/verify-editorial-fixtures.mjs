@@ -28,6 +28,7 @@ const paths = [
   "src/assets/events/walima/ci-test-only-walima/02-geometry.png",
 ];
 const output = resolve(root, "dist-editorial-fixtures");
+let ownsOutput = false;
 const created = [];
 const directories = new Set();
 
@@ -160,6 +161,7 @@ try {
   if (existsSync(output)) {
     throw new Error("Refusing to overwrite pre-existing editorial fixture output");
   }
+  ownsOutput = true;
   for (const [relative, bytes] of sources) {
     const absolute = resolve(root, relative);
     const parent = dirname(absolute);
@@ -196,6 +198,6 @@ try {
       if (err?.code !== "ENOTEMPTY" && err?.code !== "ENOENT") throw err;
     }
   }
-  await rm(output, { recursive: true, force: true });
+  if (ownsOutput) await rm(output, { recursive: true, force: true });
   process.stdout.write("Synthetic fixture files and build output removed.\n");
 }
