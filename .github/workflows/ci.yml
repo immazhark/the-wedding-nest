@@ -37,6 +37,14 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: End-to-end, accessibility and navigation tests
         run: npm run test:e2e
+      - name: Publish responsive visual-review evidence
+        if: success() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: responsive-review
+          path: playwright-report/
+          retention-days: 14
+          if-no-files-found: error
       - name: Same suite on the local Cloudflare Workers runtime (routing, headers, API)
         run: npm run test:runtime
       - uses: actions/upload-artifact@v4
