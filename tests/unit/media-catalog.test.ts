@@ -60,20 +60,13 @@ describe("approved event media catalog", () => {
   it("rejects unreviewed event files missed by the supported-image glob", () => {
     const unsupported = "../../assets/events/nikah/courtyard-wedding/family.gif";
     expect(() => buildApprovedMediaCatalog({}, {}, [unsupported])).toThrow(/unreviewed/i);
-    expect(() =>
-      buildApprovedMediaCatalog(
-        { [manifestPath]: { images: [entry] } },
-        { [file]: image },
-        [file, unsupported],
-      ),
-    ).toThrow(/unreviewed/i);
-    expect(
-      buildApprovedMediaCatalog(
-        { [manifestPath]: { images: [entry] } },
-        { [file]: image },
-        [file],
-      )["home-hero"]?.entry.file,
-    ).toBe(file);
+    const manifest = { [manifestPath]: { images: [entry] } };
+    const images = { [file]: image };
+    expect(() => buildApprovedMediaCatalog(manifest, images, [file, unsupported])).toThrow(
+      /unreviewed/i,
+    );
+    const catalog = buildApprovedMediaCatalog(manifest, images, [file]);
+    expect(catalog["home-hero"]?.entry.file).toBe(file);
   });
 
   it("rejects duplicate editorial slots and photographs across separate manifests", () => {
