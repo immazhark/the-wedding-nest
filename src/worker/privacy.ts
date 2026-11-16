@@ -16,9 +16,6 @@ const ENQUIRY_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 export async function deleteEnquiryRecord(db: D1Like, enquiryId: string): Promise<boolean> {
   if (!ENQUIRY_ID.test(enquiryId)) throw new Error("Invalid enquiry id");
 
-  const result = await db
-    .prepare("DELETE FROM enquiries WHERE id = ?1")
-    .bind(enquiryId)
-    .run();
+  const result = await db.prepare("DELETE FROM enquiries WHERE id = ?1").bind(enquiryId).run();
   return result.meta.changes === 1;
 }
