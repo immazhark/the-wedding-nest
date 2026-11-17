@@ -71,6 +71,26 @@ test("occasion-specific service enquiries are discoverable without publishing un
   await expect(page.getByRole("checkbox", { name: "Mehndi artist" })).toBeChecked();
 });
 
+test("other celebrations are linked directly to their exact planner occasions", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const occasions = page.getByRole("list", { name: "Other celebrations" });
+  for (const name of [
+    "Birthday",
+    "Anniversary",
+    "Corporate event",
+    "Private gathering",
+    "Something else",
+  ]) {
+    await expect(occasions.getByRole("link", { name })).toBeVisible();
+  }
+  await occasions.getByRole("link", { name: "Corporate event" }).click();
+  await expect(page).toHaveURL(/\/plan-your-event\/\?occasion=corporate$/);
+  await expect(page.getByRole("checkbox", { name: "Corporate event" })).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: "Nikah" })).not.toBeChecked();
+});
+
 test("structured data contains only the verified Organization identity", async ({ page }) => {
   await page.goto("/");
   const schema = page.locator('script[type="application/ld+json"]');
