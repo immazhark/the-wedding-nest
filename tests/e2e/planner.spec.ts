@@ -141,7 +141,9 @@ test("editing a copied plan clears the previous clipboard-success message", asyn
   await expect(page.locator("[data-copy-status]")).toBeEmpty();
 });
 
-test("clipboard denial exposes a selectable privacy-safe manual copy fallback", async ({ page }) => {
+test("clipboard denial exposes a selectable privacy-safe manual copy fallback", async ({
+  page,
+}) => {
   await page.getByRole("checkbox", { name: "Nikah" }).check();
   await next(page);
   await page.getByRole("radio", { name: /End-to-end planning/ }).check();
@@ -154,7 +156,11 @@ test("clipboard denial exposes a selectable privacy-safe manual copy fallback", 
   await page.evaluate(() => {
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
-      value: { writeText: async () => { throw new Error("denied"); } },
+      value: {
+        writeText: async () => {
+          throw new Error("denied");
+        },
+      },
     });
   });
   const fallback = page.getByRole("textbox", { name: "Planning choices to copy manually" });
