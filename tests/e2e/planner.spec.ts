@@ -222,7 +222,9 @@ test("clipboard denial exposes a selectable privacy-safe manual copy fallback", 
 });
 
 for (const outcome of ["resolve", "reject"] as const) {
-  test(`late clipboard ${outcome} cannot overwrite feedback for an edited plan`, async ({ page }) => {
+  test(`late clipboard ${outcome} cannot overwrite feedback for an edited plan`, async ({
+    page,
+  }) => {
     await page.getByRole("checkbox", { name: "Nikah" }).check();
     await next(page);
     await page.getByRole("radio", { name: /End-to-end planning/ }).check();
@@ -251,10 +253,10 @@ for (const outcome of ["resolve", "reject"] as const) {
     await page.getByRole("checkbox", { name: "Walima" }).check();
     await page.getByRole("button", { name: "Return to review" }).click();
     await expect(page.locator("[data-summary]")).toContainText("Walima");
-    await page.evaluate(
-      (deny) => (window as Window & { settleCopy?: (reject: boolean) => void }).settleCopy?.(deny),
-      outcome === "reject",
-    );
+    await page.evaluate((deny) => {
+      const gate = window as Window & { settleCopy?: (reject: boolean) => void };
+      gate.settleCopy?.(deny);
+    }, outcome === "reject");
     await expect(page.locator("[data-copy-status]")).toBeEmpty();
     await expect(page.locator("[data-copy-fallback]")).toBeHidden();
     await expect(page.locator("[data-copy-fallback-text]")).toHaveValue("");
