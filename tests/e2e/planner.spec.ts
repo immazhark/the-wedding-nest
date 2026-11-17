@@ -141,6 +141,35 @@ test("editing a copied plan clears the previous clipboard-success message", asyn
   await expect(page.locator("[data-copy-status]")).toBeEmpty();
 });
 
+test("clipboard denial exposes a selectable privacy-safe manual copy fallback", async ({ page }) => {
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await next(page);
+  await next(page);
+  await page.getByLabel(/Venue or area/).fill("PRIVATE VENUE");
+  await page.getByLabel(/Anything else we should know/).fill("PRIVATE NOTES");
+  await next(page);
+  await page.getByRole("button", { name: "Skip contact — preview only" }).click();
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async () => { throw new Error("denied"); } },
+    });
+  });
+  const fallback = page.getByRole("textbox", { name: "Planning choices to copy manually" });
+  await expect(fallback).toBeHidden();
+  await page.getByRole("button", { name: "Copy planning choices" }).click();
+  await expect(page.locator("[data-copy-status]")).toContainText("Select and copy");
+  await expect(fallback).toBeVisible();
+  await expect(fallback).toHaveAttribute("readonly", "");
+  const text = await fallback.inputValue();
+  expect(text).toContain("Occasion: Nikah");
+  expect(text).not.toContain("PRIVATE");
+  expect(text).not.toContain("Location:");
+  expect(text).not.toContain("Contact:");
+});
+
 test("skipping preview contact clears previously typed private answers", async ({ page }) => {
   await page.getByRole("checkbox", { name: "Nikah" }).check();
   await next(page);
