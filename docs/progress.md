@@ -1,8 +1,8 @@
-# Project progress — reconciled 16 November 2026
+# Project progress — reconciled 18 November 2026
 
 Current state first. GitHub and Cloudflare live records remain authoritative for commits, checks and exact deployed versions. This snapshot is not a production-launch approval.
 
-**Repository baseline at this update:** `main` at `777cfe391afba52519d2504415e971b81f23cb0f` (PR #51), following `de479d8d4a7dc7fb974856d1e84ff63cef86eda1` (PR #50). Both PR heads passed full CI, including the production-site and disposable editorial-fixture jobs. Check the newest combined `main` CI and Cloudflare deployments live, not this snapshot; this is not launch approval.
+**Repository baseline at this update:** `main` at `2314ac7d0522fd77f7ad9c663247653d3807019e` (#88). Check the newest combined `main` CI and Cloudflare deployments live, not this snapshot; this is not launch approval.
 
 ## Current implementation
 
@@ -24,22 +24,21 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 
 **SEO foundation:** Canonicals, robots, launch-gated sitemap and verified Organization JSON-LD (#38). Unapproved LocalBusiness details, reviews, ratings and contact facts are not added.
 
-## Takeover follow-up — 17 November 2026 (India)
+## Since the 16 November reconciliation (PRs #52–#90, merged 16–18 November 2026)
 
-- Latest takeover baseline: `607aacbc` (#58), with no open PRs before this session. #53–#58 are already merged; do not repeat those planner and notification fixes.
-- #59 rejects explicit non-array service/style collections while preserving omitted/null optional selections. Regression-first CI `43943150239` reproduced the defect (one expected failing unit test); implementation and API/retry regressions require green final-head CI before merge.
-- Cloudflare live audit confirms both Workers remain noindex, no custom Worker domains, public intake off with no D1, and isolated staging intake on with test-only bindings. Cloudflare builds-by-version records independently confirm both current deployments were built from `607aacbc` (#58). Version annotations alone do not establish source provenance.
-- Production release gates and unresolved owner inputs below remain unchanged.
+Verified against GitHub on 18 November 2026 (India): `main` at `2314ac7` (#88); #89 `9bbb6da`; #90 `7a4765f`. #64 is the only open PR (draft, on hold). Do not repeat any of the fixes below.
 
-## Latest work
+- **Planner validation and accessibility (#54–#63):** malformed or duplicate selections, guest counts and date fields are rejected or scrubbed; field errors are focused, ARIA-associated, cleared when answers become valid and kept until the rejected answer changes; stale error descriptions and reset state are fixed.
+- **Draft and privacy hardening (#65–#71, #73):** durable enquiry IDs kept out of logs; saved drafts allow-list scalar values and sanitise selections; hidden services are not persisted; contact autofill disabled while intake is off.
+- **Preview planner (#72, #74–#85):** first question fits the initial mobile viewport; screen-reader step announcements; preview plans can be reviewed and copied without contact details, with manual copy fallback and stale-confirmation clearing; contextual occasion/service links preserve compatibility; non-wedding celebrations have direct links; Instagram fallback readable without JavaScript.
+- **Enquiry intake and notifications (#86, #87, #89):** malformed explicit marketing consent rejected; dormant notification claims keep moving under contention; malformed phone grouping rejected while ordinary international formats (`+91`, `(040) …`, `+44 (0)20 …`) remain valid. One shared validator serves browser and Worker.
+- **Navigation (#88):** primary navigation stays visible, in-header and free of horizontal overflow at 360px without JavaScript; covered by an e2e regression.
+- **Operating instructions (#90):** root `CLAUDE.md` now records verified commands, `docs/progress.md` as canonical task state, and operating rules; `AGENTS.md` stack wording reconciled with the implemented stack.
+- **Live check (18 November):** both Workers return `x-robots-tag: noindex, nofollow` and a robots meta tag with a restrictive CSP. Bindings and deployed-commit provenance were not re-audited this session; use Cloudflare builds-by-version before relying on them.
+- **Open:** #64 (staging enquiry rate limiting) stays draft until Cloudflare entitlement, pricing and approvals are verified. It must not be merged or activated before then.
+- **Local note:** `npm run build:submit` uses POSIX env syntax and fails under the Windows npm shell; run it from Git Bash or let CI do it.
 
-- #63: explicit non-null, non-string guest counts now return a field validation error instead of normalizing to blank. Optional omitted/null/blank counts keep their existing behavior. Regression-first unit/Worker tests cover no writes and rejecting a malformed retry against a stored blank count. A direct runtime reproduction confirmed the prior acceptance; final CI must pass before merge. Release gates are unchanged.
-
-- #62: browser draft date serialization/restoration now reconstructs only approved date keys and restores only string date values. Unit regressions cover contaminated runtime objects, legacy rewrite and coercible malformed values; the browser regression checks reload scrubbing without changing the valid event date or expiry. A direct Node runtime reproduction confirmed nested private fields survived before the fix. Final CI must pass before merge; release gates are unchanged.
-
-- #61: server-rejected field feedback stays visible across unrelated edits. Its memory-only answer snapshot clears on navigation/reset; correction must change that answer and pass shared field validation before the error clears. Regression-first CI `43947853218` reproduced the disappearing message on desktop and mobile; final CI must pass before merge. No production launch gate changed.
-
-- #60: server validation feedback now identifies and focuses the exact visible rejected control, including field-level ARIA error association. The new browser regression failed on desktop and mobile before implementation (CI run `43943270721`); final CI remains to be checked before merge. Intake and launch gates are unchanged.
+## Earlier merged work
 
 - #51 (`777cfe39`): private, validated, plain-text operational notice contract, no transport or recipients.
 - #50 (`de479d8`): dormant outbox leases, stale-token fencing, bounded retries and v2 SQL migration; not applied or activated.
