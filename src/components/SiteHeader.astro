@@ -62,9 +62,16 @@ const current = Astro.url.pathname;
   .site-header {
     background: var(--color-ivory);
   }
-  /* Without JS the menu stays visible in-flow on mobile; with JS it becomes an overlay. */
+  /* Without JS the menu is part of the header, not a fixed-height overflow
+     that covers the opening hero. Only the JS-enhanced menu uses an overlay. */
   @media (max-width: 47.99rem) {
+    :global(html:not(.js)) .site-header > div {
+      height: auto;
+      flex-wrap: wrap;
+      padding-top: 1rem;
+    }
     .site-menu {
+      width: 100%;
       padding: 0 1rem 1rem;
     }
     :global(html.js) .site-menu {

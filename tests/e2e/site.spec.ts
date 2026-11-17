@@ -142,6 +142,44 @@ test("planner provides a readable Instagram fallback without JavaScript", async 
   }
 });
 
+test("mobile primary links remain visible and do not overlap the page without JavaScript", async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({
+    ...(baseURL ? { baseURL } : {}),
+    javaScriptEnabled: false,
+    viewport: { width: 360, height: 740 },
+  });
+  try {
+    const page = await context.newPage();
+    await page.goto("/");
+    const header = page.locator("[data-site-header]");
+    const menu = page.getByRole("navigation", { name: "Primary" });
+    await expect(menu.getByRole("link", { name: "Services" })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Plan your event" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Menu" })).toBeHidden();
+
+    const headerBounds = await header.boundingBox();
+    const menuBounds = await menu.boundingBox();
+    expect(headerBounds).not.toBeNull();
+    expect(menuBounds).not.toBeNull();
+    // A tall no-JS nav cannot spill over the hero below a fixed-height header.
+    expect(menuBounds!.y + menuBounds!.height).toBeLessThanOrEqual(
+      headerBounds!.y + headerBounds!.height + 2,
+    );
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(1);
+
+    await menu.getByRole("link", { name: "Services" }).click();
+    await expect(page).toHaveURL(/#services$/);
+  } finally {
+    await context.close();
+  }
+});
+
 test("skip link moves focus to main content", async ({ page }) => {
   await page.goto("/");
   await page.keyboard.press("Tab");
