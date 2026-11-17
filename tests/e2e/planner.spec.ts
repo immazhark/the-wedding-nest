@@ -168,6 +168,11 @@ test("clipboard denial exposes a selectable privacy-safe manual copy fallback", 
   expect(text).not.toContain("PRIVATE");
   expect(text).not.toContain("Location:");
   expect(text).not.toContain("Contact:");
+  await page.getByRole("button", { name: "Edit occasion" }).click();
+  await page.getByRole("checkbox", { name: "Walima" }).check();
+  await page.getByRole("button", { name: "Return to review" }).click();
+  await expect(fallback).toBeHidden();
+  await expect(fallback).toHaveValue("");
 });
 
 test("skipping preview contact clears previously typed private answers", async ({ page }) => {
