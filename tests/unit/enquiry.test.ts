@@ -271,9 +271,18 @@ describe("validateEnquiry (server-grade, accepts unknown input)", () => {
     );
   });
 
-  it("keeps marketing consent separate and false by default", () => {
-    const r = validateEnquiry(complete());
-    expect(r.ok && r.value.marketingConsent).toBe(false);
+  it("rejects malformed explicit marketing consent, while omission remains opt-out", () => {
+    for (const marketingConsent of ["true", "false", 1, 0, [], {}]) {
+      const result = validateEnquiry({ ...complete(), marketingConsent });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.errors.marketingConsent).toBe("invalid");
+    }
+
+    for (const marketingConsent of [undefined, null, false, true]) {
+      const result = validateEnquiry({ ...complete(), marketingConsent });
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.value.marketingConsent).toBe(marketingConsent === true);
+    }
   });
 });
 

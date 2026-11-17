@@ -293,6 +293,30 @@ describe("POST /api/enquiry", () => {
     expect(db.outbox).toHaveLength(1);
   });
 
+  it("rejects malformed marketing opt-in before storage and on retries", async () => {
+    const invalid = { ...ok(), enquiry: { ...validEnquiry, marketingConsent: "yes" } };
+    const res = await call(request(invalid));
+    expect(res.status).toBe(422);
+    expect(await res.json()).toEqual({
+      error: "invalid_enquiry",
+      errors: { marketingConsent: "invalid" },
+    });
+    expect(db.enquiries.size).toBe(0);
+    expect(db.outbox).toHaveLength(0);
+
+    expect((await call(request(ok()))).status).toBe(201);
+    turnstile.mockClear();
+    const retry = await call(request(invalid));
+    expect(retry.status).toBe(422);
+    expect(await retry.json()).toEqual({
+      error: "invalid_enquiry",
+      errors: { marketingConsent: "invalid" },
+    });
+    expect(turnstile).not.toHaveBeenCalled();
+    expect(db.enquiries.size).toBe(1);
+    expect(db.outbox).toHaveLength(1);
+  });
+
   it("rejects malformed guest counts without writes or false duplicate acknowledgements", async () => {
     for (const guestCount of [200, { count: 200 }, false, []]) {
       const response = await call(request({ ...ok(), enquiry: { ...validEnquiry, guestCount } }));
