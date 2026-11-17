@@ -306,6 +306,10 @@ export function initPlanner(form: HTMLFormElement) {
     if (panel !== current) {
       const status = form.querySelector<HTMLElement>("[data-copy-status]");
       if (status) status.textContent = "";
+      const fallback = form.querySelector<HTMLElement>("[data-copy-fallback]");
+      if (fallback) fallback.hidden = true;
+      const field = form.querySelector<HTMLTextAreaElement>("[data-copy-fallback-text]");
+      if (field) field.value = "";
     }
     if (panel === "review" || panel === "sent") editingReview = false;
     // Only real navigation animates; the initial render stays still.
@@ -441,12 +445,23 @@ export function initPlanner(form: HTMLFormElement) {
   const copyChoices = form.querySelector<HTMLButtonElement>("[data-copy-choices]");
   copyChoices?.addEventListener("click", async () => {
     const status = form.querySelector<HTMLElement>("[data-copy-status]");
+    const fallback = form.querySelector<HTMLElement>("[data-copy-fallback]");
+    const field = form.querySelector<HTMLTextAreaElement>("[data-copy-fallback-text]");
     if (!status || sending || current !== "review") return;
+    const text = previewPlanText(readState(form));
     try {
-      await navigator.clipboard.writeText(previewPlanText(readState(form)));
+      await navigator.clipboard.writeText(text);
+      if (fallback) fallback.hidden = true;
+      if (field) field.value = "";
       status.textContent = "Planning choices copied. You can paste them into a message.";
     } catch {
-      status.textContent = "Copy unavailable in this browser. No details were sent.";
+      status.textContent = "Select and copy the planning choices below. No details were sent.";
+      if (fallback && field) {
+        field.value = text;
+        fallback.hidden = false;
+        field.focus();
+        field.select();
+      }
     }
   });
 
