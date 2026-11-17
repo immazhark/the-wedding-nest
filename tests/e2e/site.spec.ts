@@ -54,6 +54,23 @@ for (const path of PAGES) {
   });
 }
 
+test("occasion-specific service enquiries are discoverable without publishing unapproved pages", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const specialists = page.getByRole("list", { name: "Occasion-specific services" });
+  for (const label of ["Ceremony coordination", "Mehndi artist", "Sound, lighting & AV"]) {
+    await expect(specialists.getByRole("link", { name: label })).toBeVisible();
+  }
+  await specialists.getByRole("link", { name: "Mehndi artist" }).click();
+  await expect(page).toHaveURL(/\/plan-your-event\/\?service=mehndi-artist$/);
+  await expect(page.getByRole("checkbox", { name: "Mehndi" })).not.toBeChecked();
+  await page.getByRole("checkbox", { name: "Mehndi" }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByRole("radio", { name: /Specific services/ })).toBeChecked();
+  await expect(page.getByRole("checkbox", { name: "Mehndi artist" })).toBeChecked();
+});
+
 test("structured data contains only the verified Organization identity", async ({ page }) => {
   await page.goto("/");
   const schema = page.locator('script[type="application/ld+json"]');
