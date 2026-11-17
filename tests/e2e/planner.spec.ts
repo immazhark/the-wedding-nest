@@ -178,7 +178,7 @@ test("clipboard denial exposes a selectable privacy-safe manual copy fallback", 
   await page.getByRole("checkbox", { name: "Walima" }).check();
   await page.getByRole("button", { name: "Return to review" }).click();
   await expect(fallback).toBeHidden();
-  await expect(fallback).toHaveValue("");
+  await expect(page.locator("[data-copy-fallback-text]")).toHaveValue("");
 });
 
 test("skipping preview contact clears previously typed private answers", async ({ page }) => {
