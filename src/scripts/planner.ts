@@ -8,6 +8,7 @@ import {
   emptyEnquiry,
   serviceOptionsFor,
   type EnquiryState,
+  type ServiceId,
   type StageId,
 } from "../lib/enquiry/schema";
 import { firstIncompleteStage, nextStage, previousStage, stageError } from "../lib/enquiry/flow";
@@ -120,6 +121,7 @@ export function initPlanner(form: HTMLFormElement) {
   const reviewReturnBtn = form.querySelector<HTMLButtonElement>("[data-review-return]")!;
   let current: Panel = "occasion";
   let editingReview = false;
+  let pendingService: ServiceId | undefined;
   let serverError: { field: keyof EnquiryState; value: string } | null = null;
   const sending = form.dataset["submit"] === "on" ? initSending() : null;
 
@@ -492,8 +494,21 @@ export function initPlanner(form: HTMLFormElement) {
   }
 
   form.addEventListener("change", (event) => {
-    syncConditional();
     const target = event.target;
+    // A specific-service link may arrive before any occasion is chosen.
+    // Honour it only after an eligible occasion is selected; never guess one.
+    if (target instanceof HTMLInputElement && target.name === "scope") {
+      pendingService = undefined; // The visitor's explicit scope choice takes precedence.
+    }
+    if (target instanceof HTMLInputElement && target.name === "occasions" && pendingService) {
+      const state = readState(form);
+      if (serviceOptionsFor(state.occasions).some((option) => option.id === pendingService)) {
+        check(form, "scope", ["specific-services"]);
+        check(form, "services", [...state.services, pendingService]);
+        pendingService = undefined;
+      }
+    }
+    syncConditional();
     if (target instanceof HTMLInputElement && draftFields.has(target.name))
       storage.save(readState(form));
     clearResolvedError();
@@ -530,6 +545,7 @@ export function initPlanner(form: HTMLFormElement) {
 
   resetBtn.addEventListener("click", () => {
     editingReview = false;
+    pendingService = undefined;
     storage.clear();
     form.reset();
     applyState(form, emptyEnquiry());
@@ -555,7 +571,10 @@ export function initPlanner(form: HTMLFormElement) {
     if (restored) storage.save(restored, (rawDraft as { savedAt: number }).savedAt);
   }
   const restoredState = restored ?? emptyEnquiry();
-  const initialState = applyPlannerIntent(restoredState, readPlannerIntent(window.location.search));
+  const intent = readPlannerIntent(window.location.search);
+  const initialState = applyPlannerIntent(restoredState, intent);
+  pendingService =
+    intent.service && !initialState.services.includes(intent.service) ? intent.service : undefined;
   applyState(form, initialState);
   syncConditional();
   if (initialState !== restoredState) storage.save(readState(form));
