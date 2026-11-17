@@ -56,7 +56,8 @@ function checkClaim(claim: OutboxClaim): void {
 /**
  * Select only event metadata, then acquire a conditional lease. Two processes
  * may select the same row; only one can change it via the attempts and
- * eligibility CAS predicate. The loser gets null, never a duplicate claim.
+ * eligibility CAS predicate. A loser reselects ready events a bounded number
+ * of times, never taking a duplicate claim.
  */
 export async function claimNextOutbox(db: D1Like, nowIso: string): Promise<OutboxClaim | null> {
   const at = parseInstant(nowIso);
