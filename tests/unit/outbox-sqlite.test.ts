@@ -92,9 +92,7 @@ describe("dormant outbox lease and retry primitives", () => {
     // event, not leave ready work idle until the next scheduled invocation.
     const claims = await Promise.all([claimNextOutbox(d1, NOW), claimNextOutbox(d1, NOW)]);
     expect(claims.every(Boolean)).toBe(true);
-    expect(claims.map((claim) => claim?.id).sort()).toEqual(
-      [OUTBOX_ID, secondOutboxId].sort(),
-    );
+    expect(claims.map((claim) => claim?.id).sort()).toEqual([OUTBOX_ID, secondOutboxId].sort());
     expect(claims.map((claim) => claim?.token).every((token) => !!token)).toBe(true);
     expect(db.prepare("SELECT SUM(attempts) AS attempts FROM outbox").get()).toEqual({
       attempts: 2,
