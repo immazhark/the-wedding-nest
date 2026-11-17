@@ -11,6 +11,7 @@ import { publishedStories, featuredStoryPath } from "../lib/stories/publication"
 // DRAFT COPY — editorial working draft pending owner approval (docs/creative-excellence-standards.md).
 // No claims about prices, clients, venues, awards or guarantees.
 const coreServices = SERVICES.filter((s) => !("onlyFor" in s));
+const occasionServices = SERVICES.filter((s) => "onlyFor" in s);
 
 // Plain descriptions of each tradition (general cultural meaning, not claims about TWN).
 const occasionNotes: Record<string, string> = {
@@ -110,6 +111,26 @@ const featuredStory = featuredStoryPath(publishedStories);
                     {s.label}
                   </a>
                   {i < coreServices.length - 1 && (
+                    <span class="text-brass" aria-hidden="true">
+                      &nbsp;/
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <p class="mt-8 text-sm font-medium tracking-wide text-charcoal">
+              For particular occasions
+            </p>
+            <ul
+              class="service-index mt-3"
+              aria-label="Occasion-specific services"
+            >
+              {occasionServices.map((s, i) => (
+                <li>
+                  <a href={servicePageHref(s.id, publishedServicePages)} class="link-underline">
+                    {s.label}
+                  </a>
+                  {i < occasionServices.length - 1 && (
                     <span class="text-brass" aria-hidden="true">
                       &nbsp;/
                     </span>
