@@ -121,10 +121,7 @@ const featuredStory = featuredStoryPath(publishedStories);
             <p class="mt-8 text-sm font-medium tracking-wide text-charcoal">
               For particular occasions
             </p>
-            <ul
-              class="service-index mt-3"
-              aria-label="Occasion-specific services"
-            >
+            <ul class="service-index mt-3" aria-label="Occasion-specific services">
               {occasionServices.map((s, i) => (
                 <li>
                   <a href={servicePageHref(s.id, publishedServicePages)} class="link-underline">
