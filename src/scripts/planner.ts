@@ -122,6 +122,7 @@ export function initPlanner(form: HTMLFormElement) {
   let current: Panel = "occasion";
   let editingReview = false;
   let pendingService: ServiceId | undefined;
+  let copyAttempt = 0;
   let serverError: { field: keyof EnquiryState; value: string } | null = null;
   const sending = form.dataset["submit"] === "on" ? initSending() : null;
 
@@ -306,6 +307,7 @@ export function initPlanner(form: HTMLFormElement) {
   function show(panel: Panel, focus = true) {
     // A previous copy acknowledgement must not describe an edited plan.
     if (panel !== current) {
+      copyAttempt++; // Invalidate pending clipboard results after navigation.
       const status = form.querySelector<HTMLElement>("[data-copy-status]");
       if (status) status.textContent = "";
       const fallback = form.querySelector<HTMLElement>("[data-copy-fallback]");
@@ -451,12 +453,15 @@ export function initPlanner(form: HTMLFormElement) {
     const field = form.querySelector<HTMLTextAreaElement>("[data-copy-fallback-text]");
     if (!status || sending || current !== "review") return;
     const text = previewPlanText(readState(form));
+    const attempt = ++copyAttempt;
     try {
       await navigator.clipboard.writeText(text);
+      if (attempt !== copyAttempt || current !== "review") return;
       if (fallback) fallback.hidden = true;
       if (field) field.value = "";
       status.textContent = "Planning choices copied. You can paste them into a message.";
     } catch {
+      if (attempt !== copyAttempt || current !== "review") return;
       status.textContent = "Select and copy the planning choices below. No details were sent.";
       if (fallback && field) {
         field.value = text;
