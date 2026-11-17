@@ -74,6 +74,34 @@ describe("dormant outbox lease and retry primitives", () => {
     expect(db.prepare("SELECT attempts FROM outbox").get()).toEqual({ attempts: 1 });
   });
 
+  it("claims another eligible event after losing contention for the oldest", async () => {
+    const { db, d1 } = createDb();
+    seed(db);
+    const secondId = "22222222-3333-4444-8555-666666666666";
+    const secondKey = "cccccccc-dddd-4eee-8fff-aaaaaaaaaaaa";
+    const secondOutboxId = "dddddddd-eeee-4fff-8000-bbbbbbbbbbbb";
+    db.prepare(
+      "INSERT INTO enquiries (id, idempotency_key, created_at, payload_json, consent_at, marketing_consent) " +
+        "VALUES (?1, ?2, ?3, ?4, ?3, 0)",
+    ).run(secondId, secondKey, "2026-11-16T11:01:00.000Z", '{"name":"Second fictional lead"}');
+    db.prepare(
+      "INSERT INTO outbox (id, enquiry_id, kind, created_at) VALUES (?1, ?2, 'enquiry.created', ?3)",
+    ).run(secondOutboxId, secondId, "2026-11-16T11:01:00.000Z");
+
+    // Both selectors race on the oldest row. A loser must try the next available
+    // event, not leave ready work idle until the next scheduled invocation.
+    const claims = await Promise.all([claimNextOutbox(d1, NOW), claimNextOutbox(d1, NOW)]);
+    expect(claims.every(Boolean)).toBe(true);
+    expect(claims.map((claim) => claim?.id).sort()).toEqual(
+      [OUTBOX_ID, secondOutboxId].sort(),
+    );
+    expect(claims.map((claim) => claim?.token).every((token) => !!token)).toBe(true);
+    expect(db.prepare("SELECT SUM(attempts) AS attempts FROM outbox").get()).toEqual({
+      attempts: 2,
+    });
+    expect(await claimNextOutbox(d1, NOW)).toBeNull();
+  });
+
   it("uses token-and-lease CAS so stale workers cannot acknowledge delivery", async () => {
     const { db, d1 } = createDb();
     seed(db);
