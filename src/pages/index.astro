@@ -24,6 +24,7 @@ const occasionNotes: Record<string, string> = {
   sangeet: "An evening of music and dance",
 };
 const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
+const otherOccasions = OCCASIONS.filter((o) => o.group === "celebration");
 const featuredStory = featuredStoryPath(publishedStories);
 ---
 
@@ -164,10 +165,24 @@ const featuredStory = featuredStoryPath(publishedStories);
           </li>
         ))}
       </ul>
-      <p class="mt-12 max-w-2xl text-[length:var(--text-lede)] text-charcoal">
-        And birthdays, anniversaries, corporate evenings and private gatherings, for families and
-        hosts from every community.
-      </p>
+      <div class="mt-12 max-w-3xl">
+        <p class="eyebrow text-brass-deep">Other celebrations</p>
+        <p class="mt-4 text-[length:var(--text-lede)] text-charcoal">
+          For families and hosts from every community, and occasions of every kind.
+        </p>
+        <ul class="mt-6 flex flex-wrap gap-x-6 gap-y-4" aria-label="Other celebrations">
+          {otherOccasions.map((o) => (
+            <li>
+              <a
+                href={`/plan-your-event/?occasion=${o.id}`}
+                class="link-underline text-[0.9375rem] font-medium"
+              >
+                {o.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   </section>
 
