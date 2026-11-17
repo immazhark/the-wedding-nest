@@ -140,7 +140,12 @@ export function validateEnquiry(input: unknown): ValidationResult {
   if (!contactChannel) errors.contactChannel = "invalid";
 
   if (i["consent"] !== true) errors.consent = "consent_required";
+  // An absent optional opt-in means no marketing consent. An explicitly malformed
+  // value must not be silently recorded as a deliberate opt-out.
   const marketingConsent = i["marketingConsent"] === true;
+  if (i["marketingConsent"] != null && typeof i["marketingConsent"] !== "boolean") {
+    errors.marketingConsent = "invalid";
+  }
 
   if (Object.keys(errors).length > 0) return { ok: false, errors };
   return {
