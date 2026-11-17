@@ -379,6 +379,18 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
               aria-live="polite"
               data-copy-status
             />
+            <div class="mt-5" data-copy-fallback hidden>
+              <label for="preview-plan-copy" class="field-label">
+                Planning choices to copy manually
+              </label>
+              <textarea
+                id="preview-plan-copy"
+                class="field-input mt-2"
+                rows="8"
+                readonly
+                data-copy-fallback-text
+              ></textarea>
+            </div>
           </div>
         )}
       </section>
