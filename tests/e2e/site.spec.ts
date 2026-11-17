@@ -147,7 +147,7 @@ test("mobile primary links remain visible and do not overlap the page without Ja
   baseURL,
 }) => {
   const context = await browser.newContext({
-    baseURL,
+    ...(baseURL ? { baseURL } : {}),
     javaScriptEnabled: false,
     viewport: { width: 360, height: 740 },
   });
