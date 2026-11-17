@@ -9,7 +9,7 @@ This is a real premium wedding and event services business in Hyderabad, India. 
 - First inspect repository state. If application code does not exist yet, establish a lean, tested scaffold; do not pretend it is built or deployed.
 - Prefer existing code and smallest sufficient dependencies. Preserve accessibility, security, SEO, performance and an editorial visual identity.
 
-## Proposed architecture (validate against current docs)
+## Architecture (implemented stack is authoritative; earlier proposals authorise no migration; validate against current docs)
 Astro + TypeScript + Tailwind CSS, static-first; progressive islands only where necessary; GSAP selectively for deliberate motion; Cloudflare Workers Static Assets; verified server-side Worker enquiry endpoint and D1 when the form is ready. Avoid a CMS, job queue or automation platform until justified.
 
 ## Workflow
@@ -32,7 +32,6 @@ Astro + TypeScript + Tailwind CSS, static-first; progressive islands only where 
 ## Verified commands and paths
 - Canonical task state: `docs/progress.md` (update at meaningful boundaries; keep branch, decisions, last checks, holds and next action current). Repo remote: `immazhark/the-wedding-nest`.
 - Focused while iterating: `npm test` (Vitest), `npm run check` (astro check), `npm run format:check`. Full gate once before merge: `npm run verify` (adds build, `build:submit`, Playwright e2e, workerd runtime e2e).
-- Implemented stack is authoritative; earlier proposals are historical and authorise no migration.
 
 ## Operating rules
 - Default to one implementation writer; delegate only a bounded independent question. One specialist skill per concrete gap; native tools are a valid choice.

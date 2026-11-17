@@ -6,7 +6,7 @@ Read README.md, CLAUDE.md, docs/decisions.md, docs/product-direction.md, docs/en
 
 - GitHub is source of truth. Use short feature branches and reviewable PRs; squash merge when approved.
 - Do not invent business facts, reviews, pricing, event photographs, or phone numbers. Use genuine approved media only.
-- Proposed stack: Astro + TypeScript + Tailwind, selective GSAP, Cloudflare Workers, D1 for leads.
+- Implemented stack (see CLAUDE.md; no migration implied): Astro + TypeScript + Tailwind, selective GSAP, Cloudflare Workers, D1 for leads.
 - Prefer native browser features/static HTML; no framework or automation service without a demonstrated need.
 - Type-check, test, build, inspect rendered UI/mobile, review security and SEO before claiming completion.
 - Do not log private enquiry contents; all customer data requires explicit lawful handling and retention decisions.
