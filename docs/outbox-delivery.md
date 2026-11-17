@@ -8,9 +8,11 @@ What is implemented:
 
 - Selects only opaque event metadata, not lead `payload_json`.
 - Uses conditional atomic updates so concurrent workers cannot both claim the
-  same event. Leases expire after two minutes and are guarded by a fresh UUID
-  token and attempt count. Old claim tokens cannot acknowledge a re-claimed
-  event.
+  same event. If a worker loses the compare-and-swap race, it retries selection
+  at most three more times to claim another ready event without spinning
+  indefinitely. A worker still returns null when no claimable event remains.
+  Leases expire after two minutes and are guarded by a fresh UUID token and
+  attempt count. Old claim tokens cannot acknowledge a re-claimed event.
 - Marks an event delivered **only when a future approved caller explicitly
   invokes acknowledgement**; there is no actual transport currently.
 - Releases failures with bounded exponential backoff, retaining undelivered
