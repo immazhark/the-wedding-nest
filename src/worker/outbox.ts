@@ -56,55 +56,61 @@ function checkClaim(claim: OutboxClaim): void {
 /**
  * Select only event metadata, then acquire a conditional lease. Two processes
  * may select the same row; only one can change it via the attempts and
- * eligibility CAS predicate. The loser gets null, never a duplicate claim.
+ * eligibility CAS predicate. A loser reselects ready events a bounded number
+ * of times, never taking a duplicate claim.
  */
 export async function claimNextOutbox(db: D1Like, nowIso: string): Promise<OutboxClaim | null> {
   const at = parseInstant(nowIso);
   const leaseUntil = new Date(at + OUTBOX_LEASE_MS).toISOString();
-  const candidate = await db
-    .prepare(
-      "SELECT id, enquiry_id, kind, attempts FROM outbox " +
-        "WHERE kind = 'enquiry.created' AND delivered_at IS NULL AND attempts < ?1 " +
-        "AND (next_attempt_at IS NULL OR next_attempt_at <= ?2) " +
-        "AND (lease_until IS NULL OR lease_until <= ?2) " +
-        "ORDER BY created_at ASC, id ASC LIMIT 1",
-    )
-    .bind(OUTBOX_MAX_ATTEMPTS, nowIso)
-    .first<{ id: string; enquiry_id: string; kind: string; attempts: number }>();
 
-  if (!candidate) return null;
-  if (
-    !UUID.test(candidate.id) ||
-    !UUID.test(candidate.enquiry_id) ||
-    candidate.kind !== "enquiry.created" ||
-    !Number.isSafeInteger(candidate.attempts) ||
-    candidate.attempts < 0 ||
-    candidate.attempts >= OUTBOX_MAX_ATTEMPTS
-  ) {
-    throw new Error("Invalid outbox event metadata");
+  // Bounded retry on CAS contention. Another consumer may have claimed the oldest
+  // row while a second ready event is still available. Never spin indefinitely.
+  for (let scan = 0; scan < 4; scan++) {
+    const candidate = await db
+      .prepare(
+        "SELECT id, enquiry_id, kind, attempts FROM outbox " +
+          "WHERE kind = 'enquiry.created' AND delivered_at IS NULL AND attempts < ?1 " +
+          "AND (next_attempt_at IS NULL OR next_attempt_at <= ?2) " +
+          "AND (lease_until IS NULL OR lease_until <= ?2) " +
+          "ORDER BY created_at ASC, id ASC LIMIT 1",
+      )
+      .bind(OUTBOX_MAX_ATTEMPTS, nowIso)
+      .first<{ id: string; enquiry_id: string; kind: string; attempts: number }>();
+
+    if (!candidate) return null;
+    if (
+      !UUID.test(candidate.id) ||
+      !UUID.test(candidate.enquiry_id) ||
+      candidate.kind !== "enquiry.created" ||
+      !Number.isSafeInteger(candidate.attempts) ||
+      candidate.attempts < 0 ||
+      candidate.attempts >= OUTBOX_MAX_ATTEMPTS
+    ) {
+      throw new Error("Invalid outbox event metadata");
+    }
+    const token = crypto.randomUUID();
+    const update = await db
+      .prepare(
+        "UPDATE outbox SET claim_token = ?1, lease_until = ?2, attempts = attempts + 1 " +
+          "WHERE id = ?3 AND kind = 'enquiry.created' AND attempts = ?4 " +
+          "AND delivered_at IS NULL AND (next_attempt_at IS NULL OR next_attempt_at <= ?5) " +
+          "AND (lease_until IS NULL OR lease_until <= ?5)",
+      )
+      .bind(token, leaseUntil, candidate.id, candidate.attempts, nowIso)
+      .run();
+
+    if (update.meta.changes !== 1) continue;
+    return {
+      id: candidate.id,
+      enquiryId: candidate.enquiry_id,
+      kind: "enquiry.created",
+      attempt: candidate.attempts + 1,
+      token,
+      leaseUntil,
+    };
   }
-  const token = crypto.randomUUID();
-  const update = await db
-    .prepare(
-      "UPDATE outbox SET claim_token = ?1, lease_until = ?2, attempts = attempts + 1 " +
-        "WHERE id = ?3 AND kind = 'enquiry.created' AND attempts = ?4 " +
-        "AND delivered_at IS NULL AND (next_attempt_at IS NULL OR next_attempt_at <= ?5) " +
-        "AND (lease_until IS NULL OR lease_until <= ?5)",
-    )
-    .bind(token, leaseUntil, candidate.id, candidate.attempts, nowIso)
-    .run();
-
-  if (update.meta.changes !== 1) return null;
-  return {
-    id: candidate.id,
-    enquiryId: candidate.enquiry_id,
-    kind: "enquiry.created",
-    attempt: candidate.attempts + 1,
-    token,
-    leaseUntil,
-  };
+  return null;
 }
-
 /**
  * ACK only after provider-verified acceptance; forged or expired claims cannot
  * mark events delivered. This primitive intentionally never calls a provider.
