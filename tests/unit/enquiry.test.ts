@@ -238,6 +238,25 @@ describe("validateEnquiry (server-grade, accepts unknown input)", () => {
     expect(validateEnquiry({ ...complete(), phone: "+44 20 7946 0958" }).ok).toBe(true);
   });
 
+  it("refuses malformed phone punctuation but supports ordinary international grouping", () => {
+    for (const phone of [
+      "9876543210(",
+      ")9876543210",
+      "(())9876543210",
+      "9876543210-",
+      "-9876543210",
+      "9876--543210",
+      "+91 (040 12345678",
+    ]) {
+      const result = validateEnquiry({ ...complete(), phone });
+      expect(result.ok, phone).toBe(false);
+      if (!result.ok) expect(result.errors.phone).toBe("invalid");
+    }
+    for (const phone of ["+1 (415) 555-2671", "(040) 2345-6789", "+44 (0)20 7946 0958"]) {
+      expect(validateEnquiry({ ...complete(), phone }).ok, phone).toBe(true);
+    }
+  });
+
   it("enforces length limits on free text", () => {
     const r = validateEnquiry({ ...complete(), notes: "x".repeat(LIMITS.notes + 1) });
     expect(r.ok).toBe(false);
