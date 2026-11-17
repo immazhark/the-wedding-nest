@@ -32,9 +32,12 @@ export type ValidationResult =
   | { ok: true; value: EnquiryState }
   | { ok: false; errors: Partial<Record<keyof EnquiryState, ErrorCode>> };
 
-// Digits with optional leading +, spaces, hyphens, brackets; 8–15 digits (E.164 max).
+// Common international number grouping (digits, optional +, spaces, hyphens,
+// single non-nested parenthesised digit groups); 8–15 digits (E.164 max).
+// Do not accept unmatched parentheses or repeated/dangling separators.
 export function isValidPhone(raw: string): boolean {
-  if (raw.length > LIMITS.phone || !/^\+?[\d\s\-()]+$/.test(raw)) return false;
+  if (raw.length > LIMITS.phone || !/^(?:\+?\d+|\(\d+\))(?:[ -]?(?:\d+|\(\d+\)))*$/.test(raw))
+    return false;
   const digits = raw.replace(/\D/g, "").length;
   return digits >= 8 && digits <= 15;
 }
