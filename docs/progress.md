@@ -2,7 +2,7 @@
 
 Current state first. GitHub and Cloudflare live records remain authoritative for commits, checks and exact deployed versions. This snapshot is not a production-launch approval.
 
-**Repository baseline at this update:** `main` at `2314ac7d0522fd77f7ad9c663247653d3807019e` (#88). Check the newest combined `main` CI and Cloudflare deployments live, not this snapshot; this is not launch approval.
+**Repository baseline at this update:** `main` at `8a56997` (#94). Check the newest combined `main` CI and Cloudflare deployments live, not this snapshot; this is not launch approval.
 
 ## Current implementation
 
@@ -24,9 +24,9 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 
 **SEO foundation:** Canonicals, robots, launch-gated sitemap and verified Organization JSON-LD (#38). Unapproved LocalBusiness details, reviews, ratings and contact facts are not added.
 
-## Since the 16 November reconciliation (PRs #52–#90, merged 16–18 November 2026)
+## Since the 16 November reconciliation (PRs #52–#94, merged 16–18 November 2026)
 
-Verified against GitHub on 18 November 2026 (India): `main` at `2314ac7` (#88); #89 `9bbb6da`; #90 `7a4765f`. #64 is the only open PR (draft, on hold). Do not repeat any of the fixes below.
+Verified against GitHub on 18 November 2026 (India): `main` at `8a56997` (#94). #64 is the only open PR (draft, on hold). Do not repeat any of the fixes below.
 
 - **Planner validation and accessibility (#54–#63):** malformed or duplicate selections, guest counts and date fields are rejected or scrubbed; field errors are focused, ARIA-associated, cleared when answers become valid and kept until the rejected answer changes; stale error descriptions and reset state are fixed.
 - **Draft and privacy hardening (#65–#71, #73):** durable enquiry IDs kept out of logs; saved drafts allow-list scalar values and sanitise selections; hidden services are not persisted; contact autofill disabled while intake is off.
@@ -35,6 +35,9 @@ Verified against GitHub on 18 November 2026 (India): `main` at `2314ac7` (#88); 
 - **Navigation (#88):** primary navigation stays visible, in-header and free of horizontal overflow at 360px without JavaScript; covered by an e2e regression.
 - **Operating instructions (#90):** root `CLAUDE.md` now records verified commands, `docs/progress.md` as canonical task state, and operating rules; `AGENTS.md` stack wording reconciled with the implemented stack.
 - **Live check (18 November):** both Workers return `x-robots-tag: noindex, nofollow` and a robots meta tag with a restrictive CSP. Bindings and deployed-commit provenance were not re-audited this session; use Cloudflare builds-by-version before relying on them.
+- **Hardening and polish (#91–#94):** #91 reconciled this file; #92 (`d03e59a`) makes the Worker entry return a generic JSON 500 for unexpected enquiry-handler throws, never logging request data; #93 (`5c8712a`) gives the header home link an explicit `aria-label` because WebKit does not name a link from inline SVG `<title>` (axe failures in WebKit); #94 (`8a56997`) preloads the two critical latin variable fonts, cutting throttled mobile home LCP from about 2.0–2.6 s to 1.3–1.7 s, with a once-only-fetch e2e test.
+- **Cross-browser check (18 November, local, not in CI):** Firefox and WebKit (desktop and mobile) ran the full e2e suite. Real defects were the WebKit logo-link name (fixed in #93). Remaining failures were environmental: Playwright WebKit does not Tab to links (skip-link test), mobile WebKit lacks `mouse.wheel` (sticky-header test), and load-related Firefox timeouts that pass in isolation. No committed cross-browser config yet; Chromium desktop/mobile remains the CI gate.
+- **Dependency alert:** Dependabot #1, picomatch <= 4.0.7 (ReDoS), has no patched release and is a build-time transitive dependency of astro, vite and vitest. Not reachable from the deployed Worker; revisit when upstream ships a fix.
 - **Open:** #64 (staging enquiry rate limiting) stays draft until Cloudflare entitlement, pricing and approvals are verified. It must not be merged or activated before then.
 - **Local note:** `npm run build:submit` uses POSIX env syntax and fails under the Windows npm shell; run it from Git Bash or let CI do it.
 
