@@ -532,24 +532,13 @@ test("films download nothing until play is pressed, then hand over to native con
   expect(filmRequests.every((u) => u.includes("film-landscape"))).toBe(true);
 });
 
-test("hero film starts only on large screens, after load, and never competes with first paint", async ({
-  page,
-}) => {
+test("the opening is the photograph alone: no hero film element or request", async ({ page }) => {
   const requests: string[] = [];
   page.on("request", (r) => {
-    if (r.url().includes("hero-loop.mp4")) requests.push(r.url());
+    if (r.url().includes("hero-loop")) requests.push(r.url());
   });
   await page.goto("/", { waitUntil: "load" });
-  const film = page.locator("[data-grand-film]");
-  await expect(film).toHaveAttribute("aria-hidden", "true");
-  await expect(film).toHaveAttribute("preload", "none");
-  const large = (page.viewportSize()?.width ?? 0) >= 1024;
-  if (large) {
-    // The loader assigns the source only after load; some engines hide media fetches from requests.
-    await expect(film).toHaveAttribute("src", /hero-loop\.mp4/, { timeout: 8000 });
-  } else {
-    await page.waitForTimeout(2500);
-    expect(requests).toHaveLength(0);
-    await expect(film).not.toHaveAttribute("src", /.+/);
-  }
+  await page.waitForTimeout(2500);
+  await expect(page.locator("[data-grand-film]")).toHaveCount(0);
+  expect(requests).toHaveLength(0);
 });

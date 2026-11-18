@@ -13,6 +13,8 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 - Owner media: private register outside the repo (`TWN-REL-2026-T0001`-`T0018`). Number plate blurred before use. People are identifiable in the team photo and portrait film; owner to confirm comfort. Film audio unverified for speech (captions may be needed).
 - Merged to `main` on 19 Nov 2026 after the owner said "merge it". Previews remain noindex; no domain, indexing or live enquiries.
 
+- **19 Nov follow-up (branch `feat/luxury-photo-hero`):** owner removed the hero film loop (photograph only); gallery section and footer invitation restyled to the dark royal register. Remaining sections and copy still to refine.
+
 ## Current implementation
 
 | Area | State |
