@@ -41,6 +41,13 @@ const doorTones: Record<string, string> = {
 const doorPhotos: Record<string, string> = {
   catering: "../../assets/events/catering/menu-table-details/01-savoury-bowl.jpg",
   decor: "../../assets/events/decor/hall-stage-decor/02-stage-seating.jpg",
+  hospitality: "../../assets/events/celebrations/banquet-table/01-long-banquet-table.jpg",
+  "venue-coordination":
+    "../../assets/events/decor/hall-ceiling-chandeliers/01-chandelier-ceiling.jpg",
+  "photo-film": "../../assets/events/celebrations/film-stills/01-hands-bokeh.jpg",
+  makeup: "../../assets/events/mehndi/mehndi-hands/01-mehndi-hands-gathering.jpg",
+  transport: "../../assets/events/celebrations/decorated-car/01-garlanded-car.jpg",
+  gifting: "../../assets/events/details/gift-box-ribbon/01-gold-gift-box-ribbon.jpg",
 };
 const thresholdPhoto =
   approvedEventPhotos["../../assets/events/catering/menu-table-details/04-white-dessert-glass.jpg"];
@@ -249,6 +256,75 @@ const thresholdPhoto =
   </section>
 
   <!-- Occasions -->
+  <!-- Film: two short owner-supplied films, loaded only when a visitor presses play. -->
+  <section class="film on-dark arch-over" aria-labelledby="film-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-28 pb-24 md:pt-40 md:pb-32">
+      <p class="eyebrow text-saffron">The films</p>
+      <h2 id="film-title" class="mt-5 text-[length:var(--text-headline)] text-ivory max-w-[18ch]">
+        Watch how a celebration feels.
+      </h2>
+      <div class="film-grid mt-14">
+        <div class="film-card film-wide" data-film>
+          <video
+            class="film-video"
+            controls
+            playsinline
+            preload="none"
+            poster="/media/film-landscape-poster.jpg"
+            aria-describedby="film-wide-desc"
+          >
+            <source src="/media/film-landscape.mp4" type="video/mp4" />
+          </video>
+          <button
+            type="button"
+            class="film-play"
+            data-film-play
+            aria-label="Play the short film of wedding details"
+            hidden
+          >
+            <span class="film-play-chip" aria-hidden="true">
+              ▶
+            </span>
+          </button>
+          <p id="film-wide-desc" class="film-desc">
+            A short wedding film of details: hands, shoes, jewellery and a groom’s watch, about 24
+            seconds, with music.
+          </p>
+        </div>
+        <div class="film-card film-tall" data-film>
+          <video
+            class="film-video"
+            controls
+            playsinline
+            preload="none"
+            poster="/media/film-portrait-poster.jpg"
+            aria-describedby="film-tall-desc"
+          >
+            <source src="/media/film-portrait.mp4" type="video/mp4" />
+          </video>
+          <button
+            type="button"
+            class="film-play"
+            data-film-play
+            aria-label="Play the short portrait wedding film"
+            hidden
+          >
+            <span class="film-play-chip" aria-hidden="true">
+              ▶
+            </span>
+          </button>
+          <p id="film-tall-desc" class="film-desc">
+            A short wedding film in portrait: a groom’s sherwani, silhouettes, bridal shoes and
+            family embraces, about 50 seconds, with music.
+          </p>
+        </div>
+      </div>
+      <p class="mt-8 text-sand text-[0.9375rem] max-w-xl">
+        Each film downloads only when you press play, and has sound.
+      </p>
+    </div>
+  </section>
+
   <section id="occasions" class="occasions on-dark" aria-labelledby="occasions-title">
     <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36">
       <p class="eyebrow text-saffron">Occasions</p>
@@ -540,6 +616,26 @@ const thresholdPhoto =
 
 <script>
   import "../scripts/motion";
+  // Films: nothing downloads until play. The native controls stay for no-JS and keyboard users;
+  // with JS a single large play button leads, then hands over to the native controls.
+  const players = document.querySelectorAll<HTMLElement>("[data-film]");
+  players.forEach((card) => {
+    const video = card.querySelector<HTMLVideoElement>("video");
+    const button = card.querySelector<HTMLButtonElement>("[data-film-play]");
+    if (!video || !button) return;
+    video.controls = false;
+    button.hidden = false;
+    const start = () => {
+      players.forEach((other) => other.querySelector("video")?.pause());
+      video.controls = true;
+      button.hidden = true;
+      void video.play().catch(() => {
+        button.hidden = false;
+        video.controls = false;
+      });
+    };
+    button.addEventListener("click", start);
+  });
   // The kitchen loop plays only while visible, never with reduced motion, and has no audio track.
   const arch = document.querySelector<HTMLElement>("[data-kitchen]");
   const video = document.querySelector<HTMLVideoElement>("[data-kitchen-video]");

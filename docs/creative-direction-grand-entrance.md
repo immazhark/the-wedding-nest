@@ -72,6 +72,13 @@ No new library. Everything is CSS and a few lines of TypeScript. GSAP, Lenis, OG
 
 - Home work section: the portrait is cropped in an arch, each photograph sits inside a gold hairline held off its edge, and the caption carries a saffron rule.
 
+## Round 7: second tranche of owner media (19 November 2026)
+
+- **Two films** (owner-supplied, permission stated by owner): a 24 s landscape film of wedding details and a 50 s portrait film. Re-encoded to 1280 and 608 px wide (about 2.9 MB and 4.5 MB), shown in a cinema frame and a portrait arch. They download nothing until a visitor presses play, then hand over to native controls. Both carry music-like audio; if either contains speech, captions are needed before launch.
+- **Service doors** now carry real photographs for hospitality, venue, photography and film, makeup and beauty, transport (number plate blurred; the door crop does not show it) and gifts. Invitations has no photograph yet.
+- **Catering page:** a band for the service team photograph (staff are identifiable; the owner should confirm the team agrees).
+- **Fix:** the menu rail sliding in from the side could briefly widen the page on phones; the kitchen section now clips horizontally.
+
 ## Performance and browsers (19 November 2026, lab, not real-user data)
 
 - Home LCP element is the hero photograph. A 1440w image step (the browser was fetching the 1920w file, 211 KB, at a 1440px window) cut desktop LCP from about 2.7-3.4 s to 2.2-2.3 s (4x CPU, about 1.6 Mbps, 150 ms latency); mobile stays about 2.0-2.1 s; CLS at most 0.001.

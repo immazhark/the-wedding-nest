@@ -103,6 +103,25 @@ const photos = servicePhotos(page.slug);
       </div>
     </section>
 
+    {photos.team && (
+      <section class="svc-team on-dark" aria-label="The catering team">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-4 pb-20 md:pb-28">
+          <div>
+            <Frame
+              photo={photos.team}
+              aspectClass="aspect-[4/3] md:aspect-[16/8]"
+              tone="dark"
+              sizes="(min-width: 1024px) 85vw, 100vw"
+              class="svc-team-photo"
+            />
+            <p class="mt-5 text-sand text-[0.9375rem]">
+              The Wedding Nest catering team, ready for service.
+            </p>
+          </div>
+        </div>
+      </section>
+    )}
+
     <aside class="svc-close on-dark" aria-labelledby="service-planner-title">
       <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36 grid gap-12 md:grid-cols-12 md:items-center">
         <div class="md:col-span-7">

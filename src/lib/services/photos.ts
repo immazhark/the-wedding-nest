@@ -14,18 +14,21 @@ const CATERING = {
     `${dir}menu-table-details/02-pineapple-dish.jpg`,
   ],
   portrait: `${dir}menu-table-details/04-white-dessert-glass.jpg`,
+  team: `${dir}service-team/01-service-team-with-banner.jpg`,
 } as const;
 
 export interface ServicePhotos {
   hero?: ApprovedPhoto;
   strip: ApprovedPhoto[];
   portrait?: ApprovedPhoto;
+  team?: ApprovedPhoto;
 }
 
 export function servicePhotos(slug: string): ServicePhotos {
   if (slug !== "hyderabadi-wedding-catering") return { strip: [] };
   const hero = approvedEventPhotos[CATERING.hero];
   const portrait = approvedEventPhotos[CATERING.portrait];
+  const team = approvedEventPhotos[CATERING.team];
   return {
     ...(hero ? { hero } : {}),
     strip: CATERING.strip.flatMap((file) => {
@@ -33,5 +36,6 @@ export function servicePhotos(slug: string): ServicePhotos {
       return photo ? [photo] : [];
     }),
     ...(portrait ? { portrait } : {}),
+    ...(team ? { team } : {}),
   };
 }

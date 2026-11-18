@@ -499,3 +499,25 @@ test("non-sending preview clearly discloses that enquiries are disabled", async 
   await page.goto("/");
   await expect(page.getByText("Preview: the planner can’t send enquiries yet.")).toBeVisible();
 });
+
+test("films download nothing until play is pressed, then hand over to native controls", async ({
+  page,
+}) => {
+  const filmRequests: string[] = [];
+  page.on("request", (r) => {
+    if (/film-(landscape|portrait)\.mp4/.test(r.url())) filmRequests.push(r.url());
+  });
+  await page.goto("/");
+  const wide = page.locator(".film-wide");
+  await wide.scrollIntoViewIfNeeded();
+  const button = wide.getByRole("button", { name: /Play the short film/ });
+  await expect(button).toBeVisible();
+  await expect(wide.locator("video")).toHaveAttribute("preload", "none");
+  await expect(wide.locator("video")).toHaveAccessibleDescription(/wedding film of details/);
+  expect(filmRequests).toHaveLength(0);
+  await button.click();
+  await expect(button).toBeHidden();
+  await expect(wide.locator("video")).toHaveJSProperty("controls", true);
+  await expect.poll(() => filmRequests.length).toBeGreaterThan(0);
+  expect(filmRequests.every((u) => u.includes("film-landscape"))).toBe(true);
+});
