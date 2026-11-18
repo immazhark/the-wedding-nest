@@ -499,3 +499,57 @@ test("non-sending preview clearly discloses that enquiries are disabled", async 
   await page.goto("/");
   await expect(page.getByText("Preview: the planner can’t send enquiries yet.")).toBeVisible();
 });
+
+test("films download nothing until play is pressed, then hand over to native controls", async ({
+  page,
+}) => {
+  const filmRequests: string[] = [];
+  page.on("request", (r) => {
+    if (/film-(landscape|portrait)\.mp4/.test(r.url())) filmRequests.push(r.url());
+  });
+  await page.goto("/");
+  const wide = page.locator(".film-wide");
+  await wide.scrollIntoViewIfNeeded();
+  const button = wide.getByRole("button", { name: /Play the short film/ });
+  await expect(button).toBeVisible();
+  await expect(wide.locator("video")).toHaveAttribute("preload", "none");
+  await expect(wide.locator("video")).toHaveAccessibleDescription(/wedding film of details/);
+  expect(filmRequests).toHaveLength(0);
+  await button.click();
+  await expect(button).toBeHidden();
+  await expect(wide.locator("video")).toHaveJSProperty("controls", true);
+  // Some engines do not surface media fetches as page requests, so also accept the media state.
+  await expect
+    .poll(async () => {
+      const loading = await wide
+        .locator("video")
+        .evaluate(
+          (v: HTMLVideoElement) => v.currentSrc.includes("film-landscape") && v.networkState > 0,
+        );
+      return filmRequests.length > 0 || loading;
+    })
+    .toBe(true);
+  expect(filmRequests.every((u) => u.includes("film-landscape"))).toBe(true);
+});
+
+test("hero film starts only on large screens, after load, and never competes with first paint", async ({
+  page,
+}) => {
+  const requests: string[] = [];
+  page.on("request", (r) => {
+    if (r.url().includes("hero-loop.mp4")) requests.push(r.url());
+  });
+  await page.goto("/", { waitUntil: "load" });
+  const film = page.locator("[data-grand-film]");
+  await expect(film).toHaveAttribute("aria-hidden", "true");
+  await expect(film).toHaveAttribute("preload", "none");
+  const large = (page.viewportSize()?.width ?? 0) >= 1024;
+  if (large) {
+    // The loader assigns the source only after load; some engines hide media fetches from requests.
+    await expect(film).toHaveAttribute("src", /hero-loop\.mp4/, { timeout: 8000 });
+  } else {
+    await page.waitForTimeout(2500);
+    expect(requests).toHaveLength(0);
+    await expect(film).not.toHaveAttribute("src", /.+/);
+  }
+});

@@ -1,8 +1,17 @@
-# Project progress — reconciled 18 November 2026
+# Project progress — reconciled 19 November 2026
 
 Current state first. GitHub and Cloudflare live records remain authoritative for commits, checks and exact deployed versions. This snapshot is not a production-launch approval.
 
-**Repository baseline at this update:** `main` at `8a56997` (#94). Check the newest combined `main` CI and Cloudflare deployments live, not this snapshot; this is not launch approval.
+**Repository baseline at this update:** `main` at `774cfc5` (#103: owner contact details, catering page published, media pipeline). Check the newest combined `main` CI and Cloudflare deployments live, not this snapshot; this is not launch approval.
+
+## Creative prototype awaiting owner approval (draft PR #104, branch `feat/creative-grand-entrance`)
+
+"The Grand Entrance": dark royal register (kohl, garnet, emerald, saffron), cinematic opening with a muted film loop on large screens, GSAP scroll story (idle-loaded, home only), gold dust, jewel-toned service doors with real photographs, kitchen arch, two owner films (download only on play), cinematic catering and story page templates, royal planner styling, persistent dark header with curtain page transitions and link prefetch. Full rationale, measurements and open items: `docs/creative-direction-grand-entrance.md`.
+
+- Checks on the latest push: `verify`, `editorial-fixtures` and Workers Builds pass. Chromium desktop/mobile e2e, WebKit and Firefox film/home checks pass.
+- Lab (4x CPU, ~1.6 Mbps): mobile LCP ~1.9-2.3 s, desktop ~2.3-2.4 s, CLS <= 0.001; planner interactions <= ~96 ms, home interactions 96-200 ms. Lab only; no real-user data.
+- Owner media: private register outside the repo (`TWN-REL-2026-T0001`-`T0018`). Number plate blurred before use. People are identifiable in the team photo and portrait film; owner to confirm comfort. Film audio unverified for speech (captions may be needed).
+- Not merged: awaiting the owner's approval of the direction. Previews remain noindex; no domain, indexing or live enquiries.
 
 ## Current implementation
 

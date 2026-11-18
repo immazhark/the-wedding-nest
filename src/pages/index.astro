@@ -1,8 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import ArchFrame from "../components/ArchFrame.astro";
+import { Picture } from "astro:assets";
 import Frame from "../components/media/Frame.astro";
-import { approvedHomePhotos } from "../lib/media/catalog";
+import { approvedHomePhotos, approvedEventPhotos } from "../lib/media/catalog";
 import { OCCASIONS, SERVICES, STAGES } from "../lib/enquiry/schema";
 import { ENQUIRIES } from "../lib/site/config";
 import { publishedServicePages, servicePageHref } from "../lib/services/publication";
@@ -26,118 +26,238 @@ const occasionNotes: Record<string, string> = {
 const weddingOccasions = OCCASIONS.filter((o) => o.group === "wedding");
 const otherOccasions = OCCASIONS.filter((o) => o.group === "celebration");
 const featuredStory = featuredStoryPath(publishedStories);
+// Each service door has its own jewel tone, so the row reads as a sequence of rooms, not identical cards.
+const doorTones: Record<string, string> = {
+  catering: "garnet",
+  decor: "emerald",
+  hospitality: "indigo",
+  "venue-coordination": "kohl",
+  "photo-film": "bronze",
+  makeup: "rose",
+  transport: "teal",
+  invitations: "plum",
+  gifting: "bronze",
+};
+const doorPhotos: Record<string, string> = {
+  catering: "../../assets/events/catering/menu-table-details/01-savoury-bowl.jpg",
+  decor: "../../assets/events/decor/hall-stage-decor/02-stage-seating.jpg",
+  hospitality: "../../assets/events/celebrations/banquet-table/01-long-banquet-table.jpg",
+  "venue-coordination":
+    "../../assets/events/decor/hall-ceiling-chandeliers/01-chandelier-ceiling.jpg",
+  "photo-film": "../../assets/events/celebrations/film-stills/01-hands-bokeh.jpg",
+  makeup: "../../assets/events/mehndi/mehndi-hands/01-mehndi-hands-gathering.jpg",
+  transport: "../../assets/events/celebrations/decorated-car/01-garlanded-car.jpg",
+  gifting: "../../assets/events/details/gift-box-ribbon/01-gold-gift-box-ribbon.jpg",
+};
+const thresholdPhoto =
+  approvedEventPhotos["../../assets/events/catering/menu-table-details/04-white-dessert-glass.jpg"];
 ---
 
 <BaseLayout>
-  <!-- Opening -->
-  <section class="opening" aria-labelledby="hero-title">
-    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-10 md:pt-16">
-      <div class="grid gap-8 md:grid-cols-12 md:items-end">
-        <div class="md:col-span-8">
-          <p class="eyebrow text-brass-deep fade-in [--i:0]">
+  <!-- Opening: the grand entrance. Curtains part on the real stage photograph. -->
+  <section class="grand" aria-labelledby="hero-title">
+    <div class="grand-stage">
+      <Frame
+        photo={approvedHomePhotos["home-hero"]}
+        aspectClass="h-full"
+        tone="dark"
+        placeholder="The opening photograph — a wide moment from a TWN wedding"
+        priority
+        sizes="100vw"
+        quality={48}
+        class="grand-photo"
+        mediaClass="grand-media"
+      />
+      <video
+        class="grand-film"
+        muted
+        loop
+        playsinline
+        preload="none"
+        tabindex="-1"
+        aria-hidden="true"
+        data-grand-film
+        data-src="/media/hero-loop.mp4"
+      ></video>
+      <div class="grand-scrim" aria-hidden="true"></div>
+      <canvas class="grand-dust" data-dust aria-hidden="true"></canvas>
+      <div class="grand-doors" aria-hidden="true">
+        <span></span>
+        <span></span>
+      </div>
+      <div class="grand-copy">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pb-10 md:pb-16">
+          <p class="eyebrow text-sand fade-in [--i:5]">
             Weddings and family celebrations<span class="hidden sm:inline"> · Hyderabad</span>
           </p>
-          <h1 id="hero-title" class="mt-6 text-[length:var(--text-display)] leading-[0.98]">
-            <span class="line-mask">
-              <span class="[--i:1]">Nikah to Walima,</span>
+          <h1
+            id="hero-title"
+            class="mt-5 text-[length:var(--text-display)] leading-[0.98] text-ivory"
+          >
+            <span class="line-mask grand-line">
+              <span class="[--i:6]">Nikah to Walima,</span>
             </span>
-            <span class="line-mask">
-              <span class="[--i:2]">and every day</span>
+            <span class="line-mask grand-line">
+              <span class="[--i:7]">and every day</span>
             </span>
-            <span class="line-mask md:pl-[1.6em]">
-              <span class="[--i:3]">
-                <em class="italic font-[300] text-brass-deep">between.</em>
+            <span class="line-mask grand-line md:pl-[1.6em]">
+              <span class="[--i:8]">
+                <em class="italic font-[300] text-saffron">between.</em>
               </span>
             </span>
           </h1>
-        </div>
-        <div class="md:col-span-4 md:pb-3 fade-in [--i:4]">
-          <p class="text-[length:var(--text-lede)] text-charcoal max-w-md">
-            We plan weddings and celebrations across Hyderabad — the whole occasion, or only the
-            parts you’d like help with.
-          </p>
-          <div class="mt-8 flex flex-wrap items-center gap-x-7 gap-y-4">
-            <a href="/plan-your-event/" class="btn btn-solid">
-              Plan your event{" "}
-              <span class="arrow" aria-hidden="true">
+          <div class="mt-8 md:mt-10 flex flex-wrap items-center gap-x-8 gap-y-5 fade-in [--i:10]">
+            <a href="/plan-your-event/" class="btn-grand">
+              <span>Plan your event</span>
+              <span class="btn-grand-chip" aria-hidden="true">
                 →
               </span>
             </a>
-            <a href="#services" class="link-underline text-[0.9375rem] font-medium">
+            <a href="#services" class="link-underline text-[0.9375rem] font-medium text-ivory">
               What we do
             </a>
           </div>
+          <p class="mt-8 max-w-md text-[length:var(--text-lede)] text-stone fade-in [--i:11]">
+            We plan weddings and celebrations across Hyderabad — the whole occasion, or only the
+            parts you’d like help with.
+          </p>
         </div>
       </div>
     </div>
-    <div class="mx-auto max-w-[110rem] mt-10 md:mt-16 sm:px-8 lg:px-12">
-      <Frame
-        photo={approvedHomePhotos["home-hero"]}
-        aspectClass="aspect-[4/5] sm:aspect-[3/2] lg:aspect-[21/9]"
-        placeholder="The opening photograph — a wide moment from a TWN wedding"
-        priority
-        class="frame-reveal"
-      />
+  </section>
+
+  <!-- Catering: the table is where the celebration is remembered. Arch rises over the opening. -->
+  <section class="kitchen arch-over on-dark" aria-labelledby="kitchen-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36 grid gap-14 md:grid-cols-12 md:items-center">
+      <div class="md:col-span-5">
+        <div class="kitchen-arch" data-kitchen>
+          <img
+            src="/media/kitchen-loop-poster.jpg"
+            alt=""
+            width="960"
+            height="540"
+            loading="lazy"
+            decoding="async"
+            class="kitchen-poster"
+          />
+          <video
+            class="kitchen-video"
+            muted
+            loop
+            playsinline
+            preload="none"
+            poster="/media/kitchen-loop-poster.jpg"
+            aria-label="A large pot of golden, saffron-streaked food being stirred"
+            data-kitchen-video
+          >
+            <source src="/media/kitchen-loop.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+      <div class="md:col-span-6 md:col-start-7">
+        <p class="eyebrow text-saffron scroll-rise">Catering</p>
+        <h2
+          id="kitchen-title"
+          class="mt-5 text-[length:var(--text-headline)] max-w-[14ch] text-ivory scroll-rise"
+        >
+          The table is where it is remembered.
+        </h2>
+        <p class="mt-6 max-w-lg text-[length:var(--text-lede)] text-stone scroll-rise">
+          Four Hyderabadi menus, each open to your changes. Begin with one and shape it around your
+          family.
+        </p>
+        <ul class="menu-rail mt-10" role="list">
+          {[
+            ["Deccani Delight", "Simple flavors, true Hyderabadi soul."],
+            ["Nawabi Zaiqa", "A royal touch in every bite."],
+            ["Daawat-E-Khaas", "For those who savor the special."],
+            ["Shahi Dastarkhwaan", "The grandeur of Hyderabad on your table."],
+          ].map(([name, line]) => (
+            <li>
+              <a href={servicePageHref("catering", publishedServicePages)} class="menu-rail-link">
+                <span class="menu-rail-name">{name}</span>
+                <span class="menu-rail-line">{line}</span>
+                <span class="menu-rail-arrow" aria-hidden="true">
+                  →
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   </section>
 
-  <!-- Services -->
-  <section id="services" class="py-24 md:py-36" aria-labelledby="services-title">
-    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 grid gap-12 md:grid-cols-12">
-      <div class="md:col-span-4">
-        <p class="eyebrow text-brass-deep">What we do</p>
-        <h2 id="services-title" class="mt-5 text-[length:var(--text-headline)] max-w-[12ch]">
-          All of it, or one part.
-        </h2>
-      </div>
-      <div class="md:col-span-8 border-t border-ink/15">
-        <article class="service-row">
-          <h3 class="service-title">The whole occasion</h3>
-          <p class="text-charcoal">
+  <!-- Services: a row of doors, each with its own jewel tone -->
+  <section id="services" class="services py-24 md:py-36" aria-labelledby="services-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12">
+      <div class="grid gap-12 md:grid-cols-12 md:items-end">
+        <div class="md:col-span-5">
+          <p class="eyebrow text-brass-deep">What we do</p>
+          <h2 id="services-title" class="mt-5 text-[length:var(--text-headline)] max-w-[12ch]">
+            All of it, or one part.
+          </h2>
+        </div>
+        <div class="md:col-span-6 md:col-start-7 grid gap-6 text-charcoal">
+          <p>
+            <strong class="font-display text-[length:var(--text-title)] font-normal block text-ink">
+              The whole occasion
+            </strong>
             One planner and one team from the first meeting onwards: venue, décor, food, guests and
             the running of each day, across as many events as the wedding holds.
           </p>
-        </article>
-        <article class="service-row">
-          <h3 class="service-title">One part, or a few</h3>
-          <div>
-            <p class="text-charcoal">
-              Catering for the Walima, décor for the Mehndi, cars for the baraat — ask for exactly
-              what you need.
-            </p>
-            <ul class="service-index mt-6" aria-label="Services you can ask about">
-              {coreServices.map((s, i) => (
-                <li>
-                  <a href={servicePageHref(s.id, publishedServicePages)} class="link-underline">
-                    {s.label}
-                  </a>
-                  {i < coreServices.length - 1 && (
-                    <span class="text-brass" aria-hidden="true">
-                      &nbsp;/
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-            <p class="mt-8 text-sm font-medium tracking-wide text-charcoal">
-              For particular occasions
-            </p>
-            <ul class="service-index mt-3" aria-label="Occasion-specific services">
-              {occasionServices.map((s, i) => (
-                <li>
-                  <a href={servicePageHref(s.id, publishedServicePages)} class="link-underline">
-                    {s.label}
-                  </a>
-                  {i < occasionServices.length - 1 && (
-                    <span class="text-brass" aria-hidden="true">
-                      &nbsp;/
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </article>
+          <p>
+            <strong class="font-display text-[length:var(--text-title)] font-normal block text-ink">
+              One part, or a few
+            </strong>
+            Catering for the Walima, décor for the Mehndi, cars for the baraat — ask for exactly
+            what you need.
+          </p>
+        </div>
+      </div>
+      <ul class="service-doors mt-14 md:mt-20" aria-label="Services you can ask about">
+        {coreServices.map((s, i) => (
+          <li class={`door door-${i + 1}`} data-tone={doorTones[s.id] ?? "kohl"}>
+            {doorPhotos[s.id] && approvedEventPhotos[doorPhotos[s.id]!] && (
+              <Picture
+                src={approvedEventPhotos[doorPhotos[s.id]!]!.image}
+                alt=""
+                formats={["avif", "webp"]}
+                widths={[480, 800, 1200]}
+                sizes="(min-width: 64rem) 55vw, 90vw"
+                loading="lazy"
+                class="door-photo"
+                aria-hidden="true"
+              />
+            )}
+            <a href={servicePageHref(s.id, publishedServicePages)} class="door-link">
+              <span class="door-index" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span class="door-name">{s.label}</span>
+              <span class="door-arrow" aria-hidden="true">
+                →
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <div class="mt-14 md:mt-20 max-w-4xl">
+        <p class="text-sm font-medium tracking-wide text-charcoal">For particular occasions</p>
+        <ul class="service-index mt-3" aria-label="Occasion-specific services">
+          {occasionServices.map((s, i) => (
+            <li>
+              <a href={servicePageHref(s.id, publishedServicePages)} class="link-underline">
+                {s.label}
+              </a>
+              {i < occasionServices.length - 1 && (
+                <span class="text-brass" aria-hidden="true">
+                  &nbsp;/
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
         <p class="pt-8 text-sm text-muted max-w-xl">
           What’s possible depends on your date, venue and guest list. We’ll talk it through with you
           before anything is agreed.
@@ -147,18 +267,103 @@ const featuredStory = featuredStoryPath(publishedStories);
   </section>
 
   <!-- Occasions -->
-  <section id="occasions" class="bg-paper border-y border-ink/10" aria-labelledby="occasions-title">
+  <!-- Film: two short owner-supplied films, loaded only when a visitor presses play. -->
+  <section class="film on-dark arch-over" aria-labelledby="film-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-28 pb-24 md:pt-40 md:pb-32">
+      <p class="eyebrow text-saffron">The films</p>
+      <h2 id="film-title" class="mt-5 text-[length:var(--text-headline)] text-ivory max-w-[18ch]">
+        Watch how a celebration feels.
+      </h2>
+      <div class="film-grid mt-14">
+        <div class="film-card film-wide" data-film>
+          <img
+            class="film-poster"
+            src="/media/film-landscape-poster.jpg"
+            alt=""
+            width="1280"
+            height="720"
+            loading="lazy"
+            decoding="async"
+            aria-hidden="true"
+          />
+          <video
+            class="film-video"
+            controls
+            playsinline
+            preload="none"
+            aria-describedby="film-wide-desc"
+          >
+            <source src="/media/film-landscape.mp4" type="video/mp4" />
+          </video>
+          <button
+            type="button"
+            class="film-play"
+            data-film-play
+            aria-label="Play the short film of wedding details"
+            hidden
+          >
+            <span class="film-play-chip" aria-hidden="true">
+              ▶
+            </span>
+          </button>
+          <p id="film-wide-desc" class="film-desc">
+            A short wedding film of details: hands, shoes, jewellery and a groom’s watch, about 24
+            seconds, with music.
+          </p>
+        </div>
+        <div class="film-card film-tall" data-film>
+          <img
+            class="film-poster"
+            src="/media/film-portrait-poster.jpg"
+            alt=""
+            width="608"
+            height="1080"
+            loading="lazy"
+            decoding="async"
+            aria-hidden="true"
+          />
+          <video
+            class="film-video"
+            controls
+            playsinline
+            preload="none"
+            aria-describedby="film-tall-desc"
+          >
+            <source src="/media/film-portrait.mp4" type="video/mp4" />
+          </video>
+          <button
+            type="button"
+            class="film-play"
+            data-film-play
+            aria-label="Play the short portrait wedding film"
+            hidden
+          >
+            <span class="film-play-chip" aria-hidden="true">
+              ▶
+            </span>
+          </button>
+          <p id="film-tall-desc" class="film-desc">
+            A short wedding film in portrait: a groom’s sherwani, silhouettes, bridal shoes and
+            family embraces, about 50 seconds, with music.
+          </p>
+        </div>
+      </div>
+      <p class="mt-8 text-sand text-[0.9375rem] max-w-xl">
+        Each film downloads only when you press play, and has sound.
+      </p>
+    </div>
+  </section>
+
+  <section id="occasions" class="occasions on-dark" aria-labelledby="occasions-title">
     <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36">
-      <h2 id="occasions-title" class="max-w-4xl text-[length:var(--text-headline)]">
+      <p class="eyebrow text-saffron">Occasions</p>
+      <h2 id="occasions-title" class="mt-5 max-w-4xl text-[length:var(--text-headline)] text-ivory">
         Rooted in Hyderabad’s wedding traditions. Open to every celebration.
       </h2>
-      <ul class="mt-16 border-t border-ink/15" role="list">
+      <ul class="occasion-list mt-16" role="list">
         {weddingOccasions.map((o) => (
-          <li class="occasion-row scroll-rise">
-            <a
-              href={`/plan-your-event/?occasion=${o.id}`}
-              class="occasion-name underline decoration-brass underline-offset-8"
-            >
+          <li class="occasion-row">
+            <a href={`/plan-your-event/?occasion=${o.id}`} class="occasion-name">
               {o.label}
             </a>
             <span class="occasion-note">{occasionNotes[o.id]}</span>
@@ -166,8 +371,8 @@ const featuredStory = featuredStoryPath(publishedStories);
         ))}
       </ul>
       <div class="mt-12 max-w-3xl">
-        <p class="eyebrow text-brass-deep">Other celebrations</p>
-        <p class="mt-4 text-[length:var(--text-lede)] text-charcoal">
+        <p class="eyebrow text-saffron">Other celebrations</p>
+        <p class="mt-4 text-[length:var(--text-lede)] text-stone">
           For families and hosts from every community, and occasions of every kind.
         </p>
         <ul class="mt-6 flex flex-wrap gap-x-6 gap-y-4" aria-label="Other celebrations">
@@ -175,7 +380,7 @@ const featuredStory = featuredStoryPath(publishedStories);
             <li>
               <a
                 href={`/plan-your-event/?occasion=${o.id}`}
-                class="link-underline text-[0.9375rem] font-medium"
+                class="link-underline text-[0.9375rem] font-medium text-ivory"
               >
                 {o.label}
               </a>
@@ -190,11 +395,21 @@ const featuredStory = featuredStoryPath(publishedStories);
   <section id="approach" class="on-dark bg-kohl text-ivory" aria-labelledby="approach-title">
     <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36 grid gap-14 md:grid-cols-12 md:items-center">
       <div class="md:col-span-5 order-2 md:order-1">
-        <ArchFrame
-          tone="dark"
-          label="Reserved for an approved décor or venue photograph"
-          class="aspect-[4/5] w-full max-w-sm mx-auto md:mx-0"
-        />
+        {thresholdPhoto ? (
+          <figure class="threshold-arch">
+            <Picture
+              src={thresholdPhoto.image}
+              alt={thresholdPhoto.entry.alt}
+              formats={["avif", "webp"]}
+              widths={[480, 720, 960]}
+              sizes="(min-width: 768px) 30vw, 80vw"
+              loading="lazy"
+              class="threshold-photo"
+            />
+          </figure>
+        ) : (
+          <div class="threshold-arch" role="img" aria-label="Photograph to come"></div>
+        )}
       </div>
       <div class="md:col-span-6 md:col-start-7 order-1 md:order-2">
         <h2 id="approach-title" class="text-[length:var(--text-headline)] max-w-[14ch]">
@@ -311,12 +526,43 @@ const featuredStory = featuredStoryPath(publishedStories);
     color: var(--color-ink);
     text-wrap: pretty;
   }
+  .occasion-list {
+    counter-reset: occasion;
+    border-top: 1px solid color-mix(in srgb, var(--color-ivory) 20%, transparent);
+  }
   .occasion-row {
+    position: relative;
+    counter-increment: occasion;
     display: grid;
     gap: 0.35rem;
     align-items: baseline;
     padding: 1.4rem 0;
-    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 15%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ivory) 20%, transparent);
+  }
+  .occasion-row::before {
+    content: counter(occasion, decimal-leading-zero);
+    position: absolute;
+    right: 0;
+    top: 1.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    color: var(--color-saffron);
+  }
+  .occasion-row::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    height: 1px;
+    width: 100%;
+    background: var(--color-saffron);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.7s var(--ease-editorial);
+  }
+  .occasion-row:hover::after,
+  .occasion-row:focus-within::after {
+    transform: none;
   }
   @media (min-width: 48rem) {
     .occasion-row {
@@ -330,9 +576,18 @@ const featuredStory = featuredStoryPath(publishedStories);
     font-weight: 320;
     line-height: 1;
     letter-spacing: -0.02em;
+    color: var(--color-ivory);
+    transition:
+      transform 0.6s var(--ease-editorial),
+      color 0.4s var(--ease-editorial);
+  }
+  .occasion-row:hover .occasion-name,
+  .occasion-name:focus-visible {
+    transform: translateX(0.6rem);
+    color: var(--color-saffron);
   }
   .occasion-note {
-    color: var(--color-muted);
+    color: var(--color-sand);
     font-size: 0.9375rem;
   }
   .work-grid {
@@ -361,4 +616,103 @@ const featuredStory = featuredStoryPath(publishedStories);
       max-width: 22rem;
     }
   }
+  /* Royal framing: an arched portrait, gold hairlines held off the photographs, a saffron rule. */
+  .work-grid :global(.work-a > :first-child) {
+    border-radius: 999px 999px 0.75rem 0.75rem;
+  }
+  .work-grid :global(.work-a),
+  .work-grid :global(.work-b),
+  .work-grid :global(.work-c) {
+    outline: 1px solid color-mix(in srgb, var(--color-brass) 55%, transparent);
+    outline-offset: 0.6rem;
+  }
+  .work-grid :global(.work-a) {
+    border-radius: 999px 999px 0.75rem 0.75rem;
+  }
+  .work-grid :global(.work-b > :first-child),
+  .work-grid :global(.work-c > :first-child) {
+    border-radius: 0.75rem;
+  }
+  .work-grid :global(.work-b),
+  .work-grid :global(.work-c) {
+    border-radius: 0.75rem;
+  }
+  .work-grid :global(.work-d) {
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-saffron);
+  }
 </style>
+
+<script>
+  import "../scripts/motion";
+  // Hero film: a muted loop that fades in over the photograph after the page has loaded. Only on
+  // large screens with motion allowed and a decent, non-data-saving connection.
+  const heroFilm = document.querySelector<HTMLVideoElement>("[data-grand-film]");
+  if (heroFilm) {
+    const nav = navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    };
+    const slow =
+      nav.connection?.saveData === true || /(^|-)2g$|3g/.test(nav.connection?.effectiveType ?? "");
+    const ok = () =>
+      !slow &&
+      window.matchMedia("(min-width: 64rem) and (prefers-reduced-motion: no-preference)").matches;
+    const begin = () => {
+      if (!ok() || !heroFilm.dataset.src) return;
+      heroFilm.src = heroFilm.dataset.src;
+      heroFilm.addEventListener("playing", () => heroFilm.setAttribute("data-playing", ""), {
+        once: true,
+      });
+      void heroFilm.play().catch(() => heroFilm.removeAttribute("src"));
+    };
+    const later = () => window.setTimeout(begin, 1200);
+    if (document.readyState === "complete") later();
+    else window.addEventListener("load", later, { once: true });
+    // Stop the loop (and the decoding) when the hero is off screen.
+    new IntersectionObserver(([entry]) => {
+      if (!heroFilm.hasAttribute("data-playing")) return;
+      if (entry?.isIntersecting) void heroFilm.play().catch(() => {});
+      else heroFilm.pause();
+    }).observe(heroFilm);
+  }
+  // Films: nothing downloads until play. The native controls stay for no-JS and keyboard users;
+  // with JS a single large play button leads, then hands over to the native controls.
+  const players = document.querySelectorAll<HTMLElement>("[data-film]");
+  players.forEach((card) => {
+    const video = card.querySelector<HTMLVideoElement>("video");
+    const button = card.querySelector<HTMLButtonElement>("[data-film-play]");
+    if (!video || !button) return;
+    video.controls = false;
+    button.hidden = false;
+    const start = () => {
+      players.forEach((other) => other.querySelector("video")?.pause());
+      video.controls = true;
+      button.hidden = true;
+      void video.play().catch(() => {
+        button.hidden = false;
+        video.controls = false;
+      });
+    };
+    button.addEventListener("click", start);
+  });
+  // The kitchen loop plays only while visible, never with reduced motion, and has no audio track.
+  const arch = document.querySelector<HTMLElement>("[data-kitchen]");
+  const video = document.querySelector<HTMLVideoElement>("[data-kitchen-video]");
+  const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (arch && video && !calm.matches && "IntersectionObserver" in window) {
+    new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.isIntersecting && !calm.matches) {
+          video
+            .play()
+            .then(() => arch.setAttribute("data-playing", ""))
+            .catch(() => arch.removeAttribute("data-playing"));
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.35 },
+    ).observe(arch);
+  }
+</script>

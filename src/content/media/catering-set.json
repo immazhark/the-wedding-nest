@@ -1,0 +1,49 @@
+{
+  "images": [
+    {
+      "file": "../../assets/events/catering/menu-table-details/01-savoury-bowl.jpg",
+      "alt": "A white bowl of a savoury dish topped with fried cashews, with a spoon resting in it, on a laid buffet table.",
+      "category": "catering",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0005"
+    },
+    {
+      "file": "../../assets/events/catering/menu-table-details/02-pineapple-dish.jpg",
+      "alt": "A silver foil dish with a pineapple half holding a creamy filling, beside grilled chicken and a glass of juice on a banquet table.",
+      "category": "catering",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0006"
+    },
+    {
+      "file": "../../assets/events/catering/menu-table-details/03-saffron-dessert-cup.jpg",
+      "alt": "A glass dessert cup of a golden, saffron-coloured sweet topped with flaked almonds, set among other dishes on a white tablecloth.",
+      "category": "catering",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0007"
+    },
+    {
+      "file": "../../assets/events/catering/menu-table-details/04-white-dessert-glass.jpg",
+      "alt": "A crystal glass of a white, creamy dessert on a plate, with other dishes softly blurred behind it.",
+      "category": "catering",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0008"
+    },
+    {
+      "file": "../../assets/events/catering/hall-service-banner/01-hall-with-banner.jpg",
+      "alt": "A banquet hall with a chandelier, red and gold chairs and a standing Wedding Nest catering banner.",
+      "category": "catering",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0009"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "images": [
+    {
+      "file": "../../assets/events/decor/hall-ceiling-chandeliers/01-chandelier-ceiling.jpg",
+      "alt": "A ceiling of square crystal chandeliers glowing green and white above angled gold lines and a dark wood wall.",
+      "category": "decor",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0010"
+    },
+    {
+      "file": "../../assets/events/celebrations/banquet-table/01-long-banquet-table.jpg",
+      "alt": "A long banquet table covered in a gold cloth and set with plates, cutlery and dishes, with red chairs along both sides.",
+      "category": "celebrations",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0011"
+    },
+    {
+      "file": "../../assets/events/mehndi/mehndi-hands/01-mehndi-hands-gathering.jpg",
+      "alt": "Many hands held out together, each decorated with detailed henna designs.",
+      "category": "mehndi",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0012"
+    },
+    {
+      "file": "../../assets/events/details/gift-box-ribbon/01-gold-gift-box-ribbon.jpg",
+      "alt": "A gold gift box tied with a red ribbon and a gold bow, beside a small card and a clear box of saffron.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0013"
+    },
+    {
+      "file": "../../assets/events/celebrations/decorated-car/01-garlanded-car.jpg",
+      "alt": "The front of a white luxury car decorated with orange and pink flowers, parked at night.",
+      "category": "celebrations",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0014"
+    },
+    {
+      "file": "../../assets/events/nikah/nikah-details/01-handshake-jasmine-bracelet.jpg",
+      "alt": "Two hands clasped over a red embroidered cloth, one wrist wearing a bracelet of white jasmine and red flowers.",
+      "category": "nikah",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0015"
+    },
+    {
+      "file": "../../assets/events/catering/service-team/01-service-team-with-banner.jpg",
+      "alt": "A team of catering staff in black aprons and caps stands in a row on either side of a Wedding Services banner in a gold-columned hall.",
+      "category": "catering",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0016"
+    },
+    {
+      "file": "../../assets/events/celebrations/film-stills/01-hands-bokeh.jpg",
+      "alt": "A hand in henna and teal bangles lifted against soft round lights.",
+      "category": "celebrations",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0017"
+    }
+  ]
+}

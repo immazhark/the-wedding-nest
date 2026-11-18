@@ -3,16 +3,25 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout title="Page not found" description="This page could not be found.">
-  <section class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-28 md:py-40">
-    <p class="eyebrow text-brass-deep">404</p>
-    <h1 class="mt-6 max-w-3xl text-[length:var(--text-headline)]">
-      This page has <em class="italic text-brass-deep font-[300]">wandered off.</em>
-    </h1>
-    <a href="/" class="btn btn-solid mt-12">
-      Return home{" "}
-      <span class="arrow" aria-hidden="true">
-        →
-      </span>
-    </a>
+  <section class="page-hero on-dark min-h-[70vh]">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-28 md:py-40">
+      <p class="eyebrow text-saffron fade-in [--i:1]">404</p>
+      <h1 class="mt-6 max-w-3xl text-[length:var(--text-headline)] text-ivory">
+        <span class="line-mask">
+          <span class="[--i:2]">This page has</span>
+        </span>
+        <span class="line-mask">
+          <span class="[--i:3]">
+            <em class="italic text-saffron font-[300]">wandered off.</em>
+          </span>
+        </span>
+      </h1>
+      <a href="/" class="btn-grand mt-12 fade-in [--i:5]">
+        <span>Return home</span>
+        <span class="btn-grand-chip" aria-hidden="true">
+          →
+        </span>
+      </a>
+    </div>
   </section>
 </BaseLayout>

@@ -30,6 +30,8 @@ interface Props {
   /** Opening/LCP image: eager + high fetch priority. */
   priority?: boolean;
   sizes?: string;
+  /** Encoder quality (1-100). Lower for dark, scrimmed hero images to cut the bytes that gate LCP. */
+  quality?: number | undefined;
   tone?: "light" | "dark";
   class?: string;
   /** Extra classes for the inner media layer (used for motion). */
@@ -46,6 +48,7 @@ const {
   placeholder = "Photograph to come",
   priority = false,
   sizes = "100vw",
+  quality,
   tone = "light",
   class: className = "",
   mediaClass = "",
@@ -69,8 +72,9 @@ const aspect = aspectClass ?? RATIOS[ratio];
         src={image}
         alt={effectiveAlt}
         formats={["avif", "webp"]}
-        widths={[640, 960, 1280, 1920, 2560]}
+        widths={[640, 960, 1280, 1440, 1920, 2560]}
         sizes={sizes}
+        {...(quality === undefined ? {} : { quality })}
         loading={priority ? "eager" : "lazy"}
         fetchpriority={priority ? "high" : "auto"}
         class:list={[
