@@ -112,6 +112,11 @@ test("preview reviews a plan without contact details", async ({ page }) => {
   const contactRows = page.locator("[data-summary] dt").filter({ hasText: /^(Name|Contact)$/ });
   await expect(contactRows).toHaveCount(0);
   await expect(page.getByText(/nothing has been sent/)).toBeVisible();
+  // While sending is off, the review offers a direct way to reach the team.
+  await expect(page.locator('.notice a[href="tel:+919966973113"]')).toBeVisible();
+  await expect(
+    page.locator('.notice a[href="mailto:theweddingnest.events@gmail.com"]'),
+  ).toBeVisible();
   await expect(page.getByRole("button", { name: "Send enquiry" })).toHaveCount(0);
   await page.getByRole("button", { name: "Edit occasion" }).click();
   await expect(heading(page)).toHaveText("What are you celebrating?");

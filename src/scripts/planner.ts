@@ -213,7 +213,7 @@ export function initPlanner(form: HTMLFormElement) {
           return;
         case "rejected":
           status.textContent =
-            "Something went wrong with this enquiry. Please message us on Instagram @twn.events instead.";
+            "Something went wrong with this enquiry. Please call +91 99669 73113 or message us on Instagram @twn.events instead.";
           return;
       }
     });
@@ -249,7 +249,7 @@ export function initPlanner(form: HTMLFormElement) {
         } catch {
           if (!reviewing || attempt !== reviewAttempt) return;
           status.textContent =
-            "The quick check couldn’t load. Go back and return to review to try again, or message us on Instagram @twn.events.";
+            "The quick check couldn’t load. Go back and return to review to try again, or call +91 99669 73113 or message us on Instagram @twn.events.";
         }
       },
       leaveReview() {
