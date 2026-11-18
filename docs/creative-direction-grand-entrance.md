@@ -79,6 +79,8 @@ No new library. Everything is CSS and a few lines of TypeScript. GSAP, Lenis, OG
 - **Catering page:** a band for the service team photograph (staff are identifiable; the owner should confirm the team agrees).
 - **Fix:** the menu rail sliding in from the side could briefly widen the page on phones; the kitchen section now clips horizontally.
 
+- **Hero film:** a 5 s muted ping-pong loop (297 KB) cut from the owner's landscape film fades in over the opening photograph, on screens 1024 px and wider only, after the page has loaded, never with reduced motion, data-saver or a 2G/3G connection, and paused when the hero is off screen. The still photograph remains the first paint and LCP element. (First attempt eagerly loaded the film posters and cost mobile LCP about 0.7 s and desktop CLS 0.08; posters are now lazy images behind the video.)
+
 ## Performance and browsers (19 November 2026, lab, not real-user data)
 
 - Home LCP element is the hero photograph. A 1440w image step (the browser was fetching the 1920w file, 211 KB, at a 1440px window) cut desktop LCP from about 2.7-3.4 s to 2.2-2.3 s (4x CPU, about 1.6 Mbps, 150 ms latency); mobile stays about 2.0-2.1 s; CLS at most 0.001.

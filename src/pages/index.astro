@@ -68,6 +68,17 @@ const thresholdPhoto =
         class="grand-photo"
         mediaClass="grand-media"
       />
+      <video
+        class="grand-film"
+        muted
+        loop
+        playsinline
+        preload="none"
+        tabindex="-1"
+        aria-hidden="true"
+        data-grand-film
+        data-src="/media/hero-loop.mp4"
+      ></video>
       <div class="grand-scrim" aria-hidden="true"></div>
       <canvas class="grand-dust" data-dust aria-hidden="true"></canvas>
       <div class="grand-doors" aria-hidden="true">
@@ -265,12 +276,21 @@ const thresholdPhoto =
       </h2>
       <div class="film-grid mt-14">
         <div class="film-card film-wide" data-film>
+          <img
+            class="film-poster"
+            src="/media/film-landscape-poster.jpg"
+            alt=""
+            width="1280"
+            height="720"
+            loading="lazy"
+            decoding="async"
+            aria-hidden="true"
+          />
           <video
             class="film-video"
             controls
             playsinline
             preload="none"
-            poster="/media/film-landscape-poster.jpg"
             aria-describedby="film-wide-desc"
           >
             <source src="/media/film-landscape.mp4" type="video/mp4" />
@@ -292,12 +312,21 @@ const thresholdPhoto =
           </p>
         </div>
         <div class="film-card film-tall" data-film>
+          <img
+            class="film-poster"
+            src="/media/film-portrait-poster.jpg"
+            alt=""
+            width="608"
+            height="1080"
+            loading="lazy"
+            decoding="async"
+            aria-hidden="true"
+          />
           <video
             class="film-video"
             controls
             playsinline
             preload="none"
-            poster="/media/film-portrait-poster.jpg"
             aria-describedby="film-tall-desc"
           >
             <source src="/media/film-portrait.mp4" type="video/mp4" />
@@ -616,6 +645,36 @@ const thresholdPhoto =
 
 <script>
   import "../scripts/motion";
+  // Hero film: a muted loop that fades in over the photograph after the page has loaded. Only on
+  // large screens with motion allowed and a decent, non-data-saving connection.
+  const heroFilm = document.querySelector<HTMLVideoElement>("[data-grand-film]");
+  if (heroFilm) {
+    const nav = navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    };
+    const slow =
+      nav.connection?.saveData === true || /(^|-)2g$|3g/.test(nav.connection?.effectiveType ?? "");
+    const ok = () =>
+      !slow &&
+      window.matchMedia("(min-width: 64rem) and (prefers-reduced-motion: no-preference)").matches;
+    const begin = () => {
+      if (!ok() || !heroFilm.dataset.src) return;
+      heroFilm.src = heroFilm.dataset.src;
+      heroFilm.addEventListener("playing", () => heroFilm.setAttribute("data-playing", ""), {
+        once: true,
+      });
+      void heroFilm.play().catch(() => heroFilm.removeAttribute("src"));
+    };
+    const later = () => window.setTimeout(begin, 1200);
+    if (document.readyState === "complete") later();
+    else window.addEventListener("load", later, { once: true });
+    // Stop the loop (and the decoding) when the hero is off screen.
+    new IntersectionObserver(([entry]) => {
+      if (!heroFilm.hasAttribute("data-playing")) return;
+      if (entry?.isIntersecting) void heroFilm.play().catch(() => {});
+      else heroFilm.pause();
+    }).observe(heroFilm);
+  }
   // Films: nothing downloads until play. The native controls stay for no-JS and keyboard users;
   // with JS a single large play button leads, then hands over to the native controls.
   const players = document.querySelectorAll<HTMLElement>("[data-film]");
