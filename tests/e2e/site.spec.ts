@@ -107,7 +107,8 @@ test("structured data contains only the verified Organization identity", async (
   expect(organization.email).toBe("theweddingnest.events@gmail.com");
   expect(organization).not.toHaveProperty("aggregateRating");
   expect(organization.address.postalCode).toBe("500028");
-  expect(organization).not.toHaveProperty("openingHoursSpecification");
+  expect(organization.openingHoursSpecification.dayOfWeek).toHaveLength(7);
+  expect(organization.founder.name).toBe("Mohammed Ather Khan");
 });
 
 test("footer offers the owner-supplied phone, email and social links", async ({ page }) => {
@@ -119,7 +120,9 @@ test("footer offers the owner-supplied phone, email and social links", async ({ 
   await expect(footer.locator('a[href="https://wa.me/919966973113"]')).toBeVisible();
   await expect(footer).toContainText("12-2-1/D/68, Zeba Bagh, Asif Nagar");
   await expect(footer).toContainText("Hyderabad, Telangana 500028");
-  await expect(footer).toContainText("9:00 am to 12:00 midnight");
+  await expect(footer).toContainText("Open every day, 9:00 am to 12:00 midnight");
+  await expect(footer.locator('a[href="tel:+918686773095"]')).toBeVisible();
+  await expect(footer).toContainText("Mohammed Ather Khan");
   await expect(footer.locator('a[href="https://www.instagram.com/twn.events/"]')).toBeVisible();
 });
 

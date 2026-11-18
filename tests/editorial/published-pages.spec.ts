@@ -3,7 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 
 // This file runs only in the isolated synthetic-fixture build. The files and
 // their source records are never committed or deployed to TWN public Workers.
-const SERVICE = "/services/hyderabadi-wedding-catering/";
+const SERVICE = "/services/guest-hospitality-hyderabad/";
 const STORY = "/stories/ci-test-only-walima/";
 
 test("approved service template renders a useful, accessible and linked page", async ({ page }) => {
@@ -15,7 +15,7 @@ test("approved service template renders a useful, accessible and linked page", a
   await expect(page.locator("main article").getByRole("heading", { level: 2 })).toHaveCount(2);
   await expect(page.getByRole("link", { name: "Explore in the planner" })).toHaveAttribute(
     "href",
-    "/plan-your-event/?service=catering",
+    "/plan-your-event/?service=hospitality",
   );
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
@@ -46,7 +46,7 @@ test("approved content is discoverable; unrelated unapproved routes remain absen
   request,
 }) => {
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Catering & menus" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Guest hospitality" })).toHaveAttribute(
     "href",
     SERVICE,
   );

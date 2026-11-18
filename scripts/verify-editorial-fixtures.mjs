@@ -21,7 +21,7 @@ if (process.env.CI !== "true" && process.env.TWN_ALLOW_LOCAL_FIXTURES !== "1") {
 
 const root = process.cwd();
 const paths = [
-  "src/content/services/hyderabadi-wedding-catering.json",
+  "src/content/services/guest-hospitality-hyderabad.json",
   "src/content/stories/ci-test-only-walima.json",
   "src/content/media/ci-test-only-walima.json",
   "src/assets/events/walima/ci-test-only-walima/01-geometry.png",
@@ -95,7 +95,7 @@ const photos = photoNames.map((name, index) => ({
 }));
 
 const service = {
-  slug: "hyderabadi-wedding-catering",
+  slug: "guest-hospitality-hyderabad",
   title: "CI-only service page — never publish",
   description: "A synthetic testing page for rendering an editorial service layout in CI only.",
   introduction:
