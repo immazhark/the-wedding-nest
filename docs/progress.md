@@ -4,14 +4,14 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 
 **Repository baseline at this update:** `main` at `774cfc5` (#103: owner contact details, catering page published, media pipeline). Check the newest combined `main` CI and Cloudflare deployments live, not this snapshot; this is not launch approval.
 
-## Creative prototype awaiting owner approval (draft PR #104, branch `feat/creative-grand-entrance`)
+## Creative direction (approved by the owner and merged in #104)
 
 "The Grand Entrance": dark royal register (kohl, garnet, emerald, saffron), cinematic opening with a muted film loop on large screens, GSAP scroll story (idle-loaded, home only), gold dust, jewel-toned service doors with real photographs, kitchen arch, two owner films (download only on play), cinematic catering and story page templates, royal planner styling, persistent dark header with curtain page transitions and link prefetch. Full rationale, measurements and open items: `docs/creative-direction-grand-entrance.md`.
 
 - Checks on the latest push: `verify`, `editorial-fixtures` and Workers Builds pass. Chromium desktop/mobile e2e, WebKit and Firefox film/home checks pass.
-- Lab (4x CPU, ~1.6 Mbps): mobile LCP ~1.9-2.3 s, desktop ~2.3-2.4 s, CLS <= 0.001; planner interactions <= ~96 ms, home interactions 96-200 ms. Lab only; no real-user data.
+- Lab (4x CPU, ~1.6 Mbps): mobile LCP ~1.9-2.3 s, desktop ~2.3-2.4 s, CLS <= 0.001; planner interactions <= ~96 ms; mobile menu open/close ~100-200 ms / <= ~120 ms after the page lock was moved to the frame after the menu paints (it was 170-340 ms). Lab only; no real-user data.
 - Owner media: private register outside the repo (`TWN-REL-2026-T0001`-`T0018`). Number plate blurred before use. People are identifiable in the team photo and portrait film; owner to confirm comfort. Film audio unverified for speech (captions may be needed).
-- Not merged: awaiting the owner's approval of the direction. Previews remain noindex; no domain, indexing or live enquiries.
+- Merged to `main` on 19 Nov 2026 after the owner said "merge it". Previews remain noindex; no domain, indexing or live enquiries.
 
 ## Current implementation
 

@@ -200,7 +200,9 @@ const dark = true;
     document.querySelector<HTMLElement>("footer"),
   ];
 
-  function setOpen(open: boolean, restoreFocus = false) {
+  let lockToken = 0;
+
+  function setOpen(open: boolean, restoreFocus = false, afterUnlock?: () => void) {
     if (!toggle || !menu) return;
     // Header bottom moves with the preview notice / scroll position; CSSOM writes are CSP-safe.
     const header = document.querySelector<HTMLElement>("[data-site-header]");
@@ -210,8 +212,22 @@ const dark = true;
     if (label) label.textContent = open ? "Close" : "Menu";
     menu.toggleAttribute("data-open", open);
     menu.toggleAttribute("inert", mobile.matches && !open);
-    background.forEach((region) => region?.toggleAttribute("inert", open && mobile.matches));
-    document.body.style.overflow = open ? "hidden" : "";
+    // Locking the page behind the overlay (inert on large subtrees) is the expensive part, so the
+    // menu paints first and the lock follows on the next frame. The Tab handler below already
+    // recovers focus in that single frame.
+    const lock = open && mobile.matches;
+    const token = ++lockToken;
+    requestAnimationFrame(() =>
+      setTimeout(() => {
+        if (token !== lockToken) return;
+        background.forEach((region) => region?.toggleAttribute("inert", lock));
+        document.body.style.overflow = open ? "hidden" : "";
+      }, 0),
+    );
+    if (afterUnlock) {
+      // Focus targets inside the page only accept focus once the lock has been lifted.
+      requestAnimationFrame(() => setTimeout(afterUnlock, 0));
+    }
     if (open) menu.querySelector<HTMLElement>("a")?.focus();
     else if (restoreFocus) toggle.focus();
   }
@@ -261,12 +277,13 @@ const dark = true;
         samePage && destinationUrl.hash
           ? document.getElementById(destinationUrl.hash.slice(1))
           : null;
-      setOpen(false);
       if (destination) {
         // Same-document navigation does not reliably focus the destination after
         // the overlay becomes inert. Keep the browser's native hash/scroll behavior.
         destination.tabIndex = -1;
-        requestAnimationFrame(() => destination.focus({ preventScroll: true }));
+        setOpen(false, false, () => destination.focus({ preventScroll: true }));
+      } else {
+        setOpen(false);
       }
     });
     mobile.addEventListener("change", () => setOpen(false));
