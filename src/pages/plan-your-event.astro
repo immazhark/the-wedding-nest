@@ -7,19 +7,32 @@ import Planner from "../components/planner/Planner.astro";
   title="Plan your event"
   description="Tell The Wedding Nest about your wedding or celebration in Hyderabad through a short, five-step guided planner."
 >
-  <section class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-8 pb-24 sm:pt-14 md:pt-20 md:pb-32">
-    <header class="max-w-3xl">
-      <p class="eyebrow text-brass-deep">Plan your event</p>
-      <h1 class="mt-4 sm:mt-6 text-[length:var(--text-headline)]">
-        Tell us about your <em class="italic text-brass-deep font-[300]">celebration.</em>
-      </h1>
-      <p class="mt-4 sm:mt-6 max-w-xl text-[length:var(--text-lede)] text-charcoal">
-        Five short steps — about two minutes. Budget and style are optional, and you can go back at
-        any point.
-      </p>
-    </header>
-    <div class="mt-8 sm:mt-14 md:mt-20 scroll-mt-28" id="planner">
-      <Planner />
+  <div class="page-hero on-dark">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-8 pb-16 sm:pt-20 sm:pb-24 md:pt-28 md:pb-32">
+      <header class="max-w-3xl">
+        <p class="eyebrow text-saffron fade-in [--i:1]">Plan your event</p>
+        <h1 class="mt-4 sm:mt-6 text-[length:var(--text-headline)] text-ivory">
+          <span class="line-mask">
+            <span class="[--i:2]">Tell us about your</span>
+          </span>
+          <span class="line-mask">
+            <span class="[--i:3]">
+              <em class="italic text-saffron font-[300]">celebration.</em>
+            </span>
+          </span>
+        </h1>
+        <p class="mt-4 sm:mt-6 max-w-xl text-[length:var(--text-lede)] text-stone fade-in [--i:5]">
+          Five short steps — about two minutes. Budget and style are optional, and you can go back
+          at any point.
+        </p>
+      </header>
+    </div>
+  </div>
+  <section class="planner-stage arch-over pb-24 md:pb-32">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-6 sm:pt-12 md:pt-16">
+      <div class="scroll-mt-28" id="planner">
+        <Planner />
+      </div>
     </div>
   </section>
 </BaseLayout>

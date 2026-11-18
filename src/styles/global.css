@@ -598,3 +598,348 @@
     padding-bottom: 70vh;
   }
 }
+
+/* ==========================================================================
+ * Round 3: the same royal register in every section and on every page.
+ * ========================================================================== */
+
+/* Services: a row of doors, each a different jewel tone. */
+.service-doors {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.door {
+  --door-bg: var(--color-kohl-soft);
+  --door-accent: var(--color-saffron);
+  position: relative;
+  min-height: 9.5rem;
+  border-radius: 1.25rem 1.25rem 1.25rem 1.25rem;
+  background: var(--door-bg);
+  color: var(--color-ivory);
+  overflow: hidden;
+  isolation: isolate;
+}
+.door[data-tone="garnet"] {
+  --door-bg: var(--color-garnet);
+}
+.door[data-tone="emerald"] {
+  --door-bg: #0f3a30;
+}
+.door[data-tone="indigo"] {
+  --door-bg: #1c2244;
+}
+.door[data-tone="bronze"] {
+  --door-bg: #3a2a14;
+}
+.door[data-tone="rose"] {
+  --door-bg: #4a1d2e;
+}
+.door[data-tone="teal"] {
+  --door-bg: #12343b;
+}
+.door[data-tone="plum"] {
+  --door-bg: #2e1a3a;
+}
+.door[data-tone="kohl"] {
+  --door-bg: var(--color-kohl);
+}
+.door::before {
+  /* A soft pool of light that opens on hover, like a door ajar. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    120% 90% at 85% 110%,
+    color-mix(in srgb, var(--door-accent) 38%, transparent),
+    transparent 60%
+  );
+  opacity: 0.35;
+  transition:
+    opacity 0.6s var(--ease-editorial),
+    transform 0.8s var(--ease-editorial);
+}
+.door:hover::before,
+.door:focus-within::before {
+  opacity: 1;
+  transform: scale(1.12);
+}
+.door-link {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr;
+  align-items: end;
+  height: 100%;
+  min-height: inherit;
+  padding: 1.25rem 1.4rem;
+  color: inherit;
+}
+.door-link:focus-visible {
+  outline: 2px solid var(--color-saffron);
+  outline-offset: -4px;
+  border-radius: 1.25rem;
+}
+.door-index {
+  grid-column: 1 / span 2;
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  color: var(--door-accent);
+}
+.door-name {
+  grid-column: 1;
+  font-family: var(--font-display);
+  font-size: clamp(1.45rem, 1.15rem + 1.2vw, 2.25rem);
+  font-weight: 330;
+  line-height: 1.08;
+  text-wrap: balance;
+  transition: transform 0.6s var(--ease-editorial);
+}
+.door-arrow {
+  grid-column: 2;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid color-mix(in srgb, var(--color-ivory) 35%, transparent);
+  border-radius: 50%;
+  color: var(--door-accent);
+  transition:
+    transform 0.6s var(--ease-editorial),
+    background-color 0.4s var(--ease-editorial),
+    color 0.4s var(--ease-editorial);
+}
+.door:hover .door-name,
+.door:focus-within .door-name {
+  transform: translateY(-0.25rem);
+}
+.door:hover .door-arrow,
+.door:focus-within .door-arrow {
+  transform: rotate(-45deg);
+  background: var(--color-saffron);
+  color: var(--color-kohl);
+}
+@media (min-width: 40rem) {
+  .service-doors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 64rem) {
+  .service-doors {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .door {
+    min-height: 13rem;
+  }
+  .door-1 {
+    grid-column: span 7;
+    grid-row: span 2;
+    min-height: 27rem;
+  }
+  .door-2 {
+    grid-column: span 5;
+  }
+  .door-3 {
+    grid-column: span 5;
+  }
+  .door-4 {
+    grid-column: span 4;
+  }
+  .door-5 {
+    grid-column: span 4;
+  }
+  .door-6 {
+    grid-column: span 4;
+  }
+  .door-7 {
+    grid-column: span 6;
+  }
+  .door-8 {
+    grid-column: span 3;
+  }
+  .door-9 {
+    grid-column: span 3;
+  }
+}
+
+/* The threshold arch, filled with a real photograph. */
+.threshold-arch {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  max-width: 24rem;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 999px 999px 1rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-saffron) 55%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--color-saffron) 25%, transparent);
+  outline-offset: 0.6rem;
+  background: var(--color-kohl-soft);
+}
+.threshold-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Inner pages open on the same dark chapter, and the next sequence rises over it in an arch. */
+.page-hero {
+  background:
+    radial-gradient(
+      70% 90% at 85% 0%,
+      color-mix(in srgb, var(--color-garnet) 70%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(to bottom, var(--color-kohl), var(--color-garnet-deep));
+}
+.planner-stage {
+  background: var(--color-ivory);
+}
+
+/* Closing invitation in the footer. */
+.footer-invite-title {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 330;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  max-width: 14ch;
+  text-wrap: balance;
+}
+footer.on-dark {
+  background: linear-gradient(to bottom, var(--color-garnet-deep), var(--color-kohl) 38%);
+}
+
+/* Service detail pages. */
+.svc-hero {
+  position: relative;
+  overflow: hidden;
+  min-height: min(82svh, 52rem);
+  display: grid;
+  align-items: end;
+  background: linear-gradient(to bottom, var(--color-kohl), var(--color-garnet-deep));
+}
+.svc-hero-photo {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+.svc-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to top,
+      rgb(11 17 14 / 0.94) 0%,
+      rgb(11 17 14 / 0.7) 45%,
+      rgb(11 17 14 / 0.25) 85%
+    ),
+    linear-gradient(to right, rgb(11 17 14 / 0.55) 0%, transparent 65%);
+}
+.svc-hero-copy {
+  position: relative;
+  width: 100%;
+  padding-bottom: 6.5rem;
+}
+.svc-details {
+  background: linear-gradient(to bottom, var(--color-garnet-deep), var(--color-kohl));
+}
+.svc-panels {
+  border-top: 1px solid color-mix(in srgb, var(--color-ivory) 20%, transparent);
+}
+.svc-panel {
+  position: relative;
+  display: grid;
+  gap: 1rem 2rem;
+  padding: 2.25rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ivory) 20%, transparent);
+}
+.svc-numeral {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 2rem + 3vw, 5rem);
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-saffron);
+}
+.svc-panel-title {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  font-weight: 330;
+  color: var(--color-ivory);
+}
+.svc-panel-body {
+  max-width: 40rem;
+  color: var(--color-stone);
+}
+@media (min-width: 48rem) {
+  .svc-panel {
+    grid-template-columns: 7rem minmax(0, 4fr) minmax(0, 7fr);
+    align-items: baseline;
+  }
+}
+.svc-strip {
+  display: grid;
+  gap: 1rem;
+  padding: 2.5rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ivory) 20%, transparent);
+}
+@media (min-width: 48rem) {
+  .svc-strip {
+    grid-template-columns: 1.1fr 0.9fr 1.1fr;
+    align-items: start;
+  }
+  .svc-strip-1 {
+    margin-top: 3.5rem;
+  }
+}
+.svc-close {
+  background: linear-gradient(to bottom, var(--color-kohl), var(--color-garnet-deep));
+}
+
+/* A guard for every on-dark section: links and focus stay clearly visible. */
+.on-dark a:focus-visible {
+  outline-color: var(--color-saffron);
+}
+
+/* Header persists through page changes: the curtain wipes the page, not the navigation. */
+.site-header {
+  view-transition-name: site-header;
+}
+::view-transition-group(site-header) {
+  animation-duration: 0s;
+}
+::view-transition-old(site-header),
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+.door-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.04);
+  transition: transform 1.1s var(--ease-editorial);
+}
+.door:hover .door-photo,
+.door:focus-within .door-photo {
+  transform: scale(1.12);
+}
+.door:has(.door-photo)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--door-bg) 92%, black) 0%,
+    color-mix(in srgb, var(--door-bg) 55%, transparent) 55%,
+    transparent 100%
+  );
+}

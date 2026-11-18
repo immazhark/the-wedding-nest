@@ -51,6 +51,16 @@ No new library. Everything is CSS and a few lines of TypeScript. GSAP, Lenis, OG
 - **GSAP assessment:** licence is the GSAP "no charge" standard licence (commercial use allowed). Cost: about 113 KB raw (about 42 KB gzipped) in two chunks, fetched at idle after first paint, only on the home page, and only when motion is allowed. Lenis was rejected (it replaces native scrolling); OGL and dotLottie were not needed.
 - **Layout stability:** the pinned push-in's space is reserved in CSS (`html.motion-ok .grand`), so pinning never shifts content (CLS 0.001 in the lab run). If GSAP fails to load, the reservation is removed.
 
+## Round 3: the same register across the whole site
+
+- **Services:** a row of nine jewel-toned doors (garnet, emerald, indigo, bronze, rose, teal, plum, kohl) of different sizes; catering and décor carry real photographs; a pool of light opens on hover.
+- **Threshold arch:** the planner invitation now holds a real catering photograph instead of a placeholder.
+- **Catering page:** a dark hero on the owner's hall photograph, outlined gold numerals for each menu, a three-photograph strip of the table, a closing invitation with call and WhatsApp.
+- **Footer:** a closing invitation ("Your celebration begins here") above the contact columns, on a garnet-to-kohl gradient.
+- **Plan page and 404:** the same dark chapter, with the next sequence rising over it in an arch.
+- **Navigation:** the header is now dark on every page and persists through page changes while a curtain wipe reveals the next page (cross-document view transitions; verified to fire on forward and back/forward navigation). Internal links are prefetched on hover, focus or touch so pages land immediately.
+- **Photographs:** five more owner-supplied catering photographs, release refs `TWN-REL-2026-T0005`–`T0009`, recorded in the private register.
+
 ## Still unapproved or open
 
 - All copy remains draft. The preview banner still says "placeholder imagery" because some slots still use honest placeholders.
