@@ -14,6 +14,7 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 - Merged to `main` on 19 Nov 2026 after the owner said "merge it". Previews remain noindex; no domain, indexing or live enquiries.
 
 - **19 Nov follow-up (branch `feat/luxury-photo-hero`):** owner removed the hero film loop (photograph only); gallery section and footer invitation restyled to the dark royal register. Remaining sections and copy still to refine.
+- **19 Nov (feat/services-occasions-luxury):** services get a faint jaali ground, a saffron-diamond ornament divider and chip links; occasions get large outlined numerals and pill links for other celebrations. Planner and plan page polish is next.
 
 ## Current implementation
 

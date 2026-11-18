@@ -178,7 +178,7 @@ const thresholdPhoto =
   </section>
 
   <!-- Services: a row of doors, each with its own jewel tone -->
-  <section id="services" class="services py-24 md:py-36" aria-labelledby="services-title">
+  <section id="services" class="services jaali py-24 md:py-36" aria-labelledby="services-title">
     <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12">
       <div class="grid gap-12 md:grid-cols-12 md:items-end">
         <div class="md:col-span-5">
@@ -204,7 +204,10 @@ const thresholdPhoto =
           </p>
         </div>
       </div>
-      <ul class="service-doors mt-14 md:mt-20" aria-label="Services you can ask about">
+      <div class="ornament mt-14 md:mt-20" aria-hidden="true">
+        <span></span>
+      </div>
+      <ul class="service-doors mt-10 md:mt-12" aria-label="Services you can ask about">
         {coreServices.map((s, i) => (
           <li class={`door door-${i + 1}`} data-tone={doorTones[s.id] ?? "kohl"}>
             {doorPhotos[s.id] && approvedEventPhotos[doorPhotos[s.id]!] && (
@@ -233,7 +236,7 @@ const thresholdPhoto =
       </ul>
       <div class="mt-14 md:mt-20 max-w-4xl">
         <p class="text-sm font-medium tracking-wide text-charcoal">For particular occasions</p>
-        <ul class="service-index mt-3" aria-label="Occasion-specific services">
+        <ul class="service-index service-chips mt-4" aria-label="Occasion-specific services">
           {occasionServices.map((s, i) => (
             <li>
               <a href={servicePageHref(s.id, publishedServicePages)} class="link-underline">
@@ -349,7 +352,10 @@ const thresholdPhoto =
       <h2 id="occasions-title" class="mt-5 max-w-4xl text-[length:var(--text-headline)] text-ivory">
         Rooted in Hyderabad’s wedding traditions. Open to every celebration.
       </h2>
-      <ul class="occasion-list mt-16" role="list">
+      <div class="ornament ornament-dark mt-14" aria-hidden="true">
+        <span></span>
+      </div>
+      <ul class="occasion-list mt-10" role="list">
         {weddingOccasions.map((o) => (
           <li class="occasion-row">
             <a href={`/plan-your-event/?occasion=${o.id}`} class="occasion-name">
@@ -364,13 +370,10 @@ const thresholdPhoto =
         <p class="mt-4 text-[length:var(--text-lede)] text-stone">
           For families and hosts from every community, and occasions of every kind.
         </p>
-        <ul class="mt-6 flex flex-wrap gap-x-6 gap-y-4" aria-label="Other celebrations">
+        <ul class="chip-row mt-6" aria-label="Other celebrations">
           {otherOccasions.map((o) => (
             <li>
-              <a
-                href={`/plan-your-event/?occasion=${o.id}`}
-                class="link-underline text-[0.9375rem] font-medium text-ivory"
-              >
+              <a href={`/plan-your-event/?occasion=${o.id}`} class="chip-link">
                 {o.label}
               </a>
             </li>
@@ -539,10 +542,23 @@ const thresholdPhoto =
     content: counter(occasion, decimal-leading-zero);
     position: absolute;
     right: 0;
-    top: 1.5rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.22em;
-    color: var(--color-saffron);
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1.5rem + 4vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px color-mix(in srgb, var(--color-saffron) 45%, transparent);
+    transition:
+      -webkit-text-stroke-color 0.5s var(--ease-editorial),
+      color 0.5s var(--ease-editorial);
+    pointer-events: none;
+  }
+  .occasion-row:hover::before,
+  .occasion-row:focus-within::before {
+    color: color-mix(in srgb, var(--color-saffron) 14%, transparent);
+    -webkit-text-stroke-color: var(--color-saffron);
   }
   .occasion-row::after {
     content: "";
