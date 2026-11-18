@@ -104,7 +104,7 @@ async function startScrollStory(): Promise<void> {
         },
       });
       hero
-        .to(".grand-photo, .grand-film", { scale: desktop ? 1.28 : 1.18, yPercent: -3 }, 0)
+        .to(".grand-photo", { scale: desktop ? 1.28 : 1.18, yPercent: -3 }, 0)
         .to(".grand-copy", { yPercent: -26, opacity: 0, ease: "power1.in" }, 0.25);
     }
 

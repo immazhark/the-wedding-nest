@@ -79,7 +79,7 @@ No new library. Everything is CSS and a few lines of TypeScript. GSAP, Lenis, OG
 - **Catering page:** a band for the service team photograph (staff are identifiable; the owner should confirm the team agrees).
 - **Fix:** the menu rail sliding in from the side could briefly widen the page on phones; the kitchen section now clips horizontally.
 
-- **Hero film:** a 5 s muted ping-pong loop (297 KB) cut from the owner's landscape film fades in over the opening photograph, on screens 1024 px and wider only, after the page has loaded, never with reduced motion, data-saver or a 2G/3G connection, and paused when the hero is off screen. The still photograph remains the first paint and LCP element. (First attempt eagerly loaded the film posters and cost mobile LCP about 0.7 s and desktop CLS 0.08; posters are now lazy images behind the video.)
+- **Hero film: removed (19 Nov 2026, owner decision).** The film-over-photograph combination did not look good, so the opening is the still photograph alone (the asset and loader are gone). A different treatment of moving image can be revisited later.
 
 ## Performance and browsers (19 November 2026, lab, not real-user data)
 
@@ -91,3 +91,4 @@ No new library. Everything is CSS and a few lines of TypeScript. GSAP, Lenis, OG
 - All copy remains draft. The preview banner still says "placeholder imagery" because some slots still use honest placeholders.
 - The kitchen loop is a golden, saffron-streaked pot; the owner should confirm it is the clip they want and what to call it.
 - The remaining sections have not been redesigned. That follows approval.
+- **Gallery and closing (19 Nov 2026):** the work section is now an emerald chapter with saffron-edged photographs and the arch divider; the footer invitation has a nested saffron arch ornament.
