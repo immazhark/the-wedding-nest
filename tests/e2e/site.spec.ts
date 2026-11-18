@@ -145,7 +145,9 @@ test("planner provides a readable Instagram fallback without JavaScript", async 
     await page.goto("/plan-your-event/");
     const fallback = page.locator(".planner .planner-panel");
     await expect(fallback).toBeVisible();
-    await expect(fallback).toContainText(/Instagram\s+in the meantime\./);
+    await expect(fallback).toContainText(
+      /Instagram\s+or call\s+\+91 99669 73113\s+in the meantime\./,
+    );
     await expect(fallback.getByRole("link", { name: "Instagram" })).toHaveAttribute(
       "href",
       "https://www.instagram.com/twn.events/",
