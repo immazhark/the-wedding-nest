@@ -446,6 +446,8 @@ test("official logo is used in the header and footer with accessible names", asy
   const homeLink = page.locator("[data-site-header] a[href='/']").first();
   await expect(homeLink.locator("svg title")).toHaveText("The Wedding Nest");
   await expect(homeLink).toHaveAccessibleName(/The Wedding Nest/);
+  // WebKit does not derive a link name from an inline SVG <title>, so name it explicitly.
+  await expect(homeLink).toHaveAttribute("aria-label", "The Wedding Nest — home");
   await expect(page.locator("footer img[alt^='The Wedding Nest']")).toHaveCount(1);
   expect((await page.request.get("/favicon.svg")).status()).toBe(200);
   expect((await page.request.get("/apple-touch-icon.png")).status()).toBe(200);
