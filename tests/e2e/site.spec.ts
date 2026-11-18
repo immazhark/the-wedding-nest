@@ -443,12 +443,20 @@ test("with reduced motion the opening is fully composed and nothing animates", a
   );
 });
 
-test("photo placeholders are labelled honestly and never use stock imagery", async ({ page }) => {
+test("photography is only reviewed local originals; remaining placeholders are honest", async ({
+  page,
+}) => {
   await page.goto("/");
   const frames = page.locator("[data-frame]");
   expect(await frames.count()).toBeGreaterThanOrEqual(4);
-  await expect(page.locator('[data-frame="image"]')).toHaveCount(0);
-  await expect(page.locator("main img")).toHaveCount(0);
+  // Every real photograph is a build-optimised local asset with descriptive alt text.
+  const images = page.locator('main [data-frame="image"] img');
+  expect(await images.count()).toBeGreaterThanOrEqual(4);
+  for (const img of await images.all()) {
+    expect(await img.getAttribute("src")).toMatch(/^\/_astro\//);
+    expect((await img.getAttribute("alt")) ?? "").not.toHaveLength(0);
+  }
+  await expect(page.locator('main img[src^="http"]')).toHaveCount(0);
   for (const label of await page.locator('[data-frame="placeholder"]').allTextContents()) {
     expect(label).toContain("Photograph to come");
   }

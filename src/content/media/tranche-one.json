@@ -1,0 +1,44 @@
+{
+  "images": [
+    {
+      "file": "../../assets/events/decor/hall-stage-decor/01-stage-wide.jpg",
+      "alt": "A wide hall stage dressed with hanging white and pink florals, white urns on either side, a red carpet aisle and a coffered ceiling.",
+      "category": "decor",
+      "slot": "home-hero",
+      "focal": "bottom",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0001"
+    },
+    {
+      "file": "../../assets/events/decor/hall-stage-decor/02-stage-seating.jpg",
+      "alt": "Close view of a stage with maroon carved sofas and a central grey chair beneath hanging florals and chandeliers.",
+      "category": "decor",
+      "slot": "home-work-wide",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0002"
+    },
+    {
+      "file": "../../assets/events/shaadi/groom-portrait-hall/01-groom-with-flowers.jpg",
+      "alt": "A groom in a cream sherwani and turban stands beside a white stand of orange and red flowers in a hall.",
+      "category": "shaadi",
+      "slot": "home-work-portrait",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0003"
+    },
+    {
+      "file": "../../assets/events/details/favour-box-basket/01-qubool-hai-favour.jpg",
+      "alt": "A hand holds a gold favour box printed with the words Qubool Hai above a basket of similar gold boxes.",
+      "category": "details",
+      "slot": "home-work-detail",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0004"
+    }
+  ]
+}
