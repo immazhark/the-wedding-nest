@@ -13,10 +13,23 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const { pathname } = new URL(request.url);
     if (pathname === "/api/enquiry") {
-      return handleEnquiry(request, env, {
-        fetch: (input, init) => fetch(input, init),
-        log: (entry) => console.log(JSON.stringify(entry)),
-      });
+      try {
+        return await handleEnquiry(request, env, {
+          fetch: (input, init) => fetch(input, init),
+          log: (entry) => console.log(JSON.stringify(entry)),
+        });
+      } catch {
+        // Never surface or log the exception: it could carry request data. A fixed
+        // JSON body replaces the platform's generic error page.
+        console.log(JSON.stringify({ event: "enquiry", outcome: "internal_error", status: 500 }));
+        return Response.json(
+          { error: "internal_error" },
+          {
+            status: 500,
+            headers: { "cache-control": "no-store", "x-content-type-options": "nosniff" },
+          },
+        );
+      }
     }
     if (pathname.startsWith("/api/")) {
       return Response.json(
