@@ -493,6 +493,16 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
   .planner :global(.progress-item[aria-current="step"] .progress-title) {
     transform: translateX(0.4rem);
   }
+  .planner :global(.progress-item[aria-current="step"] .progress-num)::after {
+    content: "";
+    display: inline-block;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin-left: 0.35rem;
+    vertical-align: middle;
+    background: var(--color-saffron);
+    transform: rotate(45deg);
+  }
   .planner :global(.progress-title) {
     transition: transform 0.5s var(--ease-editorial);
   }
@@ -559,7 +569,7 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
     gap: 0.85rem;
     min-height: 3.25rem;
     padding: 0.9rem 1rem;
-    border: 1px solid color-mix(in srgb, var(--color-ink) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-brass) 55%, transparent);
     border-radius: 0.9rem;
     background: var(--color-paper);
     cursor: pointer;
@@ -604,7 +614,8 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
     height: 1.05rem;
     margin-top: 0.2rem;
     border: 1px solid var(--color-charcoal);
-    border-radius: 0.3rem;
+    border-radius: 0.2rem;
+    transform: rotate(45deg) scale(0.88);
     display: grid;
     place-items: center;
     transition:
@@ -614,6 +625,7 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
   }
   .planner :global(.choice:has(input[type="radio"]) .choice-mark) {
     border-radius: 999px;
+    transform: none;
   }
   .planner :global(.choice:has(:checked) .choice-mark) {
     background: var(--color-saffron);
