@@ -61,6 +61,10 @@ No new library. Everything is CSS and a few lines of TypeScript. GSAP, Lenis, OG
 - **Navigation:** the header is now dark on every page and persists through page changes while a curtain wipe reveals the next page (cross-document view transitions; verified to fire on forward and back/forward navigation). Internal links are prefetched on hover, focus or touch so pages land immediately.
 - **Photographs:** five more owner-supplied catering photographs, release refs `TWN-REL-2026-T0005`–`T0009`, recorded in the private register.
 
+## Round 4: the planner
+
+- Selection tiles are rounded cards that lift on hover and fill garnet with a saffron mark when chosen; tiles rise in one by one when a step opens; the progress bar is a garnet-to-saffron line and the active step's numeral and title shift. CSS only: validation, privacy and accessibility logic are untouched.
+
 ## Still unapproved or open
 
 - All copy remains draft. The preview banner still says "placeholder imagery" because some slots still use honest placeholders.

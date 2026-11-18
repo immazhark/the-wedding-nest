@@ -486,7 +486,21 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
   }
   .progress-bar {
     width: 20%;
-    transition: width 0.5s var(--ease-editorial);
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-garnet), var(--color-saffron));
+    transition: width 0.7s var(--ease-editorial);
+  }
+  .planner :global(.progress-item[aria-current="step"] .progress-title) {
+    transform: translateX(0.4rem);
+  }
+  .planner :global(.progress-title) {
+    transition: transform 0.5s var(--ease-editorial);
+  }
+  .planner :global(.progress-item[aria-current="step"] .progress-num) {
+    color: var(--color-garnet);
+  }
+  .planner :global(.progress-item[data-done] .progress-num) {
+    color: var(--color-brass-deep);
   }
   .disclosure {
     max-width: 52rem;
@@ -504,7 +518,10 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
     margin-bottom: 1.75rem;
   }
   .stage-title {
+    font-family: var(--font-display);
     font-size: var(--text-title);
+    font-weight: 330;
+    letter-spacing: -0.01em;
     outline: none;
   }
   .stage-intro {
@@ -543,21 +560,32 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
     min-height: 3.25rem;
     padding: 0.9rem 1rem;
     border: 1px solid color-mix(in srgb, var(--color-ink) 18%, transparent);
+    border-radius: 0.9rem;
     background: var(--color-paper);
     cursor: pointer;
     transition:
-      border-color 0.25s var(--ease-editorial),
-      background-color 0.25s var(--ease-editorial);
+      border-color 0.3s var(--ease-editorial),
+      background-color 0.4s var(--ease-editorial),
+      color 0.4s var(--ease-editorial),
+      transform 0.4s var(--ease-editorial),
+      box-shadow 0.4s var(--ease-editorial);
   }
   .planner :global(.choice:hover) {
-    border-color: var(--color-ink);
+    border-color: var(--color-garnet);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -14px color-mix(in srgb, var(--color-garnet) 55%, transparent);
   }
   .planner :global(.choice:has(:checked)) {
-    border-color: var(--color-ink);
-    background: var(--color-stone);
+    border-color: var(--color-garnet);
+    background: var(--color-garnet);
+    color: var(--color-ivory);
+    box-shadow: 0 12px 28px -14px color-mix(in srgb, var(--color-garnet) 70%, transparent);
+  }
+  .planner :global(.choice:has(:checked) .choice-hint) {
+    color: var(--color-sand);
   }
   .planner :global(.choice:has(:focus-visible)) {
-    outline: 2px solid var(--color-brass-deep);
+    outline: 2px solid var(--color-garnet);
     outline-offset: 2px;
   }
   .planner :global(.choice[hidden]) {
@@ -576,16 +604,21 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
     height: 1.05rem;
     margin-top: 0.2rem;
     border: 1px solid var(--color-charcoal);
+    border-radius: 0.3rem;
     display: grid;
     place-items: center;
+    transition:
+      background-color 0.3s var(--ease-editorial),
+      border-color 0.3s var(--ease-editorial),
+      box-shadow 0.3s var(--ease-editorial);
   }
   .planner :global(.choice:has(input[type="radio"]) .choice-mark) {
     border-radius: 999px;
   }
   .planner :global(.choice:has(:checked) .choice-mark) {
-    background: var(--color-ink);
-    border-color: var(--color-ink);
-    box-shadow: inset 0 0 0 3px var(--color-stone);
+    background: var(--color-saffron);
+    border-color: var(--color-saffron);
+    box-shadow: inset 0 0 0 3px var(--color-garnet);
   }
   .planner :global(.choice-text) {
     display: flex;
@@ -747,6 +780,37 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
     [data-direction="back"] .stage:not([hidden]) {
       animation-name: stage-back;
     }
+    [data-direction] .stage:not([hidden]) .choice {
+      animation: tile-rise 0.7s var(--ease-editorial) both;
+      animation-delay: calc(var(--n, 0) * 45ms + 120ms);
+    }
+    .stage .choice:nth-child(1) {
+      --n: 0;
+    }
+    .stage .choice:nth-child(2) {
+      --n: 1;
+    }
+    .stage .choice:nth-child(3) {
+      --n: 2;
+    }
+    .stage .choice:nth-child(4) {
+      --n: 3;
+    }
+    .stage .choice:nth-child(5) {
+      --n: 4;
+    }
+    .stage .choice:nth-child(6) {
+      --n: 5;
+    }
+    .stage .choice:nth-child(n + 7) {
+      --n: 6;
+    }
+    @keyframes tile-rise {
+      from {
+        opacity: 0;
+        transform: translateY(0.9rem);
+      }
+    }
     @keyframes stage-forward {
       from {
         opacity: 0;
@@ -761,8 +825,13 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .progress-bar {
+    .progress-bar,
+    .planner :global(.progress-title),
+    .planner :global(.choice) {
       transition: none;
+    }
+    .planner :global(.choice:hover) {
+      transform: none;
     }
   }
 </style>
