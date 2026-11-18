@@ -46,6 +46,11 @@ const year = new Date().getFullYear();
             </a>
           </li>
           <li>
+            <a href={SITE.whatsapp} class="link-underline" rel="noopener" target="_blank">
+              WhatsApp<span class="sr-only"> (opens in a new tab)</span>
+            </a>
+          </li>
+          <li>
             <a href={SITE.instagram} class="link-underline" rel="noopener" target="_blank">
               Instagram — @twn.events<span class="sr-only"> (opens in a new tab)</span>
             </a>
@@ -56,6 +61,12 @@ const year = new Date().getFullYear();
             </a>
           </li>
         </ul>
+        <address class="mt-8 text-sm not-italic text-sand/90">
+          {SITE.address.street}
+          <br />
+          {SITE.address.locality}, {SITE.address.region} {SITE.address.postalCode}
+        </address>
+        <p class="mt-3 text-sm text-sand/90">Open {SITE.hours}</p>
       </div>
     </div>
     <span class="rule mt-16 text-sand"></span>
