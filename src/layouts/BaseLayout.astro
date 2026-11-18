@@ -1,5 +1,8 @@
 ---
 import "../styles/global.css";
+// Preload only the above-the-fold latin files; the CSS would otherwise reveal them late.
+import sansLatin from "@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2?url";
+import displayLatin from "@fontsource-variable/fraunces/files/fraunces-latin-opsz-normal.woff2?url";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import PreviewNotice from "../components/PreviewNotice.astro";
@@ -34,6 +37,11 @@ const canonical = canonicalUrl(Astro.url.pathname);
     <script is:inline>
       document.documentElement.classList.add("js");
     </script>
+    {
+      [sansLatin, displayLatin].map((href) => (
+        <link rel="preload" as="font" type="font/woff2" crossorigin="anonymous" href={href} />
+      ))
+    }
     <meta name="theme-color" content="#f6f1e8" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
