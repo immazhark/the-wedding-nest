@@ -943,3 +943,35 @@ footer.on-dark {
     transparent 100%
   );
 }
+
+/* Inner pages: panels and photographs land as they enter view (progressive, motion-safe). */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .svc-panel,
+    .svc-strip > *,
+    .story-gallery > * {
+      animation: land linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+    .svc-numeral {
+      animation: numeral-fill linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
+    }
+    @keyframes land {
+      from {
+        opacity: 0;
+        transform: translateY(2.25rem);
+      }
+    }
+    @keyframes numeral-fill {
+      from {
+        color: transparent;
+      }
+      to {
+        color: color-mix(in srgb, var(--color-saffron) 85%, transparent);
+      }
+    }
+  }
+}
