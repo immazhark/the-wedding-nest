@@ -10,6 +10,12 @@ const RUNTIME_PORT = 8799;
 // Submission-enabled variant (npm run build:submit), served only for planner-submit tests.
 const SUBMIT_PORT = 4322;
 const local = !remote && !workerd;
+// E2E_CROSS_BROWSER=1 (npm run test:e2e:cross) adds Firefox and WebKit. Opt-in: Chromium remains the CI gate.
+const cross = process.env["E2E_CROSS_BROWSER"] === "1";
+// Playwright's WebKit build does not Tab onto links and mobile WebKit has no mouse.wheel, so these two
+// Safari-specific behaviours cannot be driven there; they stay covered on Chromium.
+const webkitUndrivable =
+  /skip link moves focus to main content|sticky header stays pinned after scrolling/;
 // Cloud sessions ship a pre-installed Chromium; CI installs its own via `playwright install`.
 const executablePath = process.env["PLAYWRIGHT_CHROMIUM_EXECUTABLE"];
 
@@ -27,6 +33,23 @@ export default defineConfig({
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] }, testIgnore: /planner-submit/ },
     { name: "mobile", use: { ...devices["Pixel 7"] }, testIgnore: /planner-submit/ },
+    ...(cross
+      ? [
+          { name: "firefox", use: { ...devices["Desktop Firefox"] }, testIgnore: /planner-submit/ },
+          {
+            name: "webkit",
+            use: { ...devices["Desktop Safari"] },
+            testIgnore: /planner-submit/,
+            grepInvert: webkitUndrivable,
+          },
+          {
+            name: "webkit-mobile",
+            use: { ...devices["iPhone 14"] },
+            testIgnore: /planner-submit/,
+            grepInvert: webkitUndrivable,
+          },
+        ]
+      : []),
     ...(local
       ? [
           {
