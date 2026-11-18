@@ -1094,7 +1094,11 @@ footer.on-dark {
 /* The gallery: emerald chapter, saffron-edged photographs lit against the dark. */
 .gallery {
   background:
-    radial-gradient(60rem 30rem at 85% 0%, color-mix(in srgb, var(--color-saffron) 9%, transparent), transparent 70%),
+    radial-gradient(
+      60rem 30rem at 85% 0%,
+      color-mix(in srgb, var(--color-saffron) 9%, transparent),
+      transparent 70%
+    ),
     linear-gradient(to bottom, var(--color-emerald-deep), var(--color-kohl));
   color: var(--color-ivory);
 }
@@ -1132,5 +1136,9 @@ footer.on-dark {
 .footer-arches span:nth-child(3) {
   inset: 18% 18% 0;
   border-color: color-mix(in srgb, var(--color-saffron) 20%, transparent);
-  background: radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--color-saffron) 14%, transparent), transparent 70%);
+  background: radial-gradient(
+    circle at 50% 100%,
+    color-mix(in srgb, var(--color-saffron) 14%, transparent),
+    transparent 70%
+  );
 }
