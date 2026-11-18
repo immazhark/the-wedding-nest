@@ -91,7 +91,7 @@ const photos = photoNames.map((name, index) => ({
   focal: "center",
   permission: true, // schema-only CI declaration, NOT a human approval
   releaseRef: `TWN-REL-2026-CITEST`,
-  ...(index === 0 ? { slot: "home-work-wide" } : {}),
+  // No homepage slot: real approved photographs now occupy every homepage slot.
 }));
 
 const service = {
