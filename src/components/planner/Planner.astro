@@ -374,6 +374,18 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
               <a href={SITE.instagram} class="underline decoration-brass underline-offset-4">
                 Instagram @twn.events
               </a>
+              , call{" "}
+              <a href={`tel:${SITE.phone}`} class="underline decoration-brass underline-offset-4">
+                {SITE.phoneDisplay}
+              </a>{" "}
+              or email{" "}
+              <a
+                href={`mailto:${SITE.email}`}
+                class="underline decoration-brass underline-offset-4 break-words"
+              >
+                {SITE.email}
+              </a>
+              .
             </p>
             <button type="button" class="btn btn-solid mt-6" data-copy-choices>
               Copy planning choices
