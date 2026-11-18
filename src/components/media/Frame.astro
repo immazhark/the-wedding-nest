@@ -72,7 +72,7 @@ const aspect = aspectClass ?? RATIOS[ratio];
         src={image}
         alt={effectiveAlt}
         formats={["avif", "webp"]}
-        widths={[640, 960, 1280, 1920, 2560]}
+        widths={[640, 960, 1280, 1440, 1920, 2560]}
         sizes={sizes}
         {...(quality === undefined ? {} : { quality })}
         loading={priority ? "eager" : "lazy"}

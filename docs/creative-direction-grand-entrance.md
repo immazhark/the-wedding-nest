@@ -65,6 +65,11 @@ No new library. Everything is CSS and a few lines of TypeScript. GSAP, Lenis, OG
 
 - Selection tiles are rounded cards that lift on hover and fill garnet with a saffron mark when chosen; tiles rise in one by one when a step opens; the progress bar is a garnet-to-saffron line and the active step's numeral and title shift. CSS only: validation, privacy and accessibility logic are untouched.
 
+## Performance and browsers (19 November 2026, lab, not real-user data)
+
+- Home LCP element is the hero photograph. A 1440w image step (the browser was fetching the 1920w file, 211 KB, at a 1440px window) cut desktop LCP from about 2.7-3.4 s to 2.2-2.3 s (4x CPU, about 1.6 Mbps, 150 ms latency); mobile stays about 2.0-2.1 s; CLS at most 0.001.
+- WebKit (desktop and mobile) passes all 60 planner tests; Firefox passes the site checks. Running all three engines at four workers on one laptop timed out on cold starts, so cross-browser runs use fewer workers.
+
 ## Still unapproved or open
 
 - All copy remains draft. The preview banner still says "placeholder imagery" because some slots still use honest placeholders.
