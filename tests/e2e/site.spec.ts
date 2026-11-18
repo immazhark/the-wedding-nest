@@ -518,7 +518,17 @@ test("films download nothing until play is pressed, then hand over to native con
   await button.click();
   await expect(button).toBeHidden();
   await expect(wide.locator("video")).toHaveJSProperty("controls", true);
-  await expect.poll(() => filmRequests.length).toBeGreaterThan(0);
+  // Some engines do not surface media fetches as page requests, so also accept the media state.
+  await expect
+    .poll(async () => {
+      const loading = await wide
+        .locator("video")
+        .evaluate(
+          (v: HTMLVideoElement) => v.currentSrc.includes("film-landscape") && v.networkState > 0,
+        );
+      return filmRequests.length > 0 || loading;
+    })
+    .toBe(true);
   expect(filmRequests.every((u) => u.includes("film-landscape"))).toBe(true);
 });
 
@@ -535,9 +545,11 @@ test("hero film starts only on large screens, after load, and never competes wit
   await expect(film).toHaveAttribute("preload", "none");
   const large = (page.viewportSize()?.width ?? 0) >= 1024;
   if (large) {
-    await expect.poll(() => requests.length, { timeout: 8000 }).toBeGreaterThan(0);
+    // The loader assigns the source only after load; some engines hide media fetches from requests.
+    await expect(film).toHaveAttribute("src", /hero-loop\.mp4/, { timeout: 8000 });
   } else {
     await page.waitForTimeout(2500);
     expect(requests).toHaveLength(0);
+    await expect(film).not.toHaveAttribute("src", /.+/);
   }
 });
