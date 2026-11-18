@@ -308,8 +308,9 @@ test("homepage occasion links open the planner with only the chosen occasion sel
 test("homepage service links begin a specific-service enquiry without skipping occasion", async ({
   page,
 }) => {
-  await page.goto("/");
-  await page.getByRole("link", { name: "Catering & menus" }).click();
+  // Catering has an approved detail page, so the homepage links there; its planner link is the entry.
+  await page.goto("/services/hyderabadi-wedding-catering/");
+  await page.getByRole("link", { name: "Explore in the planner" }).click();
   await expect(page).toHaveURL(/\/plan-your-event\/\?service=catering$/);
   await expect(page.getByRole("checkbox", { name: "Nikah" })).not.toBeChecked();
   await page.getByRole("checkbox", { name: "Walima" }).check();

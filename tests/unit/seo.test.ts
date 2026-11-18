@@ -41,6 +41,13 @@ describe("site metadata", () => {
       url: "https://theweddingnest.in",
       telephone: "+919966973113",
       email: "theweddingnest.events@gmail.com",
+      founder: { "@type": "Person", name: "Mohammed Ather Khan", telephone: "+918686773095" },
+      openingHoursSpecification: {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        opens: "09:00",
+        closes: "00:00",
+      },
       address: {
         "@type": "PostalAddress",
         streetAddress: "12-2-1/D/68, Zeba Bagh, Asif Nagar",
@@ -51,13 +58,7 @@ describe("site metadata", () => {
       },
       sameAs: ["https://www.instagram.com/twn.events/", "https://www.facebook.com/twn.events"],
     });
-    for (const unapproved of [
-      "aggregateRating",
-      "review",
-      "priceRange",
-      "openingHours",
-      "openingHoursSpecification",
-    ]) {
+    for (const unapproved of ["aggregateRating", "review", "priceRange", "openingHours"]) {
       expect(json).not.toHaveProperty(unapproved);
     }
   });
@@ -70,7 +71,9 @@ describe("site metadata", () => {
     // WhatsApp uses the same number as the phone.
     expect(SITE.whatsapp).toBe("https://wa.me/919966973113");
     expect(SITE.address.postalCode).toBe("500028");
-    expect(SITE.hours).toBe("9:00 am to 12:00 midnight");
+    expect(SITE.hours).toBe("every day, 9:00 am to 12:00 midnight");
+    expect(SITE.founder.name).toBe("Mohammed Ather Khan");
+    expect(SITE.founder.phone).toBe("+918686773095");
     // twn.events was an earlier domain the business no longer uses or owns.
     expect(JSON.stringify(SITE)).not.toMatch(/https?:\/\/(www\.)?twn\.events/);
   });

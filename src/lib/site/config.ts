@@ -24,8 +24,15 @@ export const SITE = {
     region: "Telangana",
     postalCode: "500028",
   },
-  // Owner-supplied; days of the week were not specified, so none are claimed.
-  hours: "9:00 am to 12:00 midnight",
+  // Owner-supplied 18 November 2026: open all seven days.
+  hours: "every day, 9:00 am to 12:00 midnight",
+  // Owner/Founder's personal number, published at his own direction. 9966973113 is the business line.
+  founder: {
+    name: "Mohammed Ather Khan",
+    role: "Owner and Founder",
+    phone: "+918686773095",
+    phoneDisplay: "+91 86867 73095",
+  },
 } as const;
 
 /**
@@ -50,7 +57,7 @@ export function pageTitle(page?: string): string {
   return page ? `${page} · ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
 }
 
-/** Minimal, owner-verified Organization data. Ratings, opening hours and
+/** Minimal, owner-verified Organization data. Ratings and
  * service-specific LocalBusiness claims stay absent until explicitly approved.
  * Escaping '<' makes the generated JSON safe for an inline JSON-LD script.
  */
@@ -63,6 +70,13 @@ export function organizationJsonLd(): string {
     url: SITE.url,
     telephone: SITE.phone,
     email: SITE.email,
+    founder: { "@type": "Person", name: SITE.founder.name, telephone: SITE.founder.phone },
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      opens: "09:00",
+      closes: "00:00",
+    },
     address: {
       "@type": "PostalAddress",
       streetAddress: SITE.address.street,
