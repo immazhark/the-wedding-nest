@@ -20,6 +20,10 @@
   --color-brass-deep: #7a5c33;
   --color-kohl: #16201c;
   --color-kohl-soft: #22302a;
+  /* Jewel and metal tones for celebratory sequences: garnet silk, warm saffron-gold. */
+  --color-garnet: #5a1824;
+  --color-garnet-deep: #2a1015;
+  --color-saffron: #dba646;
 
   --font-display: "Fraunces Variable", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
@@ -240,5 +244,314 @@
         clip-path: inset(0);
       }
     }
+  }
+}
+
+/* ==========================================================================
+ * The Grand Entrance (creative prototype): opening, arch transition, CTA, kitchen.
+ * Everything below degrades to a static, fully readable composition without motion or JS.
+ * ========================================================================== */
+
+/* A tactile call to action: ivory pill, garnet fill that sweeps in, arrow in its own chip. */
+.btn-grand {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 3.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 1.75rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-ivory);
+  color: var(--color-kohl);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition:
+    color 0.45s var(--ease-editorial),
+    transform 0.2s var(--ease-editorial);
+}
+.btn-grand::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-garnet);
+  transform: translateX(-101%);
+  transition: transform 0.55s var(--ease-editorial);
+}
+.btn-grand-chip {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--color-kohl);
+  color: var(--color-ivory);
+  font-size: 1.05rem;
+  letter-spacing: 0;
+  transition:
+    transform 0.55s var(--ease-editorial),
+    background-color 0.45s var(--ease-editorial),
+    color 0.45s var(--ease-editorial);
+}
+.btn-grand:hover,
+.btn-grand:focus-visible {
+  color: var(--color-ivory);
+}
+.btn-grand:hover::before,
+.btn-grand:focus-visible::before {
+  transform: none;
+}
+.btn-grand:hover .btn-grand-chip,
+.btn-grand:focus-visible .btn-grand-chip {
+  transform: rotate(-45deg);
+  background: var(--color-saffron);
+  color: var(--color-kohl);
+}
+.btn-grand:active {
+  transform: scale(0.98);
+}
+.btn-grand:focus-visible {
+  outline: 2px solid var(--color-saffron);
+  outline-offset: 4px;
+}
+.btn-grand[aria-disabled="true"],
+.btn-grand:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.btn-grand[aria-busy="true"] .btn-grand-chip {
+  animation: chip-spin 0.9s linear infinite;
+}
+@keyframes chip-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The opening: a full-bleed photograph of a real stage, type set over a soft scrim. */
+.grand {
+  position: relative;
+  background: var(--color-kohl);
+}
+.grand-stage {
+  position: relative;
+  height: calc(100svh - 7rem);
+  min-height: 34rem;
+  max-height: 62rem;
+  overflow: hidden;
+}
+.grand-photo {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+.grand-photo img {
+  object-position: center 70%;
+}
+.grand-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to top,
+      rgb(11 17 14 / 0.94) 0%,
+      rgb(11 17 14 / 0.7) 42%,
+      rgb(11 17 14 / 0.15) 78%
+    ),
+    linear-gradient(to right, rgb(11 17 14 / 0.55) 0%, transparent 62%),
+    linear-gradient(to bottom, rgb(11 17 14 / 0.45) 0%, transparent 22%);
+}
+.grand-copy {
+  position: absolute;
+  inset: auto 0 0 0;
+}
+.grand-copy h1 {
+  text-shadow: 0 2px 28px rgb(0 0 0 / 0.35);
+}
+
+/* Curtains: two garnet panels part from the centre on arrival, once. Purely decorative. */
+.grand-doors {
+  position: absolute;
+  inset: 0;
+  display: none;
+  pointer-events: none;
+}
+.grand-doors span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5%;
+  background:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 2px, transparent 2px 18px),
+    linear-gradient(to bottom, var(--color-garnet), var(--color-garnet-deep));
+}
+.grand-doors span:first-child {
+  left: 0;
+  border-right: 1px solid var(--color-saffron);
+}
+.grand-doors span:last-child {
+  right: 0;
+  border-left: 1px solid var(--color-saffron);
+}
+
+/* The arch rises over the opening: the next sequence enters with a curved crown. */
+.arch-over {
+  position: relative;
+  z-index: 2;
+  margin-top: -4.5rem;
+  border-radius: 50% 50% 0 0 / 4.5rem 4.5rem 0 0;
+}
+.kitchen {
+  background: linear-gradient(to bottom, var(--color-garnet-deep), var(--color-kohl));
+}
+.kitchen-arch {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  max-width: 26rem;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 999px 999px 1.25rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--color-saffron) 55%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--color-saffron) 25%, transparent);
+  outline-offset: 0.6rem;
+  background: var(--color-kohl-soft);
+}
+.kitchen-poster,
+.kitchen-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.kitchen-video {
+  opacity: 0;
+  transition: opacity 0.8s var(--ease-editorial);
+}
+.kitchen-arch[data-playing] .kitchen-video {
+  opacity: 1;
+}
+.menu-rail {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-ivory) 18%, transparent);
+}
+.menu-rail-link {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  column-gap: 1rem;
+  padding: 1.15rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ivory) 18%, transparent);
+  color: var(--color-ivory);
+  transition: padding-left 0.5s var(--ease-editorial);
+}
+.menu-rail-name {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  font-weight: 330;
+  line-height: 1.1;
+}
+.menu-rail-line {
+  grid-column: 1;
+  margin-top: 0.2rem;
+  font-size: 0.9375rem;
+  color: var(--color-sand);
+}
+.menu-rail-arrow {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-self: center;
+  color: var(--color-saffron);
+  transition: transform 0.5s var(--ease-editorial);
+}
+.menu-rail-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 1px;
+  width: 100%;
+  background: var(--color-saffron);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s var(--ease-editorial);
+}
+.menu-rail-link:hover,
+.menu-rail-link:focus-visible {
+  padding-left: 0.75rem;
+}
+.menu-rail-link:hover::after,
+.menu-rail-link:focus-visible::after {
+  transform: none;
+}
+.menu-rail-link:hover .menu-rail-arrow,
+.menu-rail-link:focus-visible .menu-rail-arrow {
+  transform: translateX(6px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .grand-doors {
+    display: block;
+    animation: doors-gone 0.01s linear 2.1s both;
+  }
+  .grand-doors span:first-child {
+    animation: door-left 1.5s var(--ease-editorial) 0.35s both;
+  }
+  .grand-doors span:last-child {
+    animation: door-right 1.5s var(--ease-editorial) 0.35s both;
+  }
+  .grand-line > span,
+  .grand-copy .fade-in {
+    animation-delay: calc(var(--i, 0) * 110ms + 520ms);
+  }
+  .grand-media {
+    animation: grand-settle 2.4s var(--ease-editorial) 0.2s both;
+  }
+  @keyframes door-left {
+    to {
+      transform: translateX(-101%);
+    }
+  }
+  @keyframes door-right {
+    to {
+      transform: translateX(101%);
+    }
+  }
+  @keyframes doors-gone {
+    to {
+      visibility: hidden;
+    }
+  }
+  @keyframes grand-settle {
+    from {
+      transform: scale(1.12);
+    }
+  }
+  @supports (animation-timeline: view()) {
+    /* As the opening leaves, the photograph dims and the arch takes the stage. */
+    .grand-scrim {
+      animation: scrim-in linear both;
+      animation-timeline: view();
+      animation-range: exit 10% exit 100%;
+    }
+    @keyframes scrim-in {
+      to {
+        background: rgb(11 17 14 / 0.96);
+      }
+    }
+  }
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.3s;
   }
 }

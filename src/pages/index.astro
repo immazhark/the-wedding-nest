@@ -29,55 +29,124 @@ const featuredStory = featuredStoryPath(publishedStories);
 ---
 
 <BaseLayout>
-  <!-- Opening -->
-  <section class="opening" aria-labelledby="hero-title">
-    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-10 md:pt-16">
-      <div class="grid gap-8 md:grid-cols-12 md:items-end">
-        <div class="md:col-span-8">
-          <p class="eyebrow text-brass-deep fade-in [--i:0]">
+  <!-- Opening: the grand entrance. Curtains part on the real stage photograph. -->
+  <section class="grand" aria-labelledby="hero-title">
+    <div class="grand-stage">
+      <Frame
+        photo={approvedHomePhotos["home-hero"]}
+        aspectClass="h-full"
+        tone="dark"
+        placeholder="The opening photograph — a wide moment from a TWN wedding"
+        priority
+        sizes="100vw"
+        class="grand-photo"
+        mediaClass="grand-media"
+      />
+      <div class="grand-scrim" aria-hidden="true"></div>
+      <div class="grand-doors" aria-hidden="true">
+        <span></span>
+        <span></span>
+      </div>
+      <div class="grand-copy">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pb-10 md:pb-16">
+          <p class="eyebrow text-sand fade-in [--i:5]">
             Weddings and family celebrations<span class="hidden sm:inline"> · Hyderabad</span>
           </p>
-          <h1 id="hero-title" class="mt-6 text-[length:var(--text-display)] leading-[0.98]">
-            <span class="line-mask">
-              <span class="[--i:1]">Nikah to Walima,</span>
+          <h1
+            id="hero-title"
+            class="mt-5 text-[length:var(--text-display)] leading-[0.98] text-ivory"
+          >
+            <span class="line-mask grand-line">
+              <span class="[--i:6]">Nikah to Walima,</span>
             </span>
-            <span class="line-mask">
-              <span class="[--i:2]">and every day</span>
+            <span class="line-mask grand-line">
+              <span class="[--i:7]">and every day</span>
             </span>
-            <span class="line-mask md:pl-[1.6em]">
-              <span class="[--i:3]">
-                <em class="italic font-[300] text-brass-deep">between.</em>
+            <span class="line-mask grand-line md:pl-[1.6em]">
+              <span class="[--i:8]">
+                <em class="italic font-[300] text-saffron">between.</em>
               </span>
             </span>
           </h1>
-        </div>
-        <div class="md:col-span-4 md:pb-3 fade-in [--i:4]">
-          <p class="text-[length:var(--text-lede)] text-charcoal max-w-md">
-            We plan weddings and celebrations across Hyderabad — the whole occasion, or only the
-            parts you’d like help with.
-          </p>
-          <div class="mt-8 flex flex-wrap items-center gap-x-7 gap-y-4">
-            <a href="/plan-your-event/" class="btn btn-solid">
-              Plan your event{" "}
-              <span class="arrow" aria-hidden="true">
+          <div class="mt-8 md:mt-10 flex flex-wrap items-center gap-x-8 gap-y-5 fade-in [--i:10]">
+            <a href="/plan-your-event/" class="btn-grand">
+              <span>Plan your event</span>
+              <span class="btn-grand-chip" aria-hidden="true">
                 →
               </span>
             </a>
-            <a href="#services" class="link-underline text-[0.9375rem] font-medium">
+            <a href="#services" class="link-underline text-[0.9375rem] font-medium text-ivory">
               What we do
             </a>
           </div>
+          <p class="mt-8 max-w-md text-[length:var(--text-lede)] text-stone fade-in [--i:11]">
+            We plan weddings and celebrations across Hyderabad — the whole occasion, or only the
+            parts you’d like help with.
+          </p>
         </div>
       </div>
     </div>
-    <div class="mx-auto max-w-[110rem] mt-10 md:mt-16 sm:px-8 lg:px-12">
-      <Frame
-        photo={approvedHomePhotos["home-hero"]}
-        aspectClass="aspect-[4/5] sm:aspect-[3/2] lg:aspect-[21/9]"
-        placeholder="The opening photograph — a wide moment from a TWN wedding"
-        priority
-        class="frame-reveal"
-      />
+  </section>
+
+  <!-- Catering: the table is where the celebration is remembered. Arch rises over the opening. -->
+  <section class="kitchen arch-over on-dark" aria-labelledby="kitchen-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36 grid gap-14 md:grid-cols-12 md:items-center">
+      <div class="md:col-span-5">
+        <div class="kitchen-arch" data-kitchen>
+          <img
+            src="/media/kitchen-loop-poster.jpg"
+            alt=""
+            width="960"
+            height="540"
+            loading="lazy"
+            decoding="async"
+            class="kitchen-poster"
+          />
+          <video
+            class="kitchen-video"
+            muted
+            loop
+            playsinline
+            preload="none"
+            poster="/media/kitchen-loop-poster.jpg"
+            aria-label="A large pot of golden, saffron-streaked food being stirred"
+            data-kitchen-video
+          >
+            <source src="/media/kitchen-loop.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+      <div class="md:col-span-6 md:col-start-7">
+        <p class="eyebrow text-saffron scroll-rise">Catering</p>
+        <h2
+          id="kitchen-title"
+          class="mt-5 text-[length:var(--text-headline)] max-w-[14ch] text-ivory scroll-rise"
+        >
+          The table is where it is remembered.
+        </h2>
+        <p class="mt-6 max-w-lg text-[length:var(--text-lede)] text-stone scroll-rise">
+          Four Hyderabadi menus, each open to your changes. Begin with one and shape it around your
+          family.
+        </p>
+        <ul class="menu-rail mt-10" role="list">
+          {[
+            ["Deccani Delight", "Simple flavors, true Hyderabadi soul."],
+            ["Nawabi Zaiqa", "A royal touch in every bite."],
+            ["Daawat-E-Khaas", "For those who savor the special."],
+            ["Shahi Dastarkhwaan", "The grandeur of Hyderabad on your table."],
+          ].map(([name, line]) => (
+            <li>
+              <a href={servicePageHref("catering", publishedServicePages)} class="menu-rail-link">
+                <span class="menu-rail-name">{name}</span>
+                <span class="menu-rail-line">{line}</span>
+                <span class="menu-rail-arrow" aria-hidden="true">
+                  →
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   </section>
 
@@ -362,3 +431,26 @@ const featuredStory = featuredStoryPath(publishedStories);
     }
   }
 </style>
+
+<script>
+  // The kitchen loop plays only while visible, never with reduced motion, and has no audio track.
+  const arch = document.querySelector<HTMLElement>("[data-kitchen]");
+  const video = document.querySelector<HTMLVideoElement>("[data-kitchen-video]");
+  const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (arch && video && !calm.matches && "IntersectionObserver" in window) {
+    new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.isIntersecting && !calm.matches) {
+          video
+            .play()
+            .then(() => arch.setAttribute("data-playing", ""))
+            .catch(() => arch.removeAttribute("data-playing"));
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.35 },
+    ).observe(arch);
+  }
+</script>

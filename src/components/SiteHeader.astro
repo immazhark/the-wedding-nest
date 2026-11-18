@@ -3,17 +3,28 @@ import Logo from "./Logo.astro";
 import { NAV } from "../lib/site/config";
 
 const current = Astro.url.pathname;
+// The home page opens on a dark, photographic sequence; the header joins it instead of interrupting it.
+const dark = current === "/";
 ---
 
-<header class="site-header sticky top-0 z-50 border-b border-ink/10" data-site-header>
+<header
+  class:list={[
+    "site-header sticky top-0 z-50 border-b",
+    dark ? "site-header--dark border-ivory/10" : "border-ink/10",
+  ]}
+  data-site-header
+>
   <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 h-[4.5rem] flex items-center justify-between gap-6">
     <a href="/" class="shrink-0" aria-label="The Wedding Nest — home">
-      <Logo class="h-9 lg:h-11 text-ink" />
+      <Logo class:list={["h-9 lg:h-11", dark ? "text-ivory" : "text-ink"]} />
     </a>
 
     <button
       type="button"
-      class="hidden items-center gap-3 min-h-11 px-1 eyebrow text-ink"
+      class:list={[
+        "hidden items-center gap-3 min-h-11 px-1 eyebrow",
+        dark ? "text-ivory" : "text-ink",
+      ]}
       aria-expanded="false"
       aria-controls="site-menu"
       data-menu-toggle
@@ -41,8 +52,12 @@ const current = Astro.url.pathname;
                 aria-current={current === item.href ? "page" : undefined}
                 class:list={[
                   isCta
-                    ? "btn btn-solid md:min-h-10 md:px-5 md:py-2 md:text-[0.72rem]"
-                    : "link-underline md:text-[0.9375rem] text-charcoal hover:text-ink",
+                    ? dark
+                      ? "btn btn-light md:min-h-10 md:px-5 md:py-2 md:text-[0.72rem]"
+                      : "btn btn-solid md:min-h-10 md:px-5 md:py-2 md:text-[0.72rem]"
+                    : dark
+                      ? "link-underline md:text-[0.9375rem] text-stone hover:text-ivory"
+                      : "link-underline md:text-[0.9375rem] text-charcoal hover:text-ink",
                   "nav-link",
                 ]}
               >
@@ -61,6 +76,44 @@ const current = Astro.url.pathname;
      (Never put backdrop-filter on the header itself — it would trap the fixed mobile menu.) */
   .site-header {
     background: var(--color-ivory);
+  }
+  .site-header--dark {
+    background: var(--color-kohl);
+  }
+  @media (max-width: 47.99rem) {
+    :global(html.js) .site-header--dark .site-menu {
+      background: var(--color-garnet-deep);
+    }
+    .site-header--dark .site-menu :global(.nav-link:not(.btn)) {
+      color: var(--color-ivory);
+      border-bottom-color: color-mix(in srgb, var(--color-ivory) 18%, transparent);
+    }
+    :global(html.js) .site-header--dark .site-menu[data-open] :global(li) {
+      animation: menu-in 0.7s var(--ease-editorial) both;
+    }
+    :global(html.js) .site-header--dark .site-menu[data-open] :global(li:nth-child(2)) {
+      animation-delay: 60ms;
+    }
+    :global(html.js) .site-header--dark .site-menu[data-open] :global(li:nth-child(3)) {
+      animation-delay: 120ms;
+    }
+    :global(html.js) .site-header--dark .site-menu[data-open] :global(li:nth-child(4)) {
+      animation-delay: 180ms;
+    }
+    :global(html.js) .site-header--dark .site-menu[data-open] :global(li:nth-child(5)) {
+      animation-delay: 240ms;
+    }
+  }
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.js) .site-header--dark .site-menu[data-open] :global(li) {
+      animation: none;
+    }
   }
   /* Without JS the menu is part of the header, not a fixed-height overflow
      that covers the opening hero. Only the JS-enhanced menu uses an overlay. */
