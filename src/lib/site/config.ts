@@ -1,6 +1,6 @@
 /**
- * Verified public facts only. WhatsApp and studio address stay absent until the business
- * approves them (see docs/full-project-handover.md §8).
+ * Verified public facts only, as supplied by the owner. Opening days, service coverage and
+ * any legal name stay absent until approved (see docs/full-project-handover.md §8).
  */
 export const SITE = {
   name: "The Wedding Nest",
@@ -16,6 +16,16 @@ export const SITE = {
   phone: "+919966973113",
   phoneDisplay: "+91 99669 73113",
   email: "theweddingnest.events@gmail.com",
+  // WhatsApp is the same number as the phone.
+  whatsapp: "https://wa.me/919966973113",
+  address: {
+    street: "12-2-1/D/68, Zeba Bagh, Asif Nagar",
+    locality: "Hyderabad",
+    region: "Telangana",
+    postalCode: "500028",
+  },
+  // Owner-supplied; days of the week were not specified, so none are claimed.
+  hours: "9:00 am to 12:00 midnight",
 } as const;
 
 /**
@@ -40,7 +50,7 @@ export function pageTitle(page?: string): string {
   return page ? `${page} · ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
 }
 
-/** Minimal, owner-verified Organization data. Location, ratings and
+/** Minimal, owner-verified Organization data. Ratings, opening hours and
  * service-specific LocalBusiness claims stay absent until explicitly approved.
  * Escaping '<' makes the generated JSON safe for an inline JSON-LD script.
  */
@@ -53,6 +63,14 @@ export function organizationJsonLd(): string {
     url: SITE.url,
     telephone: SITE.phone,
     email: SITE.email,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: SITE.address.street,
+      addressLocality: SITE.address.locality,
+      addressRegion: SITE.address.region,
+      postalCode: SITE.address.postalCode,
+      addressCountry: "IN",
+    },
     sameAs: [SITE.instagram, SITE.facebook],
   };
   return JSON.stringify(facts).replace(/</g, "\\u003c");
