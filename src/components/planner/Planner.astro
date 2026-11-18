@@ -26,6 +26,10 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
       <a href={SITE.instagram} class="underline decoration-brass underline-offset-4">
         Instagram
       </a>{" "}
+      or call{" "}
+      <a href={`tel:${SITE.phone}`} class="underline decoration-brass underline-offset-4">
+        {SITE.phoneDisplay}
+      </a>{" "}
       in the meantime.
     </p>
   </noscript>
@@ -41,7 +45,11 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
         <a href={SITE.instagram} class="underline decoration-brass underline-offset-4">
           @twn.events
         </a>{" "}
-        on Instagram.
+        on Instagram, or call{" "}
+        <a href={`tel:${SITE.phone}`} class="underline decoration-brass underline-offset-4">
+          {SITE.phoneDisplay}
+        </a>
+        .
       </p>
       <p class="mt-2 text-sm text-muted">
         Planning choices stay in this browser for 7 days. Names, phone numbers, venue details and

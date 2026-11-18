@@ -9,7 +9,7 @@ must be recorded before connecting the production domain or enabling real custom
 | Privacy contact | No business privacy contact is approved. | Provide an approved business contact for access, correction and deletion requests. |
 | Retention | No production retention period is agreed or implemented. | Decide how long unsuccessful enquiries are kept, how booked clients are handled, and who authorises deletion. |
 | Marketing | Optional consent is separate; no marketing delivery exists. | Confirm whether marketing is needed at launch. Default remains no marketing. |
-| Public business details | Logo and Instagram profile are approved; other details are not publication-ready. | Confirm service coverage, contact number, address/hours and any public business/legal name. |
+| Public business details | Logo, Instagram, Facebook (facebook.com/twn.events), phone +91 99669 73113 and email theweddingnest.events@gmail.com were supplied by the owner on 18 November 2026 and are shown in the footer, planner fallback and Organization JSON-LD. Canonical domain stays theweddingnest.in (owner-confirmed); twn.events was listed as the website, so confirm whether it is a redirect or secondary domain. | Confirm service coverage, WhatsApp, address/hours, any public business/legal name and the role of twn.events. |
 | Photography and reviews | Authentic assets only; placeholders stay labelled. | Supply permission-cleared originals and approve specific quotes, names and likenesses. |
 | Production launch | Domain, indexing and real enquiry intake remain off. | Review the release preview and give explicit approval for each launch gate. |
 

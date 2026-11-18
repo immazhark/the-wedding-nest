@@ -1,6 +1,6 @@
 /**
- * Verified public facts only. Phone, WhatsApp, email and address are intentionally absent
- * until the business approves them (see docs/full-project-handover.md §8).
+ * Verified public facts only. WhatsApp and studio address stay absent until the business
+ * approves them (see docs/full-project-handover.md §8).
  */
 export const SITE = {
   name: "The Wedding Nest",
@@ -11,6 +11,11 @@ export const SITE = {
   locale: "en_IN",
   region: "Hyderabad, Telangana",
   instagram: "https://www.instagram.com/twn.events/",
+  facebook: "https://www.facebook.com/twn.events",
+  // Supplied by the business owner on 18 November 2026. Studio address and hours remain unapproved.
+  phone: "+919966973113",
+  phoneDisplay: "+91 99669 73113",
+  email: "theweddingnest.events@gmail.com",
 } as const;
 
 /**
@@ -35,7 +40,7 @@ export function pageTitle(page?: string): string {
   return page ? `${page} · ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
 }
 
-/** Minimal, owner-verified Organization data. Contact, location, ratings and
+/** Minimal, owner-verified Organization data. Location, ratings and
  * service-specific LocalBusiness claims stay absent until explicitly approved.
  * Escaping '<' makes the generated JSON safe for an inline JSON-LD script.
  */
@@ -46,7 +51,9 @@ export function organizationJsonLd(): string {
     "@id": `${SITE.url}/#organization`,
     name: SITE.name,
     url: SITE.url,
-    sameAs: [SITE.instagram],
+    telephone: SITE.phone,
+    email: SITE.email,
+    sameAs: [SITE.instagram, SITE.facebook],
   };
   return JSON.stringify(facts).replace(/</g, "\\u003c");
 }

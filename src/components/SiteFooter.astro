@@ -33,17 +33,29 @@ const year = new Date().getFullYear();
         </ul>
       </nav>
       <div class="md:col-span-4">
-        <h2 class="eyebrow text-sand font-sans">Follow</h2>
+        <h2 class="eyebrow text-sand font-sans">Get in touch</h2>
         <ul class="mt-5 space-y-3">
+          <li>
+            <a href={`tel:${SITE.phone}`} class="link-underline">
+              {SITE.phoneDisplay}
+            </a>
+          </li>
+          <li>
+            <a href={`mailto:${SITE.email}`} class="link-underline break-words">
+              {SITE.email}
+            </a>
+          </li>
           <li>
             <a href={SITE.instagram} class="link-underline" rel="noopener" target="_blank">
               Instagram — @twn.events<span class="sr-only"> (opens in a new tab)</span>
             </a>
           </li>
+          <li>
+            <a href={SITE.facebook} class="link-underline" rel="noopener" target="_blank">
+              Facebook — twn.events<span class="sr-only"> (opens in a new tab)</span>
+            </a>
+          </li>
         </ul>
-        <p class="mt-8 text-sm text-sand/80">
-          Phone, WhatsApp and studio details will appear here once confirmed.
-        </p>
       </div>
     </div>
     <span class="rule mt-16 text-sand"></span>
