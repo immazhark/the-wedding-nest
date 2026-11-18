@@ -70,6 +70,8 @@ No new library. Everything is CSS and a few lines of TypeScript. GSAP, Lenis, OG
 - Event-story pages (published only after owner-approved facts and photos) open on the same dark chapter, with the brief rising over it in an arch and a closing invitation using the grand button.
 - Inner pages: menu panels and photographs rise into place as they enter view, and each menu numeral fills with gold (CSS scroll-driven, progressive, off with reduced motion).
 
+- Home work section: the portrait is cropped in an arch, each photograph sits inside a gold hairline held off its edge, and the caption carries a saffron rule.
+
 ## Performance and browsers (19 November 2026, lab, not real-user data)
 
 - Home LCP element is the hero photograph. A 1440w image step (the browser was fetching the 1920w file, 211 KB, at a 1440px window) cut desktop LCP from about 2.7-3.4 s to 2.2-2.3 s (4x CPU, about 1.6 Mbps, 150 ms latency); mobile stays about 2.0-2.1 s; CLS at most 0.001.

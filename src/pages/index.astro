@@ -511,6 +511,31 @@ const thresholdPhoto =
       max-width: 22rem;
     }
   }
+  /* Royal framing: an arched portrait, gold hairlines held off the photographs, a saffron rule. */
+  .work-grid :global(.work-a > :first-child) {
+    border-radius: 999px 999px 0.75rem 0.75rem;
+  }
+  .work-grid :global(.work-a),
+  .work-grid :global(.work-b),
+  .work-grid :global(.work-c) {
+    outline: 1px solid color-mix(in srgb, var(--color-brass) 55%, transparent);
+    outline-offset: 0.6rem;
+  }
+  .work-grid :global(.work-a) {
+    border-radius: 999px 999px 0.75rem 0.75rem;
+  }
+  .work-grid :global(.work-b > :first-child),
+  .work-grid :global(.work-c > :first-child) {
+    border-radius: 0.75rem;
+  }
+  .work-grid :global(.work-b),
+  .work-grid :global(.work-c) {
+    border-radius: 0.75rem;
+  }
+  .work-grid :global(.work-d) {
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-saffron);
+  }
 </style>
 
 <script>
