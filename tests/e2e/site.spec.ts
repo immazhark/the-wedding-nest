@@ -99,9 +99,23 @@ test("structured data contains only the verified Organization identity", async (
   expect(organization["@type"]).toBe("Organization");
   expect(organization.name).toBe("The Wedding Nest");
   expect(organization.url).toBe("https://theweddingnest.in");
-  expect(organization.sameAs).toEqual(["https://www.instagram.com/twn.events/"]);
+  expect(organization.sameAs).toEqual([
+    "https://www.instagram.com/twn.events/",
+    "https://www.facebook.com/twn.events",
+  ]);
+  expect(organization.telephone).toBe("+919966973113");
+  expect(organization.email).toBe("theweddingnest.events@gmail.com");
   expect(organization).not.toHaveProperty("aggregateRating");
   expect(organization).not.toHaveProperty("address");
+});
+
+test("footer offers the owner-supplied phone, email and social links", async ({ page }) => {
+  await page.goto("/");
+  const footer = page.locator("footer");
+  await expect(footer.locator('a[href="tel:+919966973113"]')).toHaveText("+91 99669 73113");
+  await expect(footer.locator('a[href="mailto:theweddingnest.events@gmail.com"]')).toBeVisible();
+  await expect(footer.locator('a[href="https://www.facebook.com/twn.events"]')).toBeVisible();
+  await expect(footer.locator('a[href="https://www.instagram.com/twn.events/"]')).toBeVisible();
 });
 
 test("all internal links resolve", async ({ page, request }) => {

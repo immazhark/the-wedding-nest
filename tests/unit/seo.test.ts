@@ -39,23 +39,22 @@ describe("site metadata", () => {
       "@id": "https://theweddingnest.in/#organization",
       name: "The Wedding Nest",
       url: "https://theweddingnest.in",
-      sameAs: ["https://www.instagram.com/twn.events/"],
+      telephone: "+919966973113",
+      email: "theweddingnest.events@gmail.com",
+      sameAs: ["https://www.instagram.com/twn.events/", "https://www.facebook.com/twn.events"],
     });
-    for (const unapproved of [
-      "telephone",
-      "address",
-      "email",
-      "aggregateRating",
-      "review",
-      "priceRange",
-    ]) {
+    for (const unapproved of ["address", "aggregateRating", "review", "priceRange"]) {
       expect(json).not.toHaveProperty(unapproved);
     }
   });
 
-  it("only lists verified public profiles", () => {
+  it("only lists owner-supplied public contact details", () => {
     expect(SITE.instagram).toBe("https://www.instagram.com/twn.events/");
-    expect(SITE).not.toHaveProperty("phone");
-    expect(SITE).not.toHaveProperty("email");
+    expect(SITE.facebook).toBe("https://www.facebook.com/twn.events");
+    expect(SITE.phone).toBe("+919966973113");
+    expect(SITE.email).toBe("theweddingnest.events@gmail.com");
+    // Not supplied or approved yet.
+    expect(SITE).not.toHaveProperty("whatsapp");
+    expect(SITE).not.toHaveProperty("address");
   });
 });
