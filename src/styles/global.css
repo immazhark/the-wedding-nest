@@ -1142,3 +1142,109 @@ footer.on-dark {
     transparent 70%
   );
 }
+
+/* Ornament: a hairline with a centred saffron diamond. Decorative only. */
+.ornament {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--color-brass) 70%, transparent) 20%,
+    color-mix(in srgb, var(--color-brass) 70%, transparent) 80%,
+    transparent
+  );
+}
+.ornament span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.7rem;
+  height: 0.7rem;
+  background: var(--color-saffron);
+  transform: translate(-50%, -50%) rotate(45deg);
+  box-shadow:
+    0 0 0 0.35rem var(--color-ivory),
+    0 0 0 calc(0.35rem + 1px) color-mix(in srgb, var(--color-brass) 70%, transparent);
+}
+.ornament-dark {
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--color-saffron) 55%, transparent) 20%,
+    color-mix(in srgb, var(--color-saffron) 55%, transparent) 80%,
+    transparent
+  );
+}
+.ornament-dark span {
+  box-shadow:
+    0 0 0 0.35rem var(--color-kohl-soft),
+    0 0 0 calc(0.35rem + 1px) color-mix(in srgb, var(--color-saffron) 55%, transparent);
+}
+
+/* Jaali ground: an eight-point lattice drawn faintly in brass on ivory. */
+.jaali {
+  background-color: var(--color-ivory);
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 48.5%,
+      color-mix(in srgb, var(--color-brass) 9%, transparent) 49.5%,
+      color-mix(in srgb, var(--color-brass) 9%, transparent) 50.5%,
+      transparent 51.5%
+    ),
+    linear-gradient(
+      -45deg,
+      transparent 48.5%,
+      color-mix(in srgb, var(--color-brass) 9%, transparent) 49.5%,
+      color-mix(in srgb, var(--color-brass) 9%, transparent) 50.5%,
+      transparent 51.5%
+    );
+  background-size: 3.25rem 3.25rem;
+}
+
+/* Chip links: gold-hairline pills that fill on hover. */
+.service-chips,
+.chip-row {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.service-chips li > span,
+.service-chips li > .text-brass {
+  display: none;
+}
+.service-chips a,
+.chip-link {
+  display: inline-block;
+  padding: 0.6rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--color-brass) 70%, transparent);
+  border-radius: 999px;
+  background-image: none;
+  font-size: 1rem;
+  line-height: 1.2;
+  transition:
+    background-color 0.4s var(--ease-editorial),
+    color 0.4s var(--ease-editorial),
+    border-color 0.4s var(--ease-editorial);
+}
+.service-chips a:hover,
+.service-chips a:focus-visible {
+  background-color: var(--color-garnet);
+  border-color: var(--color-garnet);
+  color: var(--color-ivory);
+}
+.chip-link {
+  color: var(--color-ivory);
+  border-color: color-mix(in srgb, var(--color-saffron) 55%, transparent);
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+.chip-link:hover,
+.chip-link:focus-visible {
+  background-color: var(--color-saffron);
+  border-color: var(--color-saffron);
+  color: var(--color-kohl);
+}
