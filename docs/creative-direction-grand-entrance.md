@@ -42,6 +42,15 @@ Principles taken (not copied): a scene can be the navigation; one full-bleed ima
 
 No new library. Everything is CSS and a few lines of TypeScript. GSAP, Lenis, OGL and dotLottie were evaluated and deferred: nothing here needs a timeline library yet, and Lenis would take over native scrolling, which the brief asks us not to do. Revisit GSAP only if a pinned storytelling sequence is approved.
 
+## Round 2 (owner approved the direction on 18 November 2026): elevated motion
+
+- **Scroll story (GSAP + ScrollTrigger, loaded after first paint):** the camera pushes toward the stage while the headline drifts away (pinned for 0.7 of a viewport on larger screens, unpinned on phones); the kitchen arch opens from a slit while its footage settles; the menu rail slides in; occasions are read out one line at a time on an emerald chapter; the work photographs unveil behind a curtain of crop.
+- **Gold dust:** a small 2D canvas of slow motes in the hero light (22 on phones, 42 on larger screens), paused off screen and with reduced motion.
+- **Page transitions:** a curtain wipe between pages (cross-document view transitions, progressive; ignored by browsers without support).
+- **Colour rhythm:** dark kohl opening, garnet kitchen, ivory services, emerald occasions, ivory work, kohl planner invitation.
+- **GSAP assessment:** licence is the GSAP "no charge" standard licence (commercial use allowed). Cost: about 113 KB raw (about 42 KB gzipped) in two chunks, fetched at idle after first paint, only on the home page, and only when motion is allowed. Lenis was rejected (it replaces native scrolling); OGL and dotLottie were not needed.
+- **Layout stability:** the pinned push-in's space is reserved in CSS (`html.motion-ok .grand`), so pinning never shifts content (CLS 0.001 in the lab run). If GSAP fails to load, the reservation is removed.
+
 ## Still unapproved or open
 
 - All copy remains draft. The preview banner still says "placeholder imagery" because some slots still use honest placeholders.

@@ -39,10 +39,12 @@ const featuredStory = featuredStoryPath(publishedStories);
         placeholder="The opening photograph — a wide moment from a TWN wedding"
         priority
         sizes="100vw"
+        quality={48}
         class="grand-photo"
         mediaClass="grand-media"
       />
       <div class="grand-scrim" aria-hidden="true"></div>
+      <canvas class="grand-dust" data-dust aria-hidden="true"></canvas>
       <div class="grand-doors" aria-hidden="true">
         <span></span>
         <span></span>
@@ -216,18 +218,16 @@ const featuredStory = featuredStoryPath(publishedStories);
   </section>
 
   <!-- Occasions -->
-  <section id="occasions" class="bg-paper border-y border-ink/10" aria-labelledby="occasions-title">
+  <section id="occasions" class="occasions on-dark" aria-labelledby="occasions-title">
     <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36">
-      <h2 id="occasions-title" class="max-w-4xl text-[length:var(--text-headline)]">
+      <p class="eyebrow text-saffron">Occasions</p>
+      <h2 id="occasions-title" class="mt-5 max-w-4xl text-[length:var(--text-headline)] text-ivory">
         Rooted in Hyderabad’s wedding traditions. Open to every celebration.
       </h2>
-      <ul class="mt-16 border-t border-ink/15" role="list">
+      <ul class="occasion-list mt-16" role="list">
         {weddingOccasions.map((o) => (
-          <li class="occasion-row scroll-rise">
-            <a
-              href={`/plan-your-event/?occasion=${o.id}`}
-              class="occasion-name underline decoration-brass underline-offset-8"
-            >
+          <li class="occasion-row">
+            <a href={`/plan-your-event/?occasion=${o.id}`} class="occasion-name">
               {o.label}
             </a>
             <span class="occasion-note">{occasionNotes[o.id]}</span>
@@ -235,8 +235,8 @@ const featuredStory = featuredStoryPath(publishedStories);
         ))}
       </ul>
       <div class="mt-12 max-w-3xl">
-        <p class="eyebrow text-brass-deep">Other celebrations</p>
-        <p class="mt-4 text-[length:var(--text-lede)] text-charcoal">
+        <p class="eyebrow text-saffron">Other celebrations</p>
+        <p class="mt-4 text-[length:var(--text-lede)] text-stone">
           For families and hosts from every community, and occasions of every kind.
         </p>
         <ul class="mt-6 flex flex-wrap gap-x-6 gap-y-4" aria-label="Other celebrations">
@@ -244,7 +244,7 @@ const featuredStory = featuredStoryPath(publishedStories);
             <li>
               <a
                 href={`/plan-your-event/?occasion=${o.id}`}
-                class="link-underline text-[0.9375rem] font-medium"
+                class="link-underline text-[0.9375rem] font-medium text-ivory"
               >
                 {o.label}
               </a>
@@ -380,12 +380,43 @@ const featuredStory = featuredStoryPath(publishedStories);
     color: var(--color-ink);
     text-wrap: pretty;
   }
+  .occasion-list {
+    counter-reset: occasion;
+    border-top: 1px solid color-mix(in srgb, var(--color-ivory) 20%, transparent);
+  }
   .occasion-row {
+    position: relative;
+    counter-increment: occasion;
     display: grid;
     gap: 0.35rem;
     align-items: baseline;
     padding: 1.4rem 0;
-    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 15%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ivory) 20%, transparent);
+  }
+  .occasion-row::before {
+    content: counter(occasion, decimal-leading-zero);
+    position: absolute;
+    right: 0;
+    top: 1.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    color: var(--color-saffron);
+  }
+  .occasion-row::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    height: 1px;
+    width: 100%;
+    background: var(--color-saffron);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.7s var(--ease-editorial);
+  }
+  .occasion-row:hover::after,
+  .occasion-row:focus-within::after {
+    transform: none;
   }
   @media (min-width: 48rem) {
     .occasion-row {
@@ -399,9 +430,18 @@ const featuredStory = featuredStoryPath(publishedStories);
     font-weight: 320;
     line-height: 1;
     letter-spacing: -0.02em;
+    color: var(--color-ivory);
+    transition:
+      transform 0.6s var(--ease-editorial),
+      color 0.4s var(--ease-editorial);
+  }
+  .occasion-row:hover .occasion-name,
+  .occasion-name:focus-visible {
+    transform: translateX(0.6rem);
+    color: var(--color-saffron);
   }
   .occasion-note {
-    color: var(--color-muted);
+    color: var(--color-sand);
     font-size: 0.9375rem;
   }
   .work-grid {
@@ -433,6 +473,7 @@ const featuredStory = featuredStoryPath(publishedStories);
 </style>
 
 <script>
+  import "../scripts/motion";
   // The kitchen loop plays only while visible, never with reduced motion, and has no audio track.
   const arch = document.querySelector<HTMLElement>("[data-kitchen]");
   const video = document.querySelector<HTMLVideoElement>("[data-kitchen-video]");
