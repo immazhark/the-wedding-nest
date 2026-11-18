@@ -1248,3 +1248,16 @@ footer.on-dark {
   border-color: var(--color-saffron);
   color: var(--color-kohl);
 }
+
+/* Plan page hero: the nested-arch ornament, held to the right and clipped inside the hero. */
+.hero-arches-host {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+}
+.hero-arches-host .footer-arches {
+  right: clamp(1rem, 8vw, 8rem);
+  bottom: 0;
+  width: clamp(12rem, 28vw, 24rem);
+  opacity: 0.8;
+}
