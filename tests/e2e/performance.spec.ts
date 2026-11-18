@@ -49,3 +49,30 @@ for (const path of ["/", "/plan-your-event/"]) {
     expect(resources.cssBytes).toBeLessThan(350 * 1024);
   });
 }
+
+test("critical latin fonts are preloaded and fetched only once", async ({ page }) => {
+  await page.goto("/", { waitUntil: "networkidle" });
+  const preloaded = await page.evaluate(() =>
+    [...document.querySelectorAll<HTMLLinkElement>('link[rel="preload"][as="font"]')].map(
+      (link) => ({
+        path: new URL(link.href).pathname,
+        type: link.type,
+        crossOrigin: link.crossOrigin,
+      }),
+    ),
+  );
+  const paths = preloaded.map((link) => link.path);
+  expect(paths.some((p) => /instrument-sans-latin-wght-normal\..+\.woff2$/.test(p))).toBe(true);
+  expect(paths.some((p) => /fraunces-latin-opsz-normal\..+\.woff2$/.test(p))).toBe(true);
+  for (const link of preloaded) {
+    expect(link.type).toBe("font/woff2");
+    // Fonts are fetched in anonymous CORS mode; a mismatch would download each file twice.
+    expect(link.crossOrigin).toBe("anonymous");
+  }
+  const fetches = await page.evaluate(() =>
+    (performance.getEntriesByType("resource") as PerformanceResourceTiming[]).map(
+      (e) => new URL(e.name).pathname,
+    ),
+  );
+  for (const path of paths) expect(fetches.filter((p) => p === path)).toHaveLength(1);
+});
