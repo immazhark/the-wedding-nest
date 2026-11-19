@@ -1261,3 +1261,73 @@ footer.on-dark {
   width: clamp(12rem, 28vw, 24rem);
   opacity: 0.8;
 }
+
+/* Catering menu cards: tagline beside the title, courses as a set menu. */
+.menu-tagline {
+  margin-top: 0.6rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.3rem);
+  line-height: 1.35;
+  color: var(--color-saffron);
+}
+.menu {
+  max-width: 44rem;
+}
+.menu-courses {
+  display: grid;
+  gap: 1.1rem;
+}
+.menu-course {
+  display: grid;
+  gap: 0.35rem 1.5rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ivory) 14%, transparent);
+}
+.menu-course:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.menu-course dt {
+  font-size: 0.75rem;
+  font-weight: 560;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-saffron);
+}
+.menu-course ul {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: var(--color-ivory);
+  line-height: 1.7;
+}
+.menu-course li {
+  margin-right: 1.15rem;
+  white-space: normal;
+}
+.menu-course li::before {
+  content: "";
+  display: inline-block;
+  width: 0.28rem;
+  height: 0.28rem;
+  margin: 0 0.5rem 0.18rem 0;
+  background: var(--color-saffron);
+  transform: rotate(45deg);
+  opacity: 0.85;
+}
+.menu-note {
+  margin-top: 1.1rem;
+  font-size: 0.9375rem;
+  font-style: italic;
+  color: var(--color-sand);
+}
+@media (min-width: 40rem) {
+  .menu-course {
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    align-items: baseline;
+  }
+}

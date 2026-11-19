@@ -4,6 +4,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Frame from "../../components/media/Frame.astro";
 import { SITE } from "../../lib/site/config";
 import { servicePhotos } from "../../lib/services/photos";
+import { parseMenuBody } from "../../lib/services/menu";
 import { publishedServicePages, type ApprovedServicePage } from "../../lib/services/publication";
 
 // Zero pages are generated until individual factual records are owner-approved.
@@ -81,8 +82,41 @@ const photos = servicePhotos(page.slug);
                 <span class="svc-numeral" aria-hidden="true">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <h3 class="svc-panel-title">{section.title}</h3>
-                <p class="svc-panel-body">{section.body}</p>
+                {(() => {
+                  const menu = parseMenuBody(section.body);
+                  return menu ? (
+                    <>
+                      <div class="menu-head">
+                        <h3 class="svc-panel-title">{section.title}</h3>
+                        {menu.tagline && <p class="menu-tagline">“{menu.tagline}”</p>}
+                      </div>
+                      <div class="menu">
+                        <dl class="menu-courses">
+                          {menu.courses.map((course) => (
+                            <div class="menu-course">
+                              <dt>{course.label}</dt>
+                              <dd>
+                                <ul>
+                                  {course.items.map((item) => (
+                                    <li>{item}</li>
+                                  ))}
+                                </ul>
+                              </dd>
+                            </div>
+                          ))}
+                        </dl>
+                        {menu.notes.map((note) => (
+                          <p class="menu-note">{note}.</p>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h3 class="svc-panel-title">{section.title}</h3>
+                      <p class="svc-panel-body">{section.body}</p>
+                    </>
+                  );
+                })()}
               </div>
               {index === 1 && photos.strip.length > 0 && (
                 <div class="svc-strip" role="group" aria-label="From the table">
