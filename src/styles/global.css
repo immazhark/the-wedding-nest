@@ -690,6 +690,13 @@
   color: var(--door-accent);
   text-shadow: 0 1px 10px rgb(0 0 0 / 0.7);
 }
+.door:has(.door-photo) .door-index {
+  justify-self: start;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.5);
+  font-weight: 600;
+}
 .door-name {
   grid-column: 1;
   font-family: var(--font-display);
