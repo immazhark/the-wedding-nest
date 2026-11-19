@@ -22,7 +22,12 @@ const plannerHref = storyPlannerHref(story.occasion);
 
 <BaseLayout title={story.title} description={story.introduction}>
   <article>
-    <div class="page-hero on-dark">
+    <div class="page-hero hero-arches-host on-dark">
+      <div class="footer-arches" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
       <header class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-10 pb-12 md:pt-24 md:pb-16">
         <div class="grid gap-8 md:grid-cols-12 md:items-end">
           <div class="md:col-span-8">
@@ -49,7 +54,7 @@ const plannerHref = storyPlannerHref(story.occasion);
       </div>
     </div>
 
-    <section class="arch-over planner-stage">
+    <section class="arch-over planner-stage jaali">
       <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-24 pb-20 md:pt-36 md:pb-32">
         <div class="grid gap-14 md:grid-cols-12">
           <div class="md:col-span-5">
@@ -63,7 +68,10 @@ const plannerHref = storyPlannerHref(story.occasion);
             <p class="mt-8 text-charcoal max-w-xl">{story.contribution}</p>
           </div>
         </div>
-        <div class="story-gallery mt-20 md:mt-28 grid gap-10 md:grid-cols-2 md:gap-12">
+        <div class="ornament mt-20 md:mt-28" aria-hidden="true">
+          <span></span>
+        </div>
+        <div class="story-gallery mt-12 md:mt-16 md:mt-28 grid gap-10 md:grid-cols-2 md:gap-12">
           {gallery.map((photo) => (
             <Frame
               photo={photo}
