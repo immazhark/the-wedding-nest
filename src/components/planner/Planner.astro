@@ -27,7 +27,10 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
         Instagram
       </a>{" "}
       or call{" "}
-      <a href={`tel:${SITE.phone}`} class="underline decoration-brass underline-offset-4">
+      <a
+        href={`tel:${SITE.phone}`}
+        class="underline decoration-brass underline-offset-4 whitespace-nowrap"
+      >
         {SITE.phoneDisplay}
       </a>{" "}
       in the meantime.
@@ -46,7 +49,10 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
           @twn.events
         </a>{" "}
         on Instagram, or call{" "}
-        <a href={`tel:${SITE.phone}`} class="underline decoration-brass underline-offset-4">
+        <a
+          href={`tel:${SITE.phone}`}
+          class="underline decoration-brass underline-offset-4 whitespace-nowrap"
+        >
           {SITE.phoneDisplay}
         </a>
         .
@@ -379,7 +385,10 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
                 WhatsApp
               </a>
               , call{" "}
-              <a href={`tel:${SITE.phone}`} class="underline decoration-brass underline-offset-4">
+              <a
+                href={`tel:${SITE.phone}`}
+                class="underline decoration-brass underline-offset-4 whitespace-nowrap"
+              >
                 {SITE.phoneDisplay}
               </a>{" "}
               or email{" "}

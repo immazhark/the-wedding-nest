@@ -542,3 +542,13 @@ test("the opening is the photograph alone: no hero film element or request", asy
   await expect(page.locator("[data-grand-film]")).toHaveCount(0);
   expect(requests).toHaveLength(0);
 });
+
+test("a published phone number is never split across lines", async ({ page }) => {
+  await page.goto("/");
+  const links = page.locator('footer a[href^="tel:"]');
+  await expect(links).toHaveCount(2);
+  for (const link of await links.all()) {
+    const rects = await link.evaluate((el) => Array.from(el.getClientRects()).length);
+    expect(rects).toBe(1);
+  }
+});

@@ -17,6 +17,7 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 - **19 Nov (feat/services-occasions-luxury):** services get a faint jaali ground, a saffron-diamond ornament divider and chip links; occasions get large outlined numerals and pill links for other celebrations. 
 - **19 Nov (feat/planner-luxury):** plan page hero gains the nested-arch ornament; the planner stage gets the jaali ground; selection tiles get brass hairlines and a diamond mark; the active step carries a saffron diamond. Visual only: validation, privacy and accessibility logic untouched. 
 - **19 Nov (feat/catering-flagship):** the four catering menus render as menu cards (tagline, labelled courses, dishes marked with saffron diamonds) via a presentation-only parser, `src/lib/services/menu.ts`, which never changes the approved words (a test proves no word is lost). Add-ons stay prose and no prices were added. Story template check and copy review are next.
+- **19 Nov (fix/mobile-review):** reviewed home, plan, catering and 404 at 390px. Fixed published phone numbers wrapping mid-number (nowrap, with e2e regression) and made the door numerals legible over photographs (dark pill).
 
 ## Current implementation
 
