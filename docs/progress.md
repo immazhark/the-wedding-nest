@@ -106,3 +106,5 @@ The cloud browser previously reached staging review but could not complete loadi
 #1 tooling; #2 handover; #3 scaffold/planner; #4 standing merge authorisation; #5 review follow-up; #6 enquiry API; #7 approved creative pass/logo; #8 gated Send step; #9 authentic testimonial policy.
 
 Initial tooling restrictions and scaffold-only handover reports are historical. Cloudflare MCP is connected; no Cloudflare credentials are committed to GitHub.
+
+- Event story template: jaali ground, arch crown on the hero and a hairline ornament before the gallery, so a future story matches the rest of the site. Not visually reviewed: no story is published and no fixture renders the page.
