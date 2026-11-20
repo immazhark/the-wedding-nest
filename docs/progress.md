@@ -19,6 +19,15 @@ Current state first. GitHub and Cloudflare live records remain authoritative for
 - **19 Nov (feat/catering-flagship):** the four catering menus render as menu cards (tagline, labelled courses, dishes marked with saffron diamonds) via a presentation-only parser, `src/lib/services/menu.ts`, which never changes the approved words (a test proves no word is lost). Add-ons stay prose and no prices were added. Story template check and copy review are next.
 - **19 Nov (fix/mobile-review):** reviewed home, plan, catering and 404 at 390px. Fixed published phone numbers wrapping mid-number (nowrap, with e2e regression) and made the door numerals legible over photographs (dark pill).
 
+## Visual review, 21 November 2026 (local dev, Chromium; 320/360/390/768/1024/1440)
+
+Evidence: viewport screenshots at 390 and 1440, programmatic sweep of all six widths on home, plan and catering pages. Not yet reviewed: real touch devices, WebKit/Firefox visuals, tablet screenshots, planner step screens, story template.
+
+- **No horizontal overflow** at any width on the three pages. No content stuck hidden after a full scroll; reduced-motion shows content and hides the kitchen video. Astro dev-toolbar at the bottom of local screenshots is not part of the site.
+- **Fixed (#112):** mobile hero lede clipped by the arch overlap.
+- **Open, art direction (needs owner preview before merge):** (1) the hero scrim leaves the lower ~40% murky and hides the floral stage, especially on mobile; (2) the catering arch loop is a flat saffron close-up that does not read as food, in the biggest catering moment; (3) the "Makeup & beauty" door uses a mehndi-hands photo, so the image implies a service it does not show; (4) the hall-stage photo repeats across hero, décor door and gallery; (5) the preview banner still says "placeholder imagery" though the photographs are real.
+- **Low severity:** standalone phone/WhatsApp links are 20-25px tall on mobile and desktop nav links 19px tall. Inline or spaced, so not a WCAG 2.5.8 failure, but larger hit areas are worth adding when the footer is next touched.
+
 ## Current implementation
 
 | Area | State |
