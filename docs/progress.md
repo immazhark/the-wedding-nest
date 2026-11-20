@@ -1,8 +1,8 @@
-# Project progress — reconciled 19 November 2026
+# Project progress — reconciled 21 November 2026
 
 Current state first. GitHub and Cloudflare live records remain authoritative for commits, checks and exact deployed versions. This snapshot is not a production-launch approval.
 
-**Repository baseline at this update:** `main` at `774cfc5` (#103: owner contact details, catering page published, media pipeline). Check the newest combined `main` CI and Cloudflare deployments live, not this snapshot; this is not launch approval.
+**Repository baseline at this update:** `main` at `3302609` (#111). Verified 21 Nov: `main` CI green, #64 the only open PR (draft, held). The repo is **public** although early docs said private: owner decision pending (founder's personal number, team photo and portrait film are in public view). Cloudflare deployment provenance was last confirmed 19 Nov; re-check before relying on it.
 
 ## Creative direction (approved by the owner and merged in #104)
 

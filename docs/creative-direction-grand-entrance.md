@@ -1,6 +1,6 @@
-# Creative direction: the Grand Entrance (prototype, awaiting owner approval)
+# Creative direction: the Grand Entrance (approved and merged in #104, 19 Nov 2026)
 
-Status: **prototype on a feature branch. Not approved. Do not merge into `main` until the owner approves the visual direction.**
+Status: **approved by the owner and merged to `main` in #104; refined in #105-#111.** Substantial further changes to this direction need a reviewable preview and owner approval first.
 
 ## Why the previous site felt generic (audit, 18 November 2026)
 
