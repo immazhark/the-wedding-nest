@@ -370,6 +370,15 @@
   position: absolute;
   inset: auto 0 0 0;
 }
+.grand-copy-inner {
+  /* Clear the arch that rises over the opening (4.5rem) so the last line is never clipped. */
+  padding-bottom: 6.5rem;
+}
+@media (min-width: 48rem) {
+  .grand-copy-inner {
+    padding-bottom: 7.5rem;
+  }
+}
 .grand-copy h1 {
   text-shadow: 0 2px 28px rgb(0 0 0 / 0.35);
 }
