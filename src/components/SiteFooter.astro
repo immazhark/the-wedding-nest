@@ -39,7 +39,7 @@ const year = new Date().getFullYear();
       </div>
       <nav aria-label="Footer" class="md:col-span-3">
         <h2 class="eyebrow text-sand font-sans">Explore</h2>
-        <ul class="mt-5 space-y-3">
+        <ul class="footer-links mt-5 space-y-3">
           {NAV.map((item) => (
             <li>
               <a href={item.href} class="link-underline">
@@ -51,7 +51,7 @@ const year = new Date().getFullYear();
       </nav>
       <div class="md:col-span-4">
         <h2 class="eyebrow text-sand font-sans">Get in touch</h2>
-        <ul class="mt-5 space-y-3">
+        <ul class="footer-links mt-5 space-y-3">
           <li>
             <a href={`tel:${SITE.phone}`} class="link-underline whitespace-nowrap">
               {SITE.phoneDisplay}
