@@ -1347,3 +1347,13 @@ footer.on-dark {
     align-items: baseline;
   }
 }
+
+/* Footer links: extend the tap area to the full 32px row pitch (no layout change, no overlap). */
+.footer-links a {
+  position: relative;
+}
+.footer-links a::after {
+  content: "";
+  position: absolute;
+  inset: -0.375rem -0.25rem;
+}
