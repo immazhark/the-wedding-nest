@@ -76,3 +76,26 @@ for (const path of [SERVICE, STORY]) {
     expect(serious.map((v) => v.id)).toEqual([]);
   });
 }
+
+// Tablet and in-between widths: no horizontal overflow and every released photograph stays inside the viewport.
+for (const path of [SERVICE, STORY]) {
+  for (const width of [320, 768, 820, 1024, 1280]) {
+    test(`${path} fits a ${width}px-wide viewport`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(path);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        ),
+      ).toBeLessThanOrEqual(0);
+      const overflowing = await page.evaluate(
+        () =>
+          [...document.querySelectorAll("article img")].filter(
+            (img) => img.getBoundingClientRect().right > document.documentElement.clientWidth + 1,
+          ).length,
+      );
+      expect(overflowing).toBe(0);
+    });
+  }
+}
