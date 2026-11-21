@@ -127,3 +127,11 @@ Initial tooling restrictions and scaffold-only handover reports are historical. 
 - Planner at 390: every field has a label; all planner buttons are 44px or taller. Remaining small targets are inline header and footer text links, which meet WCAG 2.5.8 through spacing.
 - Still awaiting owner: #114 scrim approval, catering hero and arch-loop imagery, makeup door photo, banner wording, repo visibility, and all production gates.
 - **#114 evidence (21 Nov):** compared the #114 preview with the main preview at 1440 and 390. Floral stage, sofas and stage floor are clearly visible on #114; headline, lede and CTA stay legible on both. Branch changes only `src/styles/global.css`, mergeable and clean against current `main`. Awaiting owner approval; not merged.
+
+### 22 November 2026
+
+- **Merged #121:** editorial fixtures now sweep 320/768/820/1024/1280px on the synthetic service and story pages (no overflow, no image past the viewport). Story template is therefore covered at tablet widths; it still has no real content.
+- **Draft #120 (owner review):** catering "Choose a menu" jump bar (no JS; name + approved tagline linking to each menu card). CI green. Needs owner visual approval.
+- **#122 (testimonial framework):** zero-by-default, owner-gated quote model (`src/lib/testimonials/`, content in `src/content/testimonials/`), editorial quote section on home that renders only when approved records exist. No ratings, counts or Google text by design. Needs real, permissioned quotes to show anything.
+- **Still awaiting owner:** #114, #120, catering hero and arch-loop imagery, makeup door photo, banner wording, repo visibility/branch protection, first real story facts, quote shortlist and permissions, all production gates.
+
