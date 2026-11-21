@@ -119,3 +119,10 @@ The cloud browser previously reached staging review but could not complete loadi
 Initial tooling restrictions and scaffold-only handover reports are historical. Cloudflare MCP is connected; no Cloudflare credentials are committed to GitHub.
 
 - Event story template: jaali ground, arch crown on the hero and a hairline ornament before the gallery, so a future story matches the rest of the site. Not visually reviewed: no story is published and no fixture renders the page.
+
+### Follow-up, 21 November 2026 (later)
+
+- Merged #116: story hero arches now end with the headline block, so no stray gold lines under the photo. Merged #117: footer link tap areas extended to the 32px row pitch (no visual change).
+- Hero checked in Firefox and WebKit at 390 and 1440: no horizontal overflow, copy clears the arch, layout matches Chromium.
+- Planner at 390: every field has a label; all planner buttons are 44px or taller. Remaining small targets are inline header and footer text links, which meet WCAG 2.5.8 through spacing.
+- Still awaiting owner: #114 scrim approval, catering hero and arch-loop imagery, makeup door photo, banner wording, repo visibility, and all production gates.
