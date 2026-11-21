@@ -23,24 +23,27 @@ const plannerHref = storyPlannerHref(story.occasion);
 <BaseLayout title={story.title} description={story.introduction}>
   <article>
     <div class="page-hero hero-arches-host on-dark">
-      <div class="footer-arches" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-      <header class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-10 pb-12 md:pt-24 md:pb-16">
-        <div class="grid gap-8 md:grid-cols-12 md:items-end">
-          <div class="md:col-span-8">
-            <p class="eyebrow text-saffron fade-in [--i:1]">An event story · {story.occasion}</p>
-            <h1 class="mt-7 text-[length:var(--text-display)] max-w-[14ch] text-ivory fade-in [--i:2]">
-              {story.title}
-            </h1>
-          </div>
-          <p class="md:col-span-4 text-[length:var(--text-lede)] text-stone fade-in [--i:3]">
-            {story.introduction}
-          </p>
+      <div class="relative">
+        {/* Arches end with the headline block so their sides never trail below the photo. */}
+        <div class="footer-arches" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-      </header>
+        <header class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-10 pb-12 md:pt-24 md:pb-16">
+          <div class="grid gap-8 md:grid-cols-12 md:items-end">
+            <div class="md:col-span-8">
+              <p class="eyebrow text-saffron fade-in [--i:1]">An event story · {story.occasion}</p>
+              <h1 class="mt-7 text-[length:var(--text-display)] max-w-[14ch] text-ivory fade-in [--i:2]">
+                {story.title}
+              </h1>
+            </div>
+            <p class="md:col-span-4 text-[length:var(--text-lede)] text-stone fade-in [--i:3]">
+              {story.introduction}
+            </p>
+          </div>
+        </header>
+      </div>
 
       <div class="mx-auto max-w-[110rem] sm:px-8 lg:px-12 pb-24 md:pb-32">
         {hero && (
