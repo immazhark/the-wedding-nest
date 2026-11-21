@@ -1,0 +1,29 @@
+---
+import type { ApprovedTestimonial } from "../lib/testimonials/publication";
+
+interface Props {
+  items: readonly ApprovedTestimonial[];
+}
+const { items } = Astro.props;
+---
+
+{items.length > 0 && (
+  <section class="testimonials on-dark" aria-labelledby="testimonials-title">
+    <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-32">
+      <p class="eyebrow text-saffron">In their words</p>
+      <h2 id="testimonials-title" class="sr-only">
+        What families say about The Wedding Nest
+      </h2>
+      <div class="mt-10 grid gap-16 md:gap-20">
+        {items.map((item) => (
+          <figure class="max-w-4xl">
+            <blockquote class="testimonial-quote">
+              <p>{item.quote}</p>
+            </blockquote>
+            <figcaption class="mt-6 text-sand">— {item.attribution}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
