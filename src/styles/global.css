@@ -1348,6 +1348,64 @@ footer.on-dark {
   }
 }
 
+/* Menu jump bar: four menus at a glance, each linking to its card (no script). */
+.svc-panel[id^="menu-"] {
+  scroll-margin-top: 6rem;
+}
+.menu-switch-label {
+  font-size: 0.75rem;
+  font-weight: 560;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-sand);
+}
+.menu-switch ul {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-switch-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-height: 3.5rem;
+  height: 100%;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--color-saffron) 45%, transparent);
+  border-radius: 0.25rem;
+  color: var(--color-ivory);
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+.menu-switch-link:hover,
+.menu-switch-link:focus-visible {
+  background: color-mix(in srgb, var(--color-saffron) 14%, transparent);
+  border-color: var(--color-saffron);
+}
+.menu-switch-name {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+}
+.menu-switch-tag {
+  font-size: 0.875rem;
+  font-style: italic;
+  color: var(--color-sand);
+}
+@media (min-width: 40rem) {
+  .menu-switch ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 64rem) {
+  .menu-switch ul {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 /* Footer links: extend the tap area to the full 32px row pitch (no layout change, no overlap). */
 .footer-links a {
   position: relative;

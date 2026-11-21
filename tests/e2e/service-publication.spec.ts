@@ -15,3 +15,14 @@ test("the owner-approved catering page is published", async ({ request }) => {
   const response = await request.get("/services/hyderabadi-wedding-catering/");
   expect(response.status()).toBe(200);
 });
+
+test("catering menu jump bar links every menu card", async ({ page }) => {
+  await page.goto("/services/hyderabadi-wedding-catering/");
+  const links = page.getByRole("navigation", { name: "Choose a menu" }).getByRole("link");
+  await expect(links).toHaveCount(4);
+  for (const href of await links.evaluateAll((els) => els.map((e) => e.getAttribute("href")))) {
+    await expect(page.locator(href ?? "#none"), String(href)).toHaveCount(1);
+  }
+  await links.nth(2).click();
+  await expect(page).toHaveURL(/#menu-\d+$/);
+});

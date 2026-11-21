@@ -20,6 +20,11 @@ interface Props {
 const { page } = Astro.props;
 const plannerHref = `/plan-your-event/?service=${page.plannerService}`;
 const photos = servicePhotos(page.slug);
+// Jump bar entries: only sections that render as menu cards, and only when there is a choice.
+const menuEntries = page.sections.flatMap((section, index) => {
+  const menu = parseMenuBody(section.body);
+  return menu ? [{ id: `menu-${index + 1}`, title: section.title, tagline: menu.tagline }] : [];
+});
 ---
 
 <BaseLayout title={page.title} description={page.description}>
@@ -75,10 +80,25 @@ const photos = servicePhotos(page.slug);
         >
           Begin with the particulars.
         </h2>
+        {menuEntries.length > 1 && (
+          <nav class="menu-switch mt-12" aria-label="Choose a menu">
+            <p class="menu-switch-label">Choose a menu</p>
+            <ul>
+              {menuEntries.map((entry) => (
+                <li>
+                  <a href={`#${entry.id}`} class="menu-switch-link">
+                    <span class="menu-switch-name">{entry.title}</span>
+                    {entry.tagline && <span class="menu-switch-tag">{entry.tagline}</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
         <div class="svc-panels mt-14 md:mt-20">
           {page.sections.map((section, index) => (
             <>
-              <div class="svc-panel">
+              <div class="svc-panel" id={`menu-${index + 1}`}>
                 <span class="svc-numeral" aria-hidden="true">
                   {String(index + 1).padStart(2, "0")}
                 </span>
