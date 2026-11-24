@@ -42,3 +42,35 @@ Configuration is checked before any claim or private-data read. The consumer ren
 Permanent failures, invalid/old snapshots and exhausted attempts are held by exhausting claim eligibility and recording a bounded reason. Provider acceptance and lease acknowledgement are recorded in one conditional database update. A failed ACK leaves the event unacknowledged: a later eligible retry reuses the identical provider key and payload within the age window. A transport-contract version change blocks old snapshots for review rather than silently sending a changed payload.
 
 There is still no Worker import, scheduler, HTTP trigger, secret or live consumer. No migration or real send was performed. Staging activation requires separate migration/credential/receipt-test approval. Before live operation, provide an authenticated operator workflow for held/exhausted/expired events and distinguish provider acceptance from inbox receipt. Deleting a lead cannot recall an email already accepted or in flight; provider-side retention/access and this race need inclusion in the operating/privacy procedure. No inbox webhook or automated resend/replay endpoint is introduced here.
+
+## Manual fictional provider receipt workflow
+
+`Manual fictional email receipt test` is a manual-only GitHub Actions workflow. It has no push, schedule, pull-request or webhook trigger. Its default `mock` job runs offline and has no credentials. Ordinary CI also runs the offline probe. The Node 24 script uses native TypeScript stripping and requires no new dependency.
+
+The optional `send` job runs only from `main`, with mode `send`, exact confirmation `SEND ONE FICTIONAL RECEIPT`, a confirmed current domain-verification flag, a valid stable UUID and an original UTC timestamp within the adapter's age window. It uses the `twn-email-receipt` GitHub environment and its `TWN_RESEND_STAGING_API_KEY` secret. No environment, reviewer protection or secret is created by this source change. Configure required reviewers and restrict the environment to `main` before adding the key. If a plan cannot enforce environment protection, leave its secret unset and keep real sends blocked.
+
+The probe sends at most one HTTP request per invocation. It does not poll the inbox, read/write D1, dispatch queued leads or activate a Worker. It only proves the provider sending path when the recipient separately confirms receipt. All logs contain a bounded status, never a key, message content or private provider error. `accepted` is not inbox receipt.
+
+### Secure owner setup (dashboard only; no laptop required)
+
+1. Approve sender `The Wedding Nest <enquiries@theweddingnest.in>` and one fictional receipt message to `theweddingnest.events@gmail.com`.
+2. In GitHub repository Settings → Environments, configure `twn-email-receipt` with required reviewer approval and deployment branch `main`. Do not add a secret before confirming these restrictions.
+3. In Resend, create a **sending-access-only** key restricted to `theweddingnest.in`. Copy it directly into that environment's `TWN_RESEND_STAGING_API_KEY` secret. Never paste it in chat, issue/PR text, a repository file or workflow input. No API key has been created or exported by the agent.
+4. Recheck the provider domain is verified. Run the workflow in `mock` mode first. For the separately approved real probe, choose `send`, enter the exact confirmation, and record a fresh UUID plus its original ISO UTC timestamp with milliseconds. Keep both unchanged for any same-test retry. Never refresh the timestamp or change reference just to bypass a hold/unknown result; reconcile first.
+5. Confirm receipt of the clearly marked test email, then remove the temporary environment key or revoke it once receipt testing is finished. No Worker sending key is installed by this workflow.
+
+### Exact receipt message contract
+
+Sender and recipient are fixed as above. Subject is `[TEST] The Wedding Nest | New enquiry <first eight reference characters>`. Test idempotency keys use a separate `twn-receipt/` namespace; real enquiry keys stay `twn-enquiry/`.
+
+Body (the only variable is the non-personal test UUID):
+
+```text
+FICTIONAL STAGING RECEIPT TEST — THE WEDDING NEST
+No customer enquiry. No booking or response to a customer is required.
+Test reference: <UUID>
+This checks the email provider path only, not the deployed Worker or database.
+Please confirm inbox receipt to the project owner using the test reference.
+```
+
+This workflow is prepared and mock-tested only. No real workflow send, secret provisioning, hosted migration, inbox confirmation or public activation has occurred. A later Worker integration test still needs its own isolated staging setup and explicit receipt authorisation.

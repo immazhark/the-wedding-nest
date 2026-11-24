@@ -12,6 +12,8 @@ export interface EmailConfiguration {
 }
 
 export interface OperatorEmailEvent {
+  /** Receipt probes use a separate provider key namespace and an explicit test subject. */
+  purpose?: "receipt-test";
   id: string;
   /** Immutable outbox creation time; never refresh this on retry. */
   createdAt: string;
@@ -51,6 +53,7 @@ export async function sendOperatorEmail(
   const createdAt = Date.parse(event.createdAt);
   const age = now.getTime() - createdAt;
   if (
+    (event.purpose !== undefined && event.purpose !== "receipt-test") ||
     !UUID.test(event.id) ||
     !UUID.test(event.notice.enquiryId) ||
     !Number.isFinite(age) ||
@@ -75,13 +78,16 @@ export async function sendOperatorEmail(
       headers: {
         Authorization: `Bearer ${config.apiKey}`,
         "Content-Type": "application/json",
-        "Idempotency-Key": `twn-enquiry/${event.id.toLowerCase()}`,
+        "Idempotency-Key": `${event.purpose === "receipt-test" ? "twn-receipt" : "twn-enquiry"}/${event.id.toLowerCase()}`,
       },
       body: JSON.stringify({
         from: "The Wedding Nest <enquiries@theweddingnest.in>",
         to: ["theweddingnest.events@gmail.com"],
         reply_to: "theweddingnest.events@gmail.com",
-        subject: event.notice.subject,
+        subject:
+          event.purpose === "receipt-test"
+            ? `[TEST] ${event.notice.subject}`
+            : event.notice.subject,
         text: event.notice.text,
       }),
     });

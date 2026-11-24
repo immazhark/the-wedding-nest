@@ -1,0 +1,67 @@
+name: Manual fictional email receipt test
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [mock, send]
+        default: mock
+        description: Mock is offline; send requires separate receipt approval
+      approval:
+        type: string
+        default: ""
+        description: For send mode enter SEND ONE FICTIONAL RECEIPT
+      domain_verified:
+        type: boolean
+        default: false
+        description: Confirm the sending domain is currently provider-verified
+      reference:
+        type: string
+        default: ""
+        description: Stable UUID for an approved send; reuse for retries
+      created_at:
+        type: string
+        default: ""
+        description: Original test UTC timestamp with milliseconds; never refresh on retry
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manual-email-receipt
+  cancel-in-progress: false
+
+jobs:
+  mock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: node scripts/email-receipt-test.mjs
+        env:
+          TWN_RECEIPT_MODE: mock
+
+  send:
+    needs: mock
+    if: github.ref == 'refs/heads/main' && inputs.mode == 'send' && inputs.approval == 'SEND ONE FICTIONAL RECEIPT' && inputs.domain_verified
+    environment: twn-email-receipt
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Send one fictional provider receipt probe
+        env:
+          TWN_RECEIPT_MODE: send
+          TWN_RECEIPT_APPROVAL: ${{ inputs.approval }}
+          TWN_RECEIPT_DOMAIN_VERIFIED: "true"
+          TWN_RECEIPT_REFERENCE: ${{ inputs.reference }}
+          TWN_RECEIPT_CREATED_AT: ${{ inputs.created_at }}
+          TWN_RESEND_STAGING_API_KEY: ${{ secrets.TWN_RESEND_STAGING_API_KEY }}
+        run: node scripts/email-receipt-test.mjs
