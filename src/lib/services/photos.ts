@@ -7,7 +7,7 @@ import { approvedEventPhotos, type ApprovedPhoto } from "../media/catalog";
 
 const dir = "../../assets/events/catering/";
 const CATERING = {
-  hero: `${dir}hall-service-banner/01-hall-with-banner.jpg`,
+  hero: `${dir}menu-table-details/02-pineapple-dish.jpg`,
   strip: [
     `${dir}menu-table-details/01-savoury-bowl.jpg`,
     `${dir}menu-table-details/03-saffron-dessert-cup.jpg`,

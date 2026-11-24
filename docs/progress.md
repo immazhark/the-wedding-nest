@@ -1,5 +1,11 @@
 # Project progress — reconciled 21 November 2026
 
+## Visual candidate — 24 November 2026 (owner review, not merged)
+
+Branch `preview/food-led-catering-20261124`, based on main `e2f76d8`. Catering opens on the already permission-paired pineapple/table photograph instead of the hall/chandelier. Makeup & beauty uses its existing typographic jewel door until a genuine makeup photograph is supplied; the Mehndi-hands image no longer implies makeup work. No asset, menu wording, service claim or Grand Entrance direction is changed.
+
+This is an owner-review candidate, independent of #114 scrim and #120 menu-jump choices. CI and a real preview review are required; no visual approval or merge is claimed.
+
 Current state first. GitHub and Cloudflare live records remain authoritative for commits, checks and exact deployed versions. This snapshot is not a production-launch approval.
 
 **Repository baseline at this update:** `main` at `4bf9612` (#118), CI green (run 44843967280). Open PRs, both drafts: #114 (lighter hero scrim, awaiting owner creative approval) and #64 (staging rate limiting, held for Cloudflare entitlement/cost review). Governance checked 21 Nov: no rulesets, `main` not branch-protected (owner decision, no change made). The repo is **public** although early docs said private: owner decision pending (founder's personal number, team photo and portrait film are in public view). Cloudflare deployment provenance was last confirmed 19 Nov; re-check before relying on it.
