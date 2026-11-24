@@ -143,3 +143,9 @@ Initial tooling restrictions and scaffold-only handover reports are historical. 
 - Planner at 390: every field has a label; all planner buttons are 44px or taller. Remaining small targets are inline header and footer text links, which meet WCAG 2.5.8 through spacing.
 - Still awaiting owner: #114 scrim approval, catering hero and arch-loop imagery, makeup door photo, banner wording, repo visibility, and all production gates.
 - **#114 evidence (21 Nov):** compared the #114 preview with the main preview at 1440 and 390. Floral stage, sofas and stage floor are clearly visible on #114; headline, lede and CTA stay legible on both. Branch changes only `src/styles/global.css`, mergeable and clean against current `main`. Awaiting owner approval; not merged.
+
+### Email delivery preparation, 24 November 2026
+
+- #124 release/share/indexing safeguards and #125 draft privacy/unsuccessful retention are merged; main `096b846` was verified against its tested tree and successful Cloudflare preview build.
+- Owner approved the four email-authentication DNS records; added DNS-only and read back without replacing existing records. Provider subsequently verified the domain and all four records.
+- Added a dormant single-attempt email adapter with a fixed operator recipient, event idempotency key, conservative age cutoff, timeout and safe result classifications. No Worker import, cron, credentials, live sends or migrations. See [email-notifications.md](email-notifications.md) for consumer/credential/receipt gates.
