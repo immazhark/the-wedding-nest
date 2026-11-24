@@ -16,7 +16,7 @@ Source: `C:\Users\khana\OneDrive\Desktop\TWNMedia` (outside the repo; never comm
 | Videos decoded and sampled (8 frames each + 1.2 s audio-decode probe) | 56, 0 decode errors |
 | **Videos reviewed in full at playback speed** | **0** |
 | GPS tags in image EXIF | none found in the 296 decodable images |
-| Assets selected for integration this increment | 0 (placement proposed below) |
+| Assets integrated on the site (25 Nov) | 8: video M081 (home kitchen arch, #133); images M212, M174, M221, M185, M114, M316, M200 (home gallery reel, #134, refs T0019-T0025) |
 
 Not fully reviewed: images were judged on 300 px thumbnails (subject, composition, obvious quality, visible text/plates/faces), not at 100%; videos were frame-sampled, so motion quality, jump cuts and audio content remain unchecked. Both need a full-resolution/playback pass on each selected asset before publication.
 
@@ -171,7 +171,11 @@ All but M119 contain an audio track. Speech/music content was **not** reviewed, 
 | Favours | M136, M138, M196, M188 | Avoid M135-M147 (names) |
 | Cars | M043, M042, M049 | Blur plates; confirm whether car decoration is a service |
 
-## Owner decisions needed before publishing
+## Owner decisions (25 Nov: faces, client names on cards, plate blur, `twn.events` overlays to be ignored, no raw-meat imagery; all cleared or instructed)
+
+Remaining follow-ups: blur licence plates before any car image or video (M042-M050, M019, M029, M362) goes live; never publish M187 or other `twn.events` overlays unedited; keep audio muted until heard.
+
+## Original decisions (superseded by the above)
 
 1. Faces: staff team (M002, M003, M248-M273, M355-M361), groom/family (M171-M177), guests (M064, M211, several videos), chefs in videos. Which may be shown?
 2. Client names/dates on invitations and welcome boards (M135-M147, M152, M216-M220). Recommend not publishing without blur or consent.
