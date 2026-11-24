@@ -45,7 +45,10 @@ After a staging deployment, run the synthetic HTTP script or the manually runnab
 
 - Every build ships `X-Robots-Tag: noindex, nofollow`, `<meta name="robots" content="noindex, nofollow">` and a disallow-all `robots.txt`.
 - noindex is **not access control**. If previews must be private, add Cloudflare Access to the workers.dev / preview hostnames (owner decision).
-- Production launch (later, owner-gated): set `PUBLIC_ALLOW_INDEXING=true` as a build variable for the production build only. That single switch changes `<meta name="robots">`, the generated `robots.txt` and removes `X-Robots-Tag` together (unit tested in `tests/unit/seo-files.test.ts`). Add a sitemap and attach the custom domain in the same release.
+- `PUBLIC_SITE_RELEASED=true` controls only the approved public display state. It does not enable indexing or enquiry intake. Dummy-key submission builds always retain their fictional-data warning.
+- Public indexing remains a separate owner-gated release: set `PUBLIC_ALLOW_INDEXING=true` only after domain/redirect/host-policy approval. The build now refuses indexing unless `PUBLIC_SITE_RELEASED=true` and root `wrangler.jsonc` explicitly declares both `workers_dev: false` and `preview_urls: false`. It also refuses an indexable dummy-key test environment. Current preview configuration stays unchanged and noindex.
+- The root-host guard protects the default deployment contract; it does not inspect Cloudflare live routes or overrides. Verify actual custom-domain TLS, apex/www redirects and every old preview host at release. If previews remain needed, use a separate protected/nonindexable deployment; never reuse indexable production assets there.
+- Once the guard and owner-approved deployment conditions are satisfied, the existing indexing switch changes robots meta, robots.txt, X-Robots-Tag and sitemap together. No flags, domains or provider settings are activated by committing this code.
 
 ## Security headers
 
