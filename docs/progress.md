@@ -1,5 +1,15 @@
 # Project progress — reconciled 21 November 2026
 
+## Execution update — 24 November 2026 (not yet merged)
+
+Branch: `feat/prelaunch-release-readiness-20261124`, based on `e2f76d8a77a3fd8bdee31fced2bb00cbdce89fb5`. Scope: default-off public-display flag with test warning precedence, official-logo OG/Twitter sharing image, and a build-time indexing guard requiring explicit public release plus disabled default workers.dev/version previews. Current Wrangler flags and Cloudflare settings are unchanged. Main remains noindex with intake disabled.
+
+Owner confirmed notification destinations WhatsApp +91 86867 73095 and theweddingnest.events@gmail.com, privacy contact at that email, and 90 days for unsuccessful enquiries. Booked-client retention remains undecided; the unsuccessful-status/clock and authenticated deletion process still need definition. No sender, retention job, migration or live intake is activated.
+
+Checks: 21 focused release/host/component tests pass. Prepared candidate previously passed 177 unit/component tests, three static build variants and six direct HTTP metadata/image checks; that is not a browser pass. Current full branch verification is in progress. This execution environment blocks browser sockets and local Workerd network enumeration; GitHub CI must establish those checks before acceptance. Existing owner-review PRs #114/#120, testimonial PR #122, rate-limit hold #64 and docs PR #123 remain open and are not duplicated.
+
+The following reconciliation is historical; the execution update above is newer.
+
 Current state first. GitHub and Cloudflare live records remain authoritative for commits, checks and exact deployed versions. This snapshot is not a production-launch approval.
 
 **Repository baseline at this update:** `main` at `4bf9612` (#118), CI green (run 44843967280). Open PRs, both drafts: #114 (lighter hero scrim, awaiting owner creative approval) and #64 (staging rate limiting, held for Cloudflare entitlement/cost review). Governance checked 21 Nov: no rulesets, `main` not branch-protected (owner decision, no change made). The repo is **public** although early docs said private: owner decision pending (founder's personal number, team photo and portrait film are in public view). Cloudflare deployment provenance was last confirmed 19 Nov; re-check before relying on it.
