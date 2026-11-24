@@ -173,3 +173,7 @@ Initial tooling restrictions and scaffold-only handover reports are historical. 
 
 - Owner cleared faces, client names, plate blur, `twn.events` (ignore) and no raw-meat imagery for the new collection (`docs/media-inventory.md`, #132).
 - Home kitchen arch now plays a silent 6.6 s plating clip (M081; 720x900, 0.9 MB, no audio, poster from the plated dish) instead of the flat saffron pot. Checked at 390 and 1440: plays, no horizontal overflow. Catering-page hero and Makeup door stay with #126.
+### 25 November 2026: media collection inventory
+
+- `docs/media-inventory.md`: 364 files in TWNMedia (308 images, 56 videos), 26 exact duplicates, 11 distinct HEIC files blocked (HEVC), all decodable images viewed on contact sheets, all videos frame-sampled but **none reviewed in full**. Nothing integrated yet. Owner decisions on faces, client names on cards, plates and overlays are listed there.
+- #123 conflicted with `main`; replaced by #131 (merged). #133 (merged) swaps the home catering loop for a real plating clip.
