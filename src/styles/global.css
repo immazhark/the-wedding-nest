@@ -340,9 +340,10 @@
 }
 .grand-stage {
   position: relative;
-  height: calc(100svh - 7rem);
-  min-height: 34rem;
-  max-height: 62rem;
+  /* A floor, not a fixed height: on short windows the copy must grow the stage, never be clipped by it. */
+  min-height: clamp(34rem, calc(100svh - 7rem), 62rem);
+  display: flex;
+  align-items: flex-end;
   overflow: hidden;
 }
 .grand-photo {
@@ -367,10 +368,11 @@
     linear-gradient(to bottom, rgb(11 17 14 / 0.45) 0%, transparent 22%);
 }
 .grand-copy {
-  position: absolute;
-  inset: auto 0 0 0;
+  position: relative;
+  width: 100%;
 }
 .grand-copy-inner {
+  padding-top: 2rem;
   /* Clear the arch that rises over the opening (4.5rem) so the last line is never clipped. */
   padding-bottom: 6.5rem;
 }

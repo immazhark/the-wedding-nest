@@ -187,3 +187,8 @@ Initial tooling restrictions and scaffold-only handover reports are historical. 
 ### 25 November 2026: décor door no longer repeats the hall stage
 
 - The "Décor, florals & staging" door on home now uses the marigold-and-jasmine lattice backdrop (`M154`, `T0026`, 1300 px, 375 KB) instead of the stage-seating photo that also appears in the gallery and hero. Closes open item 4 from the 21 Nov visual review. Checked on a production build at 1440 and 390: title legible over the scrim, no overflow.
+
+### 25 November 2026: hero clipped on short windows (fix)
+
+- Owner reported overlap in the hero/header. Reproduced on the live preview: on windows shorter than the hero copy (about 1366x650 laptops, 1280x600, landscape phones) the stage was a fixed height with the copy pinned to its bottom and `overflow: hidden`, so the first headline line slid under the sticky header and was cut off. The stage now uses a `min-height` floor and grows with its copy.
+- Regression test `tests/e2e/hero-fit.spec.ts` (five viewport sizes): failed on main for four of them (headline top 1-80 px vs 106 px header), passes after the fix. Desktop and mobile e2e for site, visual-review and performance specs all pass locally (96).
