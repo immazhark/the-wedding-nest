@@ -371,7 +371,7 @@
   position: relative;
   width: 100%;
 }
-.grand-copy-inner {
+.grand-copy-inner {
   padding-top: 2rem;
   /* Clear the arch that rises over the opening (4.5rem) so the last line is never clipped. */
   padding-bottom: 6.5rem;
