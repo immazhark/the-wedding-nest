@@ -1,12 +1,23 @@
-# Project progress — reconciled 21 November 2026
+# Project progress — reconciled 24 November 2026
 
-## Retention and privacy follow-up — 24 November 2026 (not yet merged)
+## Current staging readiness — 24 November 2026
+
+- Source implementation through #129 is merged; main at this check is `710b1fbbbde5476ee0429dbfb039d4690dbd1684`. #124/#125 contain release/privacy/retention preparation; #127/#128 contain the dormant email adapter/consumer; #129 contains the offline-default manual provider receipt probe. Latest functional validation: 226 unit/component tests, build/type/format checks and full GitHub browser/runtime CI passed for #129.
+- Under the owner's continued implementation authorisation, applied migrations **0002, 0003 and 0004** only to the verified isolated `twn-enquiries-staging` database (`7a2c8b44-f24d-48e6-ba95-56aa039d60e8`). Schema read-back confirmed every new column, both added indexes and the notice immutability trigger. Foreign-key check returned no violations. No enquiry payload was read, classified, backfilled, deleted or dispatched; no cleanup was scheduled. These additive schema changes do not activate their dormant callers.
+- Created GitHub environment **twn-email-receipt** and visibly verified required reviewer **immazhark**, administrator bypass **disabled**, exactly branch **main** allowed and **zero tags** allowed. Prevent-self-review remains off so the sole owner can approve their own manually initiated workflow. This is an approval gate, not separation between the owner and an agent using the same account. No environment secret or variable exists; no credential was created or entered.
+- Public Worker recheck: intake disabled and no D1 binding. Isolated staging still points only to the named test database and exact staging Origin. No live delivery, real messages, public domain attachment, indexing or real intake was activated.
+- Post-migration HTTP GET checks of the staging homepage and `/api/enquiry` both returned 403 from this execution environment. This does not establish an application regression or a successful intake check; no real submission was attempted. Schema and binding verification above succeeded independently.
+- Remaining secure owner step: create a domain-restricted sending-only key and put it directly in the protected environment as `TWN_RESEND_STAGING_API_KEY` (never in chat). The real fictional receipt probe remains unrun and must be separately approved; its result would prove only the provider path until inbox receipt is confirmed. Deployed Worker/consumer integration and live operator/retention procedures remain outstanding.
+
+The implementation snapshots below retain the status and test counts at the time they were written; their old "not applied" or unmerged statements are superseded by this current section.
+
+## Historical retention implementation snapshot — 24 November 2026
 
 Branch `feat/unsuccessful-enquiry-retention-20261124` follows the release-readiness candidate. Adds migration 0003 (not applied), explicit unsuccessful disposition/90-day clock, aggregate preview and bounded guarded deletion primitives. Active/booked/unknown-clock records are protected; pending deliveries are counted and held for review. No deletion job, API route, sender or migration execution is enabled. Adds an honest pre-launch privacy notice, linked from footer and planner; this is not a final operational/legal approval.
 
 Focused real-SQLite retention tests pass (14 tests in worker-sqlite suite). Full branch unit/component suite: 194 passed; Astro check: zero errors, warnings or hints; formatting passes. GitHub build/browser/runtime CI remains required. No customer database was read or modified.
 
-## Execution update — 24 November 2026 (not yet merged)
+## Historical release-readiness implementation snapshot — 24 November 2026
 
 Branch: `feat/prelaunch-release-readiness-20261124`, based on `e2f76d8a77a3fd8bdee31fced2bb00cbdce89fb5`. Scope: default-off public-display flag with test warning precedence, official-logo OG/Twitter sharing image, and a build-time indexing guard requiring explicit public release plus disabled default workers.dev/version previews. Current Wrangler flags and Cloudflare settings are unchanged. Main remains noindex with intake disabled.
 
