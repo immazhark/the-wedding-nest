@@ -43,7 +43,12 @@ const split = Boolean(photos.hero);
 <BaseLayout title={page.title} description={page.description} invite={false}>
   <article>
     <header class:list={["svc-hero on-dark", split && "svc-hero-split"]}>
-      <div class="svc-hero-copy mx-auto w-full max-w-[90rem] px-4 sm:px-8 lg:px-12">
+      <div
+        class:list={[
+          "svc-hero-copy mx-auto w-full max-w-[90rem] px-4 sm:px-8 lg:px-12",
+          !split && "pt-24 pb-14 md:pt-40 md:pb-20",
+        ]}
+      >
         <p class="eyebrow text-saffron fade-in [--i:1]">Explore an event service</p>
         <h1 class="mt-6 text-[length:var(--text-display)] max-w-[14ch] text-ivory">
           <span class="line-mask">
