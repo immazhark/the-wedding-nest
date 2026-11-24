@@ -49,6 +49,54 @@ const doorPhotos: Record<string, string> = {
   transport: "../../assets/events/celebrations/decorated-car/01-garlanded-car.jpg",
   gifting: "../../assets/events/details/gift-box-ribbon/01-gold-gift-box-ribbon.jpg",
 };
+// The gallery reel: seven more real moments, laid out as a mosaic (md+ columns / aspect are tuned so rows end level).
+const ev = "../../assets/events/";
+const reel = [
+  {
+    file: "decor/garden-night-seating/01-string-lights-seating.jpg",
+    cls: "reel-a",
+    aspect: "aspect-[3/2] md:aspect-[8/5]",
+    sizes: "(min-width: 768px) 62vw, 100vw",
+  },
+  {
+    file: "shaadi/groom-orange-door/01-groom-in-doorway.jpg",
+    cls: "reel-b",
+    aspect: "aspect-[4/5]",
+    sizes: "(min-width: 768px) 31vw, 100vw",
+    arch: true,
+  },
+  {
+    file: "celebrations/couple-garlands/01-couple-holding-hands.jpg",
+    cls: "reel-c",
+    aspect: "aspect-[3/2] md:aspect-square",
+    sizes: "(min-width: 768px) 31vw, 100vw",
+  },
+  {
+    file: "nikah/nikah-signing/01-signing-jasmine-bracelet.jpg",
+    cls: "reel-d",
+    aspect: "aspect-[3/2] md:aspect-square",
+    sizes: "(min-width: 768px) 31vw, 100vw",
+  },
+  {
+    file: "catering/table-setting-gold/01-gold-runner-place-settings.jpg",
+    cls: "reel-e",
+    aspect: "aspect-[3/2] md:aspect-square",
+    sizes: "(min-width: 768px) 31vw, 100vw",
+  },
+  {
+    file: "catering/saffron-biryani/01-saffron-biryani-plate.jpg",
+    cls: "reel-f",
+    aspect: "aspect-[3/2] md:aspect-[28/25]",
+    sizes: "(min-width: 768px) 55vw, 100vw",
+  },
+  {
+    file: "mehndi/mehndi-hands-vertical/01-henna-hands-portrait.jpg",
+    cls: "reel-g",
+    aspect: "aspect-[4/5]",
+    sizes: "(min-width: 768px) 38vw, 100vw",
+    arch: true,
+  },
+].map((r) => ({ ...r, photo: approvedEventPhotos[ev + r.file] }));
 const thresholdPhoto =
   approvedEventPhotos["../../assets/events/catering/menu-table-details/04-white-dessert-glass.jpg"];
 ---
@@ -493,6 +541,17 @@ const thresholdPhoto =
           photographed it.
         </p>
       </div>
+      <div class="reel mt-24 md:mt-32">
+        {reel.map((r) => (
+          <Frame
+            photo={r.photo}
+            tone="dark"
+            aspectClass={r.aspect}
+            sizes={r.sizes}
+            class:list={["reel-item", r.cls, r.arch && "reel-arch"]}
+          />
+        ))}
+      </div>
     </div>
   </section>
 </BaseLayout>
@@ -652,6 +711,52 @@ const thresholdPhoto =
   .work-grid :global(.work-d) {
     padding-top: 1.25rem;
     border-top: 1px solid var(--color-saffron);
+  }
+  /* The reel: a second, denser act of real work. Rows are tuned to end level on desktop. */
+  .reel {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .reel :global(.reel-item) {
+    outline: 1px solid color-mix(in srgb, var(--color-saffron) 45%, transparent);
+    outline-offset: 0.6rem;
+    box-shadow: 0 2.5rem 4rem -1.5rem rgb(0 0 0 / 0.6);
+    border-radius: 0.75rem;
+  }
+  .reel :global(.reel-item > :first-child) {
+    border-radius: 0.75rem;
+  }
+  .reel :global(.reel-arch),
+  .reel :global(.reel-arch > :first-child) {
+    border-radius: 999px 999px 0.75rem 0.75rem;
+  }
+  @media (min-width: 48rem) {
+    .reel {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 2rem;
+      align-items: start;
+    }
+    .reel :global(.reel-a) {
+      grid-column: 1 / span 8;
+    }
+    .reel :global(.reel-b) {
+      grid-column: 9 / span 4;
+    }
+    .reel :global(.reel-c) {
+      grid-column: 1 / span 4;
+    }
+    .reel :global(.reel-d) {
+      grid-column: 5 / span 4;
+    }
+    .reel :global(.reel-e) {
+      grid-column: 9 / span 4;
+    }
+    .reel :global(.reel-f) {
+      grid-column: 1 / span 7;
+    }
+    .reel :global(.reel-g) {
+      grid-column: 8 / span 5;
+    }
   }
 </style>
 
