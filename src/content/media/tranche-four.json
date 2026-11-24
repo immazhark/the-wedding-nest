@@ -62,6 +62,15 @@
       "orientation": "portrait",
       "permission": true,
       "releaseRef": "TWN-REL-2026-T0025"
+    },
+    {
+      "file": "../../assets/events/decor/marigold-jasmine-backdrop/01-marigold-jasmine-backdrop.jpg",
+      "alt": "A freestanding backdrop of yellow marigold garlands and white jasmine strung in a diamond lattice over saffron fabric, on a patterned floor.",
+      "category": "decor",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0026"
     }
   ]
 }

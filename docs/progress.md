@@ -183,3 +183,7 @@ Initial tooling restrictions and scaffold-only handover reports are historical. 
 - Home gallery gains a seven-frame mosaic below the original three (`src/content/media/tranche-four.json`, refs `TWN-REL-2026-T0019`-`T0025`, owner-attested 25 Nov): night garden seating, groom in a doorway, couple holding hands, nikah signing, gold place settings, saffron biryani, henna hands. Derivatives 1200-2400 px, 248-408 KB, EXIF stripped. Portraits sit in arches; desktop rows end level; one column on phones.
 - Checked on a production build at 1440, 820 and 390: all seven load, no horizontal overflow. New guard test `tests/unit/media-manifests.test.ts` (unique release refs and alts, files exist).
 - Still not integrated: décor/home-event backdrops, cars (plates need blur), favours beyond existing, more videos.
+
+### 25 November 2026: décor door no longer repeats the hall stage
+
+- The "Décor, florals & staging" door on home now uses the marigold-and-jasmine lattice backdrop (`M154`, `T0026`, 1300 px, 375 KB) instead of the stage-seating photo that also appears in the gallery and hero. Closes open item 4 from the 21 Nov visual review. Checked on a production build at 1440 and 390: title legible over the scrim, no overflow.

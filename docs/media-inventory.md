@@ -16,7 +16,7 @@ Source: `C:\Users\khana\OneDrive\Desktop\TWNMedia` (outside the repo; never comm
 | Videos decoded and sampled (8 frames each + 1.2 s audio-decode probe) | 56, 0 decode errors |
 | **Videos reviewed in full at playback speed** | **0** |
 | GPS tags in image EXIF | none found in the 296 decodable images |
-| Assets integrated on the site (25 Nov) | 8: video M081 (home kitchen arch, #133); images M212, M174, M221, M185, M114, M316, M200 (home gallery reel, #134, refs T0019-T0025) |
+| Assets integrated on the site (25 Nov) | 9: video M081 (home kitchen arch, #133); images M212, M174, M221, M185, M114, M316, M200 (gallery reel, #134, T0019-T0025); M154 (décor door, T0026) |
 
 Not fully reviewed: images were judged on 300 px thumbnails (subject, composition, obvious quality, visible text/plates/faces), not at 100%; videos were frame-sampled, so motion quality, jump cuts and audio content remain unchecked. Both need a full-resolution/playback pass on each selected asset before publication.
 
