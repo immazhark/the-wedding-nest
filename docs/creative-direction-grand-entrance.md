@@ -89,6 +89,6 @@ No new library. Everything is CSS and a few lines of TypeScript. GSAP, Lenis, OG
 ## Still unapproved or open
 
 - All copy remains draft. The preview banner still says "placeholder imagery" because some slots still use honest placeholders.
-- The kitchen loop is a golden, saffron-streaked pot; the owner should confirm it is the clip they want and what to call it.
+- The kitchen loop (25 Nov) is a cook plating curry from a large pot (source `M081`, silent H.264 4:5, ~0.9 MB, re-encoded in Chrome; no faces visible); the former saffron pot clip is retired.
 - The remaining sections have not been redesigned. That follows approval.
 - **Gallery and closing (19 Nov 2026):** the work section is now an emerald chapter with saffron-edged photographs and the arch divider; the footer invitation has a nested saffron arch ornament.
