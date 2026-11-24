@@ -1,0 +1,58 @@
+{
+  "images": [
+    {
+      "file": "../../assets/events/catering/hero-biryani-hall/01-biryani-hall-banner.jpg",
+      "alt": "A plate of golden biryani on a white-clothed banquet table in a gold and cream hall, with other dishes, a glass of orange juice and a Wedding Nest catering banner behind.",
+      "category": "catering",
+      "focal": "bottom-right",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0027"
+    },
+    {
+      "file": "../../assets/events/catering/menu-deccani-platter/01-rolls-platter.jpg",
+      "alt": "A foil platter of golden fried rolls and other starters on shredded red and white cabbage, with broccoli and pepper garnish.",
+      "category": "catering",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0028"
+    },
+    {
+      "file": "../../assets/events/catering/menu-nawabi-biryani/01-biryani-with-menu-stand.jpg",
+      "alt": "A large plate of long-grain biryani with meat, on a banquet table beside a menu stand.",
+      "category": "catering",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0029"
+    },
+    {
+      "file": "../../assets/events/catering/menu-daawat-grill/01-grilled-chicken-platter.jpg",
+      "alt": "Charred, spiced grilled chicken pieces heaped on a foil-lined plate on a banquet table.",
+      "category": "catering",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0030"
+    },
+    {
+      "file": "../../assets/events/catering/menu-shahi-haleem/01-haleem-cashew-topping.jpg",
+      "alt": "A white bowl of a rich, slow-cooked dish topped with whole cashews and golden fried onions.",
+      "category": "catering",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0031"
+    },
+    {
+      "file": "../../assets/events/catering/dessert-saffron-bowl/01-saffron-dessert-almonds.jpg",
+      "alt": "A glass bowl of golden, saffron-coloured dessert scattered with flaked almonds.",
+      "category": "catering",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0032"
+    }
+  ]
+}

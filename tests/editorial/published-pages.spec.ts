@@ -13,7 +13,7 @@ test("approved service template renders a useful, accessible and linked page", a
     "CI-only service page — never publish",
   );
   await expect(page.locator("main article").getByRole("heading", { level: 2 })).toHaveCount(2);
-  await expect(page.getByRole("link", { name: "Explore in the planner" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Begin planning" })).toHaveAttribute(
     "href",
     "/plan-your-event/?service=hospitality",
   );

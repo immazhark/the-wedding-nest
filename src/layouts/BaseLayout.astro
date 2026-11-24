@@ -19,9 +19,11 @@ import {
 interface Props {
   title?: string;
   description?: string;
+  /** The footer's "Begin planning" band. Off where the page already ends with its own invitation. */
+  invite?: boolean;
 }
 
-const { title, description = SITE.description } = Astro.props;
+const { title, description = SITE.description, invite = true } = Astro.props;
 const fullTitle = pageTitle(title);
 const canonical = canonicalUrl(Astro.url.pathname);
 ---
@@ -75,7 +77,7 @@ const canonical = canonicalUrl(Astro.url.pathname);
     <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
       <slot />
     </main>
-    <SiteFooter />
+    <SiteFooter invite={invite} />
     <script>
       import "../scripts/arrive";
     </script>
