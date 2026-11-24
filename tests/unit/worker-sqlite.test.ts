@@ -6,7 +6,13 @@ import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 import { handleEnquiry } from "../../src/worker/enquiry";
-import { deleteEnquiryRecord, previewRetentionImpact } from "../../src/worker/privacy";
+import {
+  deleteEnquiryRecord,
+  previewRetentionImpact,
+  markEnquiryUnsuccessful,
+  previewUnsuccessfulRetention,
+  deleteExpiredUnsuccessfulEnquiries,
+} from "../../src/worker/privacy";
 import type { D1Like, D1PreparedLike } from "../../src/worker/types";
 
 function sqliteD1(): { d1: D1Like; db: DatabaseSync } {
@@ -237,5 +243,117 @@ describe("read-only retention planning against real SQLite/D1 migration", () => 
     ]) {
       await expect(previewRetentionImpact(d1, cutoff)).rejects.toThrow(/Invalid retention cutoff/);
     }
+  });
+});
+
+describe("owner-approved unsuccessful-enquiry retention", () => {
+  const now = "2026-11-24T00:00:00.000Z";
+  const cutoff = "2026-08-26T00:00:00.000Z";
+  const id = "11111111-2222-4333-8444-111111111111";
+  function setup() {
+    const { d1, db } = sqliteD1();
+    db.exec(readFileSync("migrations/0003_unsuccessful_retention.sql", "utf8"));
+    const add = (key: string, status = "new", closed: string | null = null) => {
+      db.prepare(
+        "INSERT INTO enquiries (id,idempotency_key,created_at,payload_json,consent_at,marketing_consent,status,unsuccessful_at) " +
+          "VALUES (?1,?1,'2026-01-01T00:00:00.000Z','{}','2026-01-01T00:00:00.000Z',0,?2,?3)",
+      ).run(key, status, closed);
+    };
+    return { d1, db, add };
+  }
+
+  it("starts the clock only on an explicit unsuccessful disposition, without resetting it", async () => {
+    const { d1, db, add } = setup();
+    add(id);
+    expect(await markEnquiryUnsuccessful(d1, id, cutoff)).toBe(true);
+    expect(await markEnquiryUnsuccessful(d1, id, now)).toBe(false);
+    expect(db.prepare("SELECT status,unsuccessful_at FROM enquiries").get()).toEqual({
+      status: "unsuccessful",
+      unsuccessful_at: cutoff,
+    });
+  });
+
+  it.each(["booked", "unknown", "cancelled"])(
+    "cannot automatically close a %s record",
+    async (status) => {
+      const { d1, db, add } = setup();
+      add(id, status);
+      expect(await markEnquiryUnsuccessful(d1, id, cutoff)).toBe(false);
+      expect(db.prepare("SELECT status FROM enquiries").get()).toEqual({ status });
+    },
+  );
+
+  it("retains active, booked, unknown-clock, recent and pending-delivery records", async () => {
+    const { d1, db, add } = setup();
+    add(id, "unsuccessful", cutoff);
+    add("active", "new");
+    add("booked", "booked", cutoff);
+    add("unknown-clock", "unsuccessful");
+    add("recent", "unsuccessful", "2026-08-26T00:00:00.001Z");
+    add("pending", "unsuccessful", cutoff);
+    db.prepare(
+      "INSERT INTO outbox (id,enquiry_id,kind,created_at) VALUES ('event','pending','enquiry.created',?1)",
+    ).run(cutoff);
+    expect(await previewUnsuccessfulRetention(d1, now)).toEqual({
+      eligibleCount: 1,
+      pendingDeliveryCount: 1,
+    });
+    expect(await deleteExpiredUnsuccessfulEnquiries(d1, now)).toBe(1);
+    expect(db.prepare("SELECT COUNT(*) AS c FROM enquiries").get()).toEqual({ c: 5 });
+    expect(await previewUnsuccessfulRetention(d1, now)).toEqual({
+      eligibleCount: 0,
+      pendingDeliveryCount: 1,
+    });
+  });
+
+  it("bounds a deletion batch and cascades delivered events without returning identifiers", async () => {
+    const { d1, db, add } = setup();
+    add(id, "unsuccessful", cutoff);
+    add("second", "unsuccessful", cutoff);
+    db.prepare(
+      "INSERT INTO outbox (id,enquiry_id,kind,created_at,delivered_at) VALUES ('done',?1,'enquiry.created',?2,?2)",
+    ).run(id, cutoff);
+    expect(await deleteExpiredUnsuccessfulEnquiries(d1, now, 1)).toBe(1);
+    expect(db.prepare("SELECT COUNT(*) AS c FROM outbox").get()).toEqual({ c: 0 });
+    expect(db.prepare("SELECT COUNT(*) AS c FROM enquiries").get()).toEqual({ c: 1 });
+  });
+
+  it("rejects malformed times, IDs and unsafe batch limits before database access", async () => {
+    const { d1 } = setup();
+    await expect(markEnquiryUnsuccessful(d1, "bad", now)).rejects.toThrow(/Invalid enquiry id/);
+    await expect(markEnquiryUnsuccessful(d1, id, "2026-02-30T00:00:00.000Z")).rejects.toThrow(
+      /Invalid retention time/,
+    );
+    await expect(previewUnsuccessfulRetention(d1, "2026-11-24")).rejects.toThrow(
+      /Invalid retention time/,
+    );
+    for (const limit of [0, -1, 101, 1.5, NaN]) {
+      await expect(deleteExpiredUnsuccessfulEnquiries(d1, now, limit)).rejects.toThrow(
+        /Invalid retention batch/,
+      );
+    }
+  });
+
+  it("rechecks eligibility after a preview so a newly booked enquiry is protected", async () => {
+    const { d1, db, add } = setup();
+    add(id, "unsuccessful", cutoff);
+    expect((await previewUnsuccessfulRetention(d1, now)).eligibleCount).toBe(1);
+    db.prepare("UPDATE enquiries SET status = 'booked' WHERE id = ?1").run(id);
+    expect(await deleteExpiredUnsuccessfulEnquiries(d1, now)).toBe(0);
+    expect(db.prepare("SELECT COUNT(*) AS c FROM enquiries").get()).toEqual({ c: 1 });
+  });
+
+  it("does not manufacture a closure date for legacy records or accept invalid database times", async () => {
+    const { d1, db } = sqliteD1();
+    db.prepare(
+      "INSERT INTO enquiries (id,idempotency_key,created_at,payload_json,consent_at,status) " +
+        "VALUES (?1,?1,'2026-01-01T00:00:00.000Z','{}','2026-01-01T00:00:00.000Z','unsuccessful')",
+    ).run(id);
+    db.exec(readFileSync("migrations/0003_unsuccessful_retention.sql", "utf8"));
+    expect(await deleteExpiredUnsuccessfulEnquiries(d1, now)).toBe(0);
+    expect(() => db.prepare("UPDATE enquiries SET unsuccessful_at = 'not-a-time'").run()).toThrow();
+    expect(() =>
+      db.prepare("UPDATE enquiries SET unsuccessful_at = '2026-02-30T00:00:00.000Z'").run(),
+    ).toThrow();
   });
 });

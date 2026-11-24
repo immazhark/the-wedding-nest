@@ -1,10 +1,16 @@
 # Project progress — reconciled 21 November 2026
 
+## Retention and privacy follow-up — 24 November 2026 (not yet merged)
+
+Branch `feat/unsuccessful-enquiry-retention-20261124` follows the release-readiness candidate. Adds migration 0003 (not applied), explicit unsuccessful disposition/90-day clock, aggregate preview and bounded guarded deletion primitives. Active/booked/unknown-clock records are protected; pending deliveries are counted and held for review. No deletion job, API route, sender or migration execution is enabled. Adds an honest pre-launch privacy notice, linked from footer and planner; this is not a final operational/legal approval.
+
+Focused real-SQLite retention tests pass (14 tests in worker-sqlite suite). Full branch unit/component suite: 194 passed; Astro check: zero errors, warnings or hints; formatting passes. GitHub build/browser/runtime CI remains required. No customer database was read or modified.
+
 ## Execution update — 24 November 2026 (not yet merged)
 
 Branch: `feat/prelaunch-release-readiness-20261124`, based on `e2f76d8a77a3fd8bdee31fced2bb00cbdce89fb5`. Scope: default-off public-display flag with test warning precedence, official-logo OG/Twitter sharing image, and a build-time indexing guard requiring explicit public release plus disabled default workers.dev/version previews. Current Wrangler flags and Cloudflare settings are unchanged. Main remains noindex with intake disabled.
 
-Owner confirmed notification destinations WhatsApp +91 86867 73095 and theweddingnest.events@gmail.com, privacy contact at that email, and 90 days for unsuccessful enquiries. Booked-client retention remains undecided; the unsuccessful-status/clock and authenticated deletion process still need definition. No sender, retention job, migration or live intake is activated.
+Owner confirmed notification destinations WhatsApp +91 86867 73095 and theweddingnest.events@gmail.com, privacy contact at that email, and 90 days for unsuccessful enquiries. Owner subsequently confirmed the clock starts when marked unsuccessful. Booked-client retention, pending-delivery handling and authenticated deletion process still need definition. No sender, retention job, migration or live intake is activated.
 
 Checks: 21 focused release/host/component tests pass. Prepared candidate previously passed 177 unit/component tests, three static build variants and six direct HTTP metadata/image checks; that is not a browser pass. Current full branch verification is in progress. This execution environment blocks browser sockets and local Workerd network enumeration; GitHub CI must establish those checks before acceptance. Existing owner-review PRs #114/#120, testimonial PR #122, rate-limit hold #64 and docs PR #123 remain open and are not duplicated.
 
