@@ -29,6 +29,10 @@ jobs:
         run: npm run check
       - name: Unit tests
         run: npm test
+      - name: Offline fictional receipt harness
+        run: node scripts/email-receipt-test.mjs
+        env:
+          TWN_RECEIPT_MODE: mock
       - name: Build
         run: npm run build
       - name: Build submission-enabled variant (test key; for planner submit tests only)

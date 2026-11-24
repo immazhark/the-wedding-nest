@@ -155,3 +155,9 @@ Initial tooling restrictions and scaffold-only handover reports are historical. 
 - Merged #127 after all GitHub checks succeeded, including verify, editorial fixtures and Workers Builds; merge commit `1fe3849`.
 - Added a dormant single-event consumer and unapplied migration 0004: immutable validated notice snapshots, guarded live leases, bounded retries, operator-review holds, atomic provider-acceptance acknowledgement and cascade deletion. No customer record was read, no migration applied, no secret created and no email sent. All new delivery tests use real in-memory SQLite with a mocked provider.
 - Public launch, indexing and real intake remain off; secure credentials, isolated staging migration/receipt test, operator/backup and held-record procedures remain activation gates. Owner-facing design PRs remain separately reviewable.
+
+### Manual receipt-test controls, 24 November 2026
+
+- #128 merged as `f4ac1d4` after full GitHub verify/editorial/Workers checks. Its migration and consumer remain inactive at the provider.
+- Prepared a manual-only fictional receipt workflow with an offline default, fixed test-labelled message, separate test idempotency namespace, explicit confirmation and protected-environment secret boundary. No new packages. Node 24 offline script and receipt gates are tested; no real send or key provisioning.
+- Secure owner-only setup and the exact fictional message are in [email-notifications.md](email-notifications.md). Environment protections and a domain-restricted sending-only secret must be configured directly in provider/GitHub dashboards before a separately approved real probe. The provider probe does not prove Worker/D1 delivery.
