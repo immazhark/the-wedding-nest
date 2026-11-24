@@ -177,3 +177,9 @@ Initial tooling restrictions and scaffold-only handover reports are historical. 
 
 - `docs/media-inventory.md`: 364 files in TWNMedia (308 images, 56 videos), 26 exact duplicates, 11 distinct HEIC files blocked (HEVC), all decodable images viewed on contact sheets, all videos frame-sampled but **none reviewed in full**. Nothing integrated yet. Owner decisions on faces, client names on cards, plates and overlays are listed there.
 - #123 conflicted with `main`; replaced by #131 (merged). #133 (merged) swaps the home catering loop for a real plating clip.
+
+### 25 November 2026: gallery reel (new media, first still-photo integration)
+
+- Home gallery gains a seven-frame mosaic below the original three (`src/content/media/tranche-four.json`, refs `TWN-REL-2026-T0019`-`T0025`, owner-attested 25 Nov): night garden seating, groom in a doorway, couple holding hands, nikah signing, gold place settings, saffron biryani, henna hands. Derivatives 1200-2400 px, 248-408 KB, EXIF stripped. Portraits sit in arches; desktop rows end level; one column on phones.
+- Checked on a production build at 1440, 820 and 390: all seven load, no horizontal overflow. New guard test `tests/unit/media-manifests.test.ts` (unique release refs and alts, files exist).
+- Still not integrated: décor/home-event backdrops, cars (plates need blur), favours beyond existing, more videos.
