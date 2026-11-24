@@ -107,3 +107,13 @@ Privacy notice and retention period agreed; production D1 + Turnstile widget/sec
 - `tests/unit/worker-enquiry.test.ts`: every status path, idempotency, Turnstile, logging privacy, normalisation.
 - `tests/unit/worker-sqlite.test.ts`: the real SQL against the real migration on SQLite.
 - `npm run test:runtime`: the full browser suite on the local Workers runtime, including "API is off in production config".
+
+## Unsuccessful-enquiry retention — dormant, not activated
+
+Owner decision (24 Nov 2026): unsuccessful enquiries become retention candidates 90 days after they are explicitly marked unsuccessful, not 90 days after intake. The approved privacy contact is theweddingnest.events@gmail.com. Booked-client retention remains separate.
+
+`migrations/0003_unsuccessful_retention.sql` adds a nullable, validated UTC `unsuccessful_at` and a partial index. It does not classify or backfill any record. `src/worker/privacy.ts` adds a controlled status transition, aggregate-only preview and a bounded deletion primitive (at most 100 rows), tested against the real SQLite migration. Only known active states (`new`, `contacted`, `in_progress`) may be marked unsuccessful; repeated marking does not reset the date. Active, booked and unknown-clock records never qualify. The DELETE rechecks state and age atomically, and cascades associated delivered outbox rows.
+
+Pending deliveries are reported separately and held instead of silently discarded. That hold can extend storage beyond the selected 90-day eligibility point; its resolution/escalation must be approved before promising a hard deletion deadline in a live notice. The pre-launch `/privacy/` page states this work is not operational.
+
+No route, cron, operator credentials, automatic migration application or live data operation is added. Before any live use: approve the authenticated operator/closure workflow, settle booked-client and pending-delivery handling, review the migration in isolated staging, verify rollback/backups and run fictional-data tests. Never infer unsuccessful status from age alone.

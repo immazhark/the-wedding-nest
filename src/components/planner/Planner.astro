@@ -325,7 +325,11 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
         <div class="consent mt-8">
           <p class="text-[0.9375rem] text-charcoal">
             We will use your name and number only to respond to this enquiry. We don’t share them
-            for marketing. A full privacy notice will be published before enquiries open.
+            for marketing.{" "}
+            <a href="/privacy/" class="link-underline">
+              Read the pre-launch privacy notice
+            </a>
+            .
           </p>
           <label class="check mt-5">
             <input type="checkbox" name="consent" value="yes" required />
