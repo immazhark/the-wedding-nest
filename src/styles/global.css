@@ -1130,8 +1130,11 @@ footer.on-dark {
   z-index: -1;
   right: clamp(1rem, 6vw, 6rem);
   bottom: 0;
-  width: clamp(14rem, 34vw, 30rem);
-  aspect-ratio: 3 / 4;
+  width: clamp(12rem, 26vw, 24rem);
+  /* Sized from the host, never from its own aspect: the arches always fit inside the section they
+     decorate (they used to grow taller than the footer invitation and poke into the section above). */
+  height: calc(100% - clamp(1.5rem, 4vw, 3.5rem));
+  max-height: 36rem;
   pointer-events: none;
   display: none;
 }
@@ -1358,4 +1361,264 @@ footer.on-dark {
   content: "";
   position: absolute;
   inset: -0.375rem -0.25rem;
+}
+
+/* ==========================================================================
+ * Service pages, art-directed: split hero, paired menu photographs, kitchen film, dessert arch.
+ * ========================================================================== */
+
+/* Opening: copy on the dark chapter, the photograph crisp beside it (never scrimmed or blurred). */
+.svc-hero-split {
+  display: grid;
+  min-height: 0;
+  align-items: stretch;
+  padding-bottom: 4.5rem; /* the details section rises over this edge in an arch */
+}
+.svc-hero-split .svc-hero-copy {
+  order: 2;
+  padding-block: 2.5rem 1rem;
+}
+.svc-hero-split .svc-hero-figure {
+  order: 1;
+}
+.svc-hero-split .svc-hero-figure {
+  position: relative;
+}
+.svc-hero-split .svc-hero-figure > :first-child {
+  border-radius: 0;
+}
+@media (min-width: 64rem) {
+  /* A soft edge where the photograph meets the dark chapter: no hard seam, and the picture stays crisp. */
+  .svc-hero-split .svc-hero-figure::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 9rem;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(to right, var(--color-kohl), transparent);
+  }
+}
+.svc-hero-split .svc-hero-copy h1 {
+  font-size: clamp(2.5rem, 1.5rem + 3vw, 4.25rem);
+  max-width: 16ch;
+}
+@media (min-width: 64rem) {
+  .svc-hero-split {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    min-height: clamp(32rem, calc(100svh - 7rem), 46rem);
+    padding-bottom: 0;
+  }
+  .svc-hero-split .svc-hero-copy {
+    order: 1;
+    align-self: center;
+    padding-block: 5rem 8rem;
+    padding-right: 2rem;
+    /* the copy column starts at the page gutter even though the grid spans the viewport */
+    padding-left: max(3rem, calc((100vw - 90rem) / 2 + 3rem));
+    max-width: none;
+    margin: 0;
+  }
+  .svc-hero-split .svc-hero-figure {
+    order: 2;
+    height: 100%;
+  }
+  .svc-hero-split .svc-hero-figure > :first-child {
+    height: 100%;
+  }
+}
+
+/* Menu jump bar: the menus at a glance, each linking to its card (no script). */
+.svc-panel[id^="menu-"] {
+  scroll-margin-top: 6rem;
+}
+.menu-switch-label {
+  font-size: 0.75rem;
+  font-weight: 560;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-sand);
+}
+.menu-switch ul {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.menu-switch-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-height: 3.5rem;
+  height: 100%;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--color-saffron) 45%, transparent);
+  border-radius: 0.25rem;
+  color: var(--color-ivory);
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+.menu-switch-link:hover,
+.menu-switch-link:focus-visible {
+  background: color-mix(in srgb, var(--color-saffron) 14%, transparent);
+  border-color: var(--color-saffron);
+}
+.menu-switch-name {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+}
+.menu-switch-tag {
+  font-size: 0.875rem;
+  font-style: italic;
+  color: var(--color-sand);
+}
+@media (min-width: 40rem) {
+  .menu-switch ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 64rem) {
+  .menu-switch ul {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* A menu card: number and name, the set menu, and one photograph (below the name on tablets, to the
+   right of the menu on desktops, so the card has no dead space beside the courses). */
+.menu-card {
+  display: grid;
+  gap: 1.5rem 3rem;
+  padding: 3rem 0;
+  grid-template-areas: "side" "photo" "menu";
+}
+.menu-card-side {
+  grid-area: side;
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+}
+.menu-card > .menu {
+  grid-area: menu;
+}
+.menu-card-photo {
+  grid-area: photo;
+  width: 100%;
+  max-width: 22rem;
+}
+.menu-card-photo > :first-child {
+  border-radius: 0.75rem;
+  outline: 1px solid color-mix(in srgb, var(--color-saffron) 40%, transparent);
+  outline-offset: 0.5rem;
+}
+@media (min-width: 48rem) {
+  .menu-card {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas:
+      "side menu"
+      "photo menu";
+    align-items: start;
+  }
+}
+@media (min-width: 64rem) {
+  .menu-card {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 5fr) minmax(0, 3fr);
+    grid-template-areas: "side menu photo";
+    padding: 4rem 0;
+  }
+  .menu-card-photo {
+    max-width: none;
+  }
+}
+
+/* The kitchen film: a tall frame, poster until visible, a real pause control. */
+.svc-reel {
+  background: linear-gradient(to bottom, var(--color-kohl), var(--color-garnet-deep));
+}
+.loop-frame {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  max-width: 28rem;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-saffron) 55%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--color-saffron) 25%, transparent);
+  outline-offset: 0.6rem;
+  background: var(--color-kohl-soft);
+}
+.loop-poster,
+.loop-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.loop-video {
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-editorial);
+}
+.loop-frame[data-playing] .loop-video {
+  opacity: 1;
+}
+.loop-toggle {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-ivory) 45%, transparent);
+  background: rgb(11 17 14 / 0.72);
+  color: var(--color-ivory);
+  font-size: 0.8125rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.loop-toggle:hover,
+.loop-toggle:focus-visible {
+  border-color: var(--color-saffron);
+}
+
+/* Desserts: one close photograph in an arch, the approved dessert names set as a quiet list. */
+.svc-dessert {
+  background: linear-gradient(to bottom, var(--color-garnet-deep), var(--color-kohl));
+}
+.dessert-arch {
+  max-width: 26rem;
+  margin-inline: auto;
+}
+.dessert-arch > :first-child {
+  border-radius: 999px 999px 1rem 1rem;
+  outline: 1px solid color-mix(in srgb, var(--color-saffron) 45%, transparent);
+  outline-offset: 0.6rem;
+}
+.dessert-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 2rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 1.05rem + 0.9vw, 1.75rem);
+  font-weight: 330;
+  color: var(--color-ivory);
+}
+.dessert-list li::before {
+  content: "◆";
+  margin-right: 0.6rem;
+  font-size: 0.55em;
+  vertical-align: 0.25em;
+  color: var(--color-saffron);
+}
+
+.svc-more {
+  background: var(--color-kohl);
+}
+.svc-panels-more {
+  border-top: 1px solid color-mix(in srgb, var(--color-ivory) 20%, transparent);
 }

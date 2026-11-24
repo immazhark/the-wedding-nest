@@ -20,24 +20,30 @@ interface Props {
 const { page } = Astro.props;
 const plannerHref = `/plan-your-event/?service=${page.plannerService}`;
 const photos = servicePhotos(page.slug);
+
+// Menu cards (sections that parse as menus) come first, in order; everything else follows them.
+const parsed = page.sections.map((section) => ({ section, menu: parseMenuBody(section.body) }));
+const menus = parsed.flatMap((entry) =>
+  entry.menu ? [{ section: entry.section, menu: entry.menu }] : [],
+);
+const others = parsed.filter((entry) => !entry.menu).map((entry) => entry.section);
+// The dessert moment lists only dishes already approved in the menus above, each once.
+const desserts = [
+  ...new Set(
+    menus.flatMap(({ menu }) =>
+      menu.courses
+        .filter((course) => /dessert/i.test(course.label))
+        .flatMap((course) => course.items),
+    ),
+  ),
+];
+const split = Boolean(photos.hero);
 ---
 
-<BaseLayout title={page.title} description={page.description}>
+<BaseLayout title={page.title} description={page.description} invite={false}>
   <article>
-    <header class="svc-hero on-dark">
-      {photos.hero && (
-        <Frame
-          photo={photos.hero}
-          aspectClass="h-full"
-          tone="dark"
-          priority
-          quality={50}
-          sizes="100vw"
-          class="svc-hero-photo"
-        />
-      )}
-      <div class="svc-hero-scrim" aria-hidden="true"></div>
-      <div class="svc-hero-copy mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pt-24 pb-14 md:pt-40 md:pb-20">
+    <header class:list={["svc-hero on-dark", split && "svc-hero-split"]}>
+      <div class="svc-hero-copy mx-auto w-full max-w-[90rem] px-4 sm:px-8 lg:px-12">
         <p class="eyebrow text-saffron fade-in [--i:1]">Explore an event service</p>
         <h1 class="mt-6 text-[length:var(--text-display)] max-w-[14ch] text-ivory">
           <span class="line-mask">
@@ -48,94 +54,210 @@ const photos = servicePhotos(page.slug);
           {page.introduction}
         </p>
         <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5 fade-in [--i:5]">
-          <a class="btn-grand" href={plannerHref}>
-            <span>Explore in the planner</span>
+          <a class="btn-grand" href="#menus">
+            <span>{menus.length > 0 ? "See the menus" : "See the details"}</span>
             <span class="btn-grand-chip" aria-hidden="true">
-              →
+              ↓
             </span>
           </a>
-          <a
-            href={SITE.whatsapp}
-            class="link-underline text-[0.9375rem] font-medium text-ivory"
-            rel="noopener"
-            target="_blank"
-          >
-            Or message us on WhatsApp<span class="sr-only"> (opens in a new tab)</span>
+          <a class="link-underline text-[0.9375rem] font-medium text-ivory" href={plannerHref}>
+            Plan with us
           </a>
         </div>
       </div>
+      {photos.hero && (
+        <Frame
+          photo={photos.hero}
+          aspectClass="aspect-[4/3] lg:aspect-auto lg:h-full"
+          tone="dark"
+          priority
+          quality={80}
+          sizes="(min-width: 1024px) 58vw, 100vw"
+          class="svc-hero-figure"
+        />
+      )}
     </header>
 
     <section class="svc-details arch-over on-dark" aria-labelledby="service-details-heading">
       <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36">
-        <p class="eyebrow text-saffron">Details to discuss</p>
+        <p class="eyebrow text-saffron" id="menus">
+          Details to discuss
+        </p>
         <h2
           id="service-details-heading"
           class="mt-6 text-[length:var(--text-headline)] max-w-[16ch] text-ivory"
         >
           Begin with the particulars.
         </h2>
+        {menus.length > 1 && (
+          <nav class="menu-switch mt-12" aria-label="Choose a menu">
+            <p class="menu-switch-label">Choose a menu</p>
+            <ul>
+              {menus.map(({ section, menu }, i) => (
+                <li>
+                  <a href={`#menu-${i + 1}`} class="menu-switch-link">
+                    <span class="menu-switch-name">{section.title}</span>
+                    {menu.tagline && <span class="menu-switch-tag">{menu.tagline}</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
         <div class="svc-panels mt-14 md:mt-20">
-          {page.sections.map((section, index) => (
-            <>
-              <div class="svc-panel">
+          {menus.map(({ section, menu }, i) => (
+            <div class="svc-panel menu-card" id={`menu-${i + 1}`}>
+              <div class="menu-card-side">
                 <span class="svc-numeral" aria-hidden="true">
-                  {String(index + 1).padStart(2, "0")}
+                  {String(i + 1).padStart(2, "0")}
                 </span>
-                {(() => {
-                  const menu = parseMenuBody(section.body);
-                  return menu ? (
-                    <>
-                      <div class="menu-head">
-                        <h3 class="svc-panel-title">{section.title}</h3>
-                        {menu.tagline && <p class="menu-tagline">“{menu.tagline}”</p>}
-                      </div>
-                      <div class="menu">
-                        <dl class="menu-courses">
-                          {menu.courses.map((course) => (
-                            <div class="menu-course">
-                              <dt>{course.label}</dt>
-                              <dd>
-                                <ul>
-                                  {course.items.map((item) => (
-                                    <li>{item}</li>
-                                  ))}
-                                </ul>
-                              </dd>
-                            </div>
-                          ))}
-                        </dl>
-                        {menu.notes.map((note) => (
-                          <p class="menu-note">{note}.</p>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <h3 class="svc-panel-title">{section.title}</h3>
-                      <p class="svc-panel-body">{section.body}</p>
-                    </>
-                  );
-                })()}
-              </div>
-              {index === 1 && photos.strip.length > 0 && (
-                <div class="svc-strip" role="group" aria-label="From the table">
-                  {photos.strip.map((photo, i) => (
-                    <Frame
-                      photo={photo}
-                      aspectClass="aspect-[4/5] md:aspect-[3/4]"
-                      tone="dark"
-                      sizes="(min-width: 768px) 30vw, 80vw"
-                      class={`svc-strip-item svc-strip-${i}`}
-                    />
-                  ))}
+                <div class="menu-head">
+                  <h3 class="svc-panel-title">{section.title}</h3>
+                  {menu.tagline && <p class="menu-tagline">“{menu.tagline}”</p>}
                 </div>
+              </div>
+              {photos.menus[i] && (
+                <Frame
+                  photo={photos.menus[i]}
+                  aspectClass="aspect-[4/5]"
+                  tone="dark"
+                  sizes="(min-width: 1024px) 22rem, (min-width: 768px) 38vw, 80vw"
+                  class="menu-card-photo"
+                />
               )}
-            </>
+              <div class="menu">
+                <dl class="menu-courses">
+                  {menu.courses.map((course) => (
+                    <div class="menu-course">
+                      <dt>{course.label}</dt>
+                      <dd>
+                        <ul>
+                          {course.items.map((item) => (
+                            <li>{item}</li>
+                          ))}
+                        </ul>
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                {menu.notes.map((note) => (
+                  <p class="menu-note">{note}.</p>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
+        {menus.length === 0 && others.length > 0 && (
+          <div class="svc-panels mt-14 md:mt-20">
+            {others.map((section, i) => (
+              <div class="svc-panel">
+                <span class="svc-numeral" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 class="svc-panel-title">{section.title}</h3>
+                <p class="svc-panel-body">{section.body}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
+
+    {menus.length > 0 && (
+      <section class="svc-reel on-dark" aria-labelledby="reel-title">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-28 grid gap-12 md:grid-cols-12 md:items-center">
+          <div class="md:col-span-6 lg:col-span-5">
+            <p class="eyebrow text-saffron">In the kitchen</p>
+            <h2
+              id="reel-title"
+              class="mt-6 text-[length:var(--text-headline)] max-w-[12ch] text-ivory"
+            >
+              From the pot to the plate.
+            </h2>
+            <p class="mt-6 max-w-md text-stone">
+              Preparation and plating, filmed in a Wedding Nest catering kitchen.
+            </p>
+          </div>
+          <div class="md:col-span-6 lg:col-span-6 lg:col-start-7">
+            <div class="loop-frame" data-loop>
+              <img
+                src="/media/catering-pot-to-plate-poster.jpg"
+                alt=""
+                width="720"
+                height="960"
+                loading="lazy"
+                decoding="async"
+                class="loop-poster"
+              />
+              <video
+                class="loop-video"
+                muted
+                loop
+                playsinline
+                preload="none"
+                poster="/media/catering-pot-to-plate-poster.jpg"
+                aria-label="A cook ladles curry from a large pot and plates it onto a foil platter of shredded cabbage"
+                data-loop-video
+              >
+                <source src="/media/catering-pot-to-plate.mp4" type="video/mp4" />
+              </video>
+              <button type="button" class="loop-toggle" data-loop-toggle hidden>
+                <span data-loop-toggle-label>Pause</span>
+                <span class="sr-only"> the kitchen film</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    )}
+
+    {photos.dessert && desserts.length > 0 && (
+      <section class="svc-dessert on-dark" aria-labelledby="dessert-title">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-32 grid gap-14 md:grid-cols-12 md:items-center">
+          <div class="md:col-span-5 lg:col-span-4 lg:col-start-2">
+            <Frame
+              photo={photos.dessert}
+              aspectClass="aspect-[4/5]"
+              tone="dark"
+              sizes="(min-width: 1024px) 30vw, 80vw"
+              class="dessert-arch"
+            />
+          </div>
+          <div class="md:col-span-7 lg:col-span-6 lg:col-start-7">
+            <p class="eyebrow text-saffron">Sweet endings</p>
+            <h2
+              id="dessert-title"
+              class="mt-6 text-[length:var(--text-headline)] max-w-[14ch] text-ivory"
+            >
+              Every menu closes with something sweet.
+            </h2>
+            <ul class="dessert-list mt-10" aria-label="Desserts across the four menus">
+              {desserts.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+    )}
+
+    {menus.length > 0 && others.length > 0 && (
+      <section class="svc-more on-dark" aria-label="More to ask about">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 pb-20 md:pb-28">
+          <div class="svc-panels svc-panels-more">
+            {others.map((section, i) => (
+              <div class="svc-panel">
+                <span class="svc-numeral" aria-hidden="true">
+                  {String(menus.length + i + 1).padStart(2, "0")}
+                </span>
+                <h3 class="svc-panel-title">{section.title}</h3>
+                <p class="svc-panel-body">{section.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
 
     {photos.team && (
       <section class="svc-team on-dark" aria-label="The catering team">
@@ -157,43 +279,79 @@ const photos = servicePhotos(page.slug);
     )}
 
     <aside class="svc-close on-dark" aria-labelledby="service-planner-title">
-      <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36 grid gap-12 md:grid-cols-12 md:items-center">
-        <div class="md:col-span-7">
-          <p class="eyebrow text-saffron">Start a conversation</p>
-          <h2 id="service-planner-title" class="mt-6 text-[length:var(--text-headline)] text-ivory">
-            Tell us what you're considering.
-          </h2>
-          <p class="mt-6 text-stone max-w-xl">
-            Start the five-step planner with this topic selected. Your date and budget can remain
-            undecided, and availability is discussed before anything is confirmed.
-          </p>
-          <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5">
-            <a class="btn-grand" href={plannerHref}>
-              <span>Begin planning</span>
-              <span class="btn-grand-chip" aria-hidden="true">
-                →
-              </span>
-            </a>
-            <a
-              href={`tel:${SITE.phone}`}
-              class="link-underline text-[0.9375rem] font-medium text-ivory whitespace-nowrap"
-            >
-              Call {SITE.phoneDisplay}
-            </a>
-          </div>
+      <div class="mx-auto max-w-3xl px-4 sm:px-8 py-24 md:py-36 text-center">
+        <p class="eyebrow text-saffron">Start a conversation</p>
+        <h2 id="service-planner-title" class="mt-6 text-[length:var(--text-headline)] text-ivory">
+          Tell us what you're considering.
+        </h2>
+        <p class="mt-6 mx-auto text-stone max-w-xl">
+          Start the five-step planner with this topic selected. Your date and budget can remain
+          undecided, and availability is discussed before anything is confirmed.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
+          <a class="btn-grand" href={plannerHref}>
+            <span>Begin planning</span>
+            <span class="btn-grand-chip" aria-hidden="true">
+              →
+            </span>
+          </a>
+          <a
+            href={SITE.whatsapp}
+            class="link-underline text-[0.9375rem] font-medium text-ivory"
+            rel="noopener"
+            target="_blank"
+          >
+            Message us on WhatsApp<span class="sr-only"> (opens in a new tab)</span>
+          </a>
+          <a
+            href={`tel:${SITE.phone}`}
+            class="link-underline text-[0.9375rem] font-medium text-ivory whitespace-nowrap"
+          >
+            Call {SITE.phoneDisplay}
+          </a>
         </div>
-        {photos.portrait && (
-          <div class="md:col-span-4 md:col-start-9">
-            <Frame
-              photo={photos.portrait}
-              aspectClass="aspect-[4/5]"
-              tone="dark"
-              sizes="(min-width: 768px) 30vw, 80vw"
-              class="svc-portrait"
-            />
-          </div>
-        )}
       </div>
     </aside>
   </article>
 </BaseLayout>
+
+<script>
+  // Kitchen film: plays only while visible, never with reduced motion, has no audio track, and can
+  // always be paused (WCAG 2.2.2). Without JavaScript or with reduced motion the poster stays.
+  const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+  document.querySelectorAll<HTMLElement>("[data-loop]").forEach((frame) => {
+    const video = frame.querySelector<HTMLVideoElement>("[data-loop-video]");
+    const toggle = frame.querySelector<HTMLButtonElement>("[data-loop-toggle]");
+    const label = frame.querySelector<HTMLElement>("[data-loop-toggle-label]");
+    if (!video || !toggle || !label || calm.matches || !("IntersectionObserver" in window)) return;
+    let userPaused = false;
+    const show = (playing: boolean) => {
+      frame.toggleAttribute("data-playing", playing);
+      label.textContent = playing ? "Pause" : "Play";
+    };
+    const start = () =>
+      video
+        .play()
+        .then(() => show(true))
+        .catch(() => show(false));
+    toggle.hidden = false;
+    toggle.addEventListener("click", () => {
+      userPaused = !video.paused;
+      if (userPaused) {
+        video.pause();
+        show(false);
+      } else void start();
+    });
+    new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.isIntersecting && !userPaused) void start();
+        else {
+          video.pause();
+          if (!userPaused) show(false);
+        }
+      },
+      { threshold: 0.4 },
+    ).observe(frame);
+  });
+</script>
