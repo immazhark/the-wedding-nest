@@ -149,3 +149,9 @@ Initial tooling restrictions and scaffold-only handover reports are historical. 
 - #124 release/share/indexing safeguards and #125 draft privacy/unsuccessful retention are merged; main `096b846` was verified against its tested tree and successful Cloudflare preview build.
 - Owner approved the four email-authentication DNS records; added DNS-only and read back without replacing existing records. Provider subsequently verified the domain and all four records.
 - Added a dormant single-attempt email adapter with a fixed operator recipient, event idempotency key, conservative age cutoff, timeout and safe result classifications. No Worker import, cron, credentials, live sends or migrations. See [email-notifications.md](email-notifications.md) for consumer/credential/receipt gates.
+
+### Durable email consumer preparation, 24 November 2026
+
+- Merged #127 after all GitHub checks succeeded, including verify, editorial fixtures and Workers Builds; merge commit `1fe3849`.
+- Added a dormant single-event consumer and unapplied migration 0004: immutable validated notice snapshots, guarded live leases, bounded retries, operator-review holds, atomic provider-acceptance acknowledgement and cascade deletion. No customer record was read, no migration applied, no secret created and no email sent. All new delivery tests use real in-memory SQLite with a mocked provider.
+- Public launch, indexing and real intake remain off; secure credentials, isolated staging migration/receipt test, operator/backup and held-record procedures remain activation gates. Owner-facing design PRs remain separately reviewable.

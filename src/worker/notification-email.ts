@@ -28,6 +28,18 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 // Resend retains keys for 24h. Stop at 23h from creation, even if never sent.
 const MAX_EVENT_AGE_MS = 23 * 60 * 60_000;
 
+/** Version the fixed sender/recipient and notice contract; never replay old snapshots under a new contract. */
+export const EMAIL_NOTICE_VERSION = 1;
+
+export function isEmailConfigured(config: EmailConfiguration): boolean {
+  return (
+    config.enabled === "true" &&
+    config.domainVerified === true &&
+    typeof config.apiKey === "string" &&
+    /^re_[A-Za-z0-9_-]+$/.test(config.apiKey)
+  );
+}
+
 /** Not imported by the deployed Worker. A caller must explicitly enable it. */
 export async function sendOperatorEmail(
   config: EmailConfiguration,
@@ -35,14 +47,7 @@ export async function sendOperatorEmail(
   now: Date,
   fetcher: typeof fetch = fetch,
 ): Promise<EmailAttemptResult> {
-  if (
-    config.enabled !== "true" ||
-    config.domainVerified !== true ||
-    !config.apiKey ||
-    !/^re_[A-Za-z0-9_-]+$/.test(config.apiKey)
-  ) {
-    return { status: "blocked", reason: "configuration" };
-  }
+  if (!isEmailConfigured(config)) return { status: "blocked", reason: "configuration" };
   const createdAt = Date.parse(event.createdAt);
   const age = now.getTime() - createdAt;
   if (
