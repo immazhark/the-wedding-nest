@@ -69,50 +69,70 @@ export async function sendOperatorEmail(
     return { status: "blocked", reason: "event" };
   }
 
-  let response: Response;
-  try {
-    response = await fetcher("https://api.resend.com/emails", {
-      method: "POST",
-      redirect: "error",
-      signal: AbortSignal.timeout(10_000),
-      headers: {
-        Authorization: `Bearer ${config.apiKey}`,
-        "Content-Type": "application/json",
-        "Idempotency-Key": `${event.purpose === "receipt-test" ? "twn-receipt" : "twn-enquiry"}/${event.id.toLowerCase()}`,
-      },
-      body: JSON.stringify({
-        from: "The Wedding Nest <enquiries@theweddingnest.in>",
-        to: ["theweddingnest.events@gmail.com"],
-        reply_to: "theweddingnest.events@gmail.com",
-        subject:
-          event.purpose === "receipt-test"
-            ? `[TEST] ${event.notice.subject}`
-            : event.notice.subject,
-        text: event.notice.text,
-      }),
-    });
-  } catch {
-    return { status: "retry", reason: "network" };
-  }
-  if (response.status === 429 || response.status >= 500) {
-    return { status: "retry", reason: "provider" };
-  }
-  // Includes configuration/authentication errors and ambiguous idempotency conflicts.
-  // Hold for review; never change keys to circumvent a provider conflict.
-  if (!response.ok) return { status: "blocked", reason: "provider" };
-  try {
-    const data: unknown = await response.json();
-    if (
-      typeof data === "object" &&
-      data !== null &&
-      "id" in data &&
-      typeof data.id === "string" &&
-      UUID.test(data.id)
-    ) {
-      return { status: "accepted", providerId: data.id };
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<EmailAttemptResult>((resolve) => {
+    timer = setTimeout(() => {
+      resolve({ status: "retry", reason: "network" });
+      controller.abort();
+    }, 10_000);
+  });
+  const attempt = async (): Promise<EmailAttemptResult> => {
+    let response: Response;
+    try {
+      response = await fetcher("https://api.resend.com/emails", {
+        method: "POST",
+        redirect: "error",
+        signal: controller.signal,
+        headers: {
+          Authorization: `Bearer ${config.apiKey}`,
+          "Content-Type": "application/json",
+          "Idempotency-Key": `${event.purpose === "receipt-test" ? "twn-receipt" : "twn-enquiry"}/${event.id.toLowerCase()}`,
+        },
+        body: JSON.stringify({
+          from: "The Wedding Nest <enquiries@theweddingnest.in>",
+          to: ["theweddingnest.events@gmail.com"],
+          reply_to: "theweddingnest.events@gmail.com",
+          subject:
+            event.purpose === "receipt-test"
+              ? `[TEST] ${event.notice.subject}`
+              : event.notice.subject,
+          text: event.notice.text,
+        }),
+      });
+    } catch {
+      return { status: "retry", reason: "network" };
     }
-  } catch {
-    // A malformed 2xx may still represent acceptance. Retry with the same key.
+    if (controller.signal.aborted) {
+      void response.body?.cancel().catch(() => {});
+      return { status: "retry", reason: "network" };
+    }
+    if (!response.ok) void response.body?.cancel().catch(() => {});
+    if (response.status === 429 || response.status >= 500) {
+      return { status: "retry", reason: "provider" };
+    }
+    // Includes configuration/authentication errors and ambiguous idempotency conflicts.
+    // Hold for review; never change keys to circumvent a provider conflict.
+    if (!response.ok) return { status: "blocked", reason: "provider" };
+    try {
+      const data: unknown = await response.json();
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        "id" in data &&
+        typeof data.id === "string" &&
+        UUID.test(data.id)
+      ) {
+        return { status: "accepted", providerId: data.id };
+      }
+    } catch {
+      // A malformed 2xx may still represent acceptance. Retry with the same key.
+    }
+    return { status: "retry", reason: "response" };
+  };
+  try {
+    return await Promise.race([attempt(), deadline]);
+  } finally {
+    clearTimeout(timer);
   }
-  return { status: "retry", reason: "response" };
 }
