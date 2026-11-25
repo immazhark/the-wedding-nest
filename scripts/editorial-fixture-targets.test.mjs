@@ -10,7 +10,10 @@ const photo = "src/assets/events/walima/ci-test-only-walima/01-geometry.png";
 const paths = [hospitality, decor, story, media, photo];
 
 test("all missing fixtures are generated on a clean checkout", () => {
-  assert.deepEqual(missingFixtureTargets(paths, () => false), paths);
+  assert.deepEqual(
+    missingFixtureTargets(paths, () => false),
+    paths,
+  );
 });
 
 test("existing service records are excluded from fixture creation and cleanup", () => {
