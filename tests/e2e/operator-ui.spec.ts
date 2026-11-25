@@ -166,3 +166,86 @@ test("operator list ignores superseded filters and blocks duplicate pagination r
   await expect(page.getByRole("button", { name: /Older booked fixture/ })).toBeVisible();
   await expect(more).toBeHidden();
 });
+
+test("operator navigation ignores late details and status writes from abandoned views", async ({
+  page,
+}) => {
+  test.skip(workerd, "static page is gated by the Worker");
+  const other = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+  const at = "2026-12-01T09:00:00.000Z";
+  const entry = (id: string, name: string) => ({
+    id,
+    createdAt: at,
+    status: "new",
+    name,
+    occasions: ["nikah"],
+  });
+  await page.route("**/api/operator/enquiries?**", (route) =>
+    route.fulfill({
+      json: { enquiries: [entry(ID, "First fixture"), entry(other, "Second fixture")] },
+    }),
+  );
+  await page.addInitScript(() => {
+    const original = window.fetch.bind(window);
+    const pending: {
+      url: string;
+      method: string;
+      resolve: (response: Response) => void;
+    }[] = [];
+    Object.assign(window, { operatorDetailPending: pending });
+    window.fetch = (input, init) => {
+      const url = String(input);
+      if (!url.startsWith("/api/operator/enquiries/")) return original(input, init);
+      return new Promise<Response>((resolve) =>
+        pending.push({ url, method: init?.method || "GET", resolve }),
+      );
+    };
+  });
+  type Pending = { url: string; method: string; resolve: (response: Response) => void };
+  const count = () =>
+    page.evaluate(
+      () => (window as unknown as { operatorDetailPending: Pending[] }).operatorDetailPending.length,
+    );
+  const deliver = (index: number, body: unknown) =>
+    page.evaluate(
+      async ({ index, body }) => {
+        const pending = (window as unknown as { operatorDetailPending: Pending[] })
+          .operatorDetailPending;
+        pending[index]!.resolve(Response.json(body));
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      },
+      { index, body },
+    );
+  const detail = (id: string, name: string) => ({
+    enquiry: {
+      id,
+      createdAt: at,
+      status: "new",
+      marketingConsent: false,
+      payload: { name },
+    },
+    history: [],
+  });
+
+  await page.goto("/operator/");
+  await page.getByRole("button", { name: /First fixture/ }).click();
+  await expect.poll(count).toBe(1);
+  await page.getByRole("button", { name: /Back to list/ }).click();
+  await page.getByRole("button", { name: /Second fixture/ }).click();
+  await expect.poll(count).toBe(2);
+  await deliver(1, detail(other, "Second fixture"));
+  await expect(page.getByRole("heading", { level: 2 })).toHaveText("Second fixture");
+  await deliver(0, detail(ID, "First fixture"));
+  await expect(page.getByRole("heading", { level: 2 })).toHaveText("Second fixture");
+
+  await page.getByRole("button", { name: "Mark contacted" }).click();
+  await expect.poll(count).toBe(3);
+  await expect(page.getByRole("button", { name: "Mark booked" })).toBeDisabled();
+  await page.getByRole("button", { name: /Back to list/ }).click();
+  await page.getByRole("button", { name: /First fixture/ }).click();
+  await expect.poll(count).toBe(4);
+  await deliver(3, detail(ID, "First fixture"));
+  await deliver(2, { ok: true });
+  await expect(page.getByRole("heading", { level: 2 })).toHaveText("First fixture");
+  expect(await count()).toBe(4);
+});

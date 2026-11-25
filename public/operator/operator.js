@@ -16,6 +16,7 @@ const PAGE = 25;
 let cursor = null;
 let listRequest = 0;
 let listLoading = false;
+let detailRequest = 0;
 
 const say = (t) => {
   $("message").textContent = t;
@@ -94,9 +95,20 @@ function field(dl, k, v) {
 }
 
 async function show(id, note) {
+  const request = ++detailRequest;
+  const title = $("detail-title");
+  title.textContent = "Enquiry details";
+  $("fields").replaceChildren();
+  $("actions").replaceChildren();
+  $("detail").hidden = false;
+  $("list").hidden = true;
+  $("more").hidden = true;
+  document.querySelector("header").hidden = true;
+  title.focus();
   say("Loading…");
   try {
     const { enquiry: e, history } = await api(`/api/operator/enquiries/${id}`);
+    if (request !== detailRequest) return;
     const p = e.payload;
     $("detail-title").textContent = p.name || "(no name)";
     const dl = $("fields");
@@ -121,40 +133,39 @@ async function show(id, note) {
     );
     const actions = $("actions");
     actions.replaceChildren();
+    const state = { request, pending: false };
     for (const to of NEXT[e.status] || [])
-      actions.append(button(`Mark ${LABEL[to].toLowerCase()}`, e, to));
-    if (NEXT[e.status]) actions.append(button("Mark unsuccessful", e, "unsuccessful", true));
-    $("detail").hidden = false;
-    $("list").hidden = true;
-    $("more").hidden = true;
-    document.querySelector("header").hidden = true;
+      actions.append(button(`Mark ${LABEL[to].toLowerCase()}`, e, to, state));
+    if (NEXT[e.status]) actions.append(button("Mark unsuccessful", e, "unsuccessful", state, true));
     say(note || "");
-    $("detail-title").focus();
   } catch (e) {
-    say(`Could not open enquiry (${e.status || "network"}).`);
+    if (request === detailRequest) say(`Could not open enquiry (${e.status || "network"}).`);
   }
 }
 
-function button(text, e, to, danger) {
+function button(text, e, to, state, danger) {
   const b = document.createElement("button");
   b.type = "button";
   b.textContent = text;
   if (danger) b.className = "danger";
   b.addEventListener("click", async () => {
+    if (state.pending || state.request !== detailRequest) return;
     if (
       to === "unsuccessful" &&
       !confirm("Mark unsuccessful? Its details will be deleted 90 days from now.")
     )
       return;
-    b.disabled = true;
+    state.pending = true;
+    for (const action of $("actions").querySelectorAll("button")) action.disabled = true;
     try {
       await api(`/api/operator/enquiries/${e.id}/status`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ from: e.status, to }),
       });
-      await show(e.id, "Updated.");
+      if (state.request === detailRequest) await show(e.id, "Updated.");
     } catch (err) {
+      if (state.request !== detailRequest) return;
       await show(
         e.id,
         err.status === 409
@@ -167,6 +178,10 @@ function button(text, e, to, danger) {
 }
 
 $("back").addEventListener("click", () => {
+  detailRequest++;
+  $("detail-title").textContent = "";
+  $("fields").replaceChildren();
+  $("actions").replaceChildren();
   $("detail").hidden = true;
   $("list").hidden = false;
   document.querySelector("header").hidden = false;
