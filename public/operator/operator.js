@@ -14,6 +14,8 @@ const LABEL = {
 };
 const PAGE = 25;
 let cursor = null;
+let listRequest = 0;
+let listLoading = false;
 
 const say = (t) => {
   $("message").textContent = t;
@@ -28,7 +30,12 @@ const when = (iso) =>
   new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 
 async function load(reset) {
+  if (!reset && (listLoading || !cursor)) return;
+  const request = ++listRequest;
+  listLoading = true;
+  $("more").disabled = true;
   if (reset) {
+    $("more").hidden = true;
     $("list").replaceChildren();
     cursor = null;
   }
@@ -41,6 +48,7 @@ async function load(reset) {
       q.set("beforeId", cursor.id);
     }
     const { enquiries, nextCursor } = await api(`/api/operator/enquiries?${q}`);
+    if (request !== listRequest) return;
     for (const e of enquiries) {
       const li = document.createElement("li");
       const b = document.createElement("button");
@@ -59,10 +67,17 @@ async function load(reset) {
       $("list").append(li);
     }
     cursor = nextCursor || null;
-    $("more").hidden = !cursor;
-    say($("list").children.length ? "" : "No enquiries.");
+    $("more").hidden = !cursor || !$("detail").hidden;
+    if ($("detail").hidden) say($("list").children.length ? "" : "No enquiries.");
   } catch (e) {
-    say(`Could not load enquiries (${e.status || "network"}).`);
+    if (request === listRequest && $("detail").hidden) {
+      say(`Could not load enquiries (${e.status || "network"}).`);
+    }
+  } finally {
+    if (request === listRequest) {
+      listLoading = false;
+      $("more").disabled = false;
+    }
   }
 }
 
