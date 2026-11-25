@@ -9,6 +9,9 @@
  */
 import { validateEnquiry } from "../lib/enquiry/validate";
 import type { D1Like, RateLimiterLike } from "./types";
+import { BodyReadTimeout, readBody } from "./request-body";
+
+export { BODY_READ_TIMEOUT_MS } from "./request-body";
 
 export interface EnquiryEnv {
   /** Must be exactly "true". Live submission is owner-gated; production defaults to off. */
@@ -62,59 +65,6 @@ async function verifyTurnstile(
   }
 }
 
-/** Also bound slow or stalled upload streams, not just their total byte length. */
-export const BODY_READ_TIMEOUT_MS = 10_000;
-class BodyReadTimeout extends Error {}
-
-/** Enforce a total time and byte limit while consuming untrusted request streams. */
-async function readBody(request: Request): Promise<string | null> {
-  if (!request.body) return "";
-  const reader = request.body.getReader();
-
-  // Keep the actual read separate from the deadline: a misbehaving transport
-  // can ignore cancellation, but must never delay the handler's 408 response.
-  const read = async (): Promise<string | null> => {
-    const chunks: Uint8Array[] = [];
-    let size = 0;
-    try {
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        size += value.byteLength;
-        if (size > MAX_BODY_BYTES) {
-          // Cancellation is best effort, including streams that ignore it.
-          void reader.cancel().catch(() => {});
-          return null;
-        }
-        chunks.push(value);
-      }
-    } finally {
-      reader.releaseLock();
-    }
-    const bytes = new Uint8Array(size);
-    let offset = 0;
-    for (const chunk of chunks) {
-      bytes.set(chunk, offset);
-      offset += chunk.byteLength;
-    }
-    return new TextDecoder().decode(bytes);
-  };
-
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const deadline = new Promise<never>((_resolve, reject) => {
-    timer = setTimeout(() => {
-      // Settle the timeout first: a late successful read must not be accepted.
-      reject(new BodyReadTimeout());
-      void reader.cancel().catch(() => {});
-    }, BODY_READ_TIMEOUT_MS);
-  });
-  try {
-    return await Promise.race([read(), deadline]);
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
 const json = (status: number, body: unknown, headers: Record<string, string> = {}) =>
   Response.json(body, {
     status,
@@ -151,7 +101,7 @@ export async function handleEnquiry(
   if (declared > MAX_BODY_BYTES) return fail(413, "payload_too_large");
   let raw: string | null;
   try {
-    raw = await readBody(request);
+    raw = await readBody(request, MAX_BODY_BYTES);
   } catch (error) {
     if (error instanceof BodyReadTimeout) return fail(408, "request_timeout");
     return fail(400, "invalid_body");

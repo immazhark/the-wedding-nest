@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { BODY_READ_TIMEOUT_MS } from "../../src/worker/request-body";
 import { handleOperatorApi, type OperatorD1 } from "../../src/worker/operator-api";
 
 const ID_A = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
@@ -207,6 +208,55 @@ describe("operator API", () => {
       status: "new",
     });
   });
+  it("rejects JSONP and over-limit UTF-8 bytes before changing status", async () => {
+    const path = `/api/operator/enquiries/${ID_A}/status`;
+    const body = { from: "new", to: "contacted" };
+    expect((await call("POST", path, body, { "content-type": "application/jsonp" })).status).toBe(
+      415,
+    );
+    expect((await call("POST", path, { ...body, padding: "é".repeat(600) })).status).toBe(413);
+    expect(sql.prepare("SELECT status FROM enquiries WHERE id=?").get(ID_A)).toEqual({
+      status: "new",
+    });
+    expect(sql.prepare("SELECT COUNT(*) AS c FROM operator_audit").get()).toEqual({ c: 0 });
+    expect(
+      (await call("POST", path, body, { "content-type": "application/json; charset=UTF-8" })).status,
+    ).toBe(200);
+  });
+
+  it("bounds stalled and oversized status request streams", async () => {
+    const request = (body: ReadableStream<Uint8Array>) =>
+      new Request(`https://twn.test/api/operator/enquiries/${ID_A}/status`, {
+        method: "POST",
+        headers: { origin: "https://twn.test", "content-type": "application/json" },
+        body,
+        duplex: "half",
+      } as RequestInit & { duplex: "half" });
+    const ctx = { db, operator: "owner@example.com", now: () => NOW, log: () => {} };
+    const cancel = vi.fn(() => new Promise<void>(() => {}));
+    const oversized = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new Uint8Array(1025));
+      },
+      cancel,
+    });
+    expect((await handleOperatorApi(request(oversized), ctx)).status).toBe(413);
+    expect(cancel).toHaveBeenCalledOnce();
+    vi.useFakeTimers();
+    try {
+      const stalled = new ReadableStream<Uint8Array>();
+      const pending = handleOperatorApi(request(stalled), ctx);
+      await vi.advanceTimersByTimeAsync(BODY_READ_TIMEOUT_MS);
+      expect((await pending).status).toBe(408);
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(sql.prepare("SELECT status FROM enquiries WHERE id=?").get(ID_A)).toEqual({
+      status: "new",
+    });
+    expect(sql.prepare("SELECT COUNT(*) AS c FROM operator_audit").get()).toEqual({ c: 0 });
+  });
+
   it("logs actions without customer data", async () => {
     await call("POST", `/api/operator/enquiries/${ID_A}/status`, { from: "new", to: "contacted" });
     const text = JSON.stringify(logs);
