@@ -14,7 +14,7 @@ import { existsSync } from "node:fs";
 import { mkdir, open, rm, rmdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { deflateSync } from "node:zlib";
-import { missingFixtureTargets } from "./editorial-fixture-targets.mjs";
+import { editorialFixtureEnv, missingFixtureTargets } from "./editorial-fixture-targets.mjs";
 
 if (process.env.CI !== "true" && process.env.TWN_ALLOW_LOCAL_FIXTURES !== "1") {
   throw new Error("Fixture build requires CI=true or explicit TWN_ALLOW_LOCAL_FIXTURES=1");
@@ -193,11 +193,7 @@ try {
       await handle.close();
     }
   }
-  const testEnv = {
-    ASTRO_OUT_DIR: "./dist-editorial-fixtures",
-    PUBLIC_ALLOW_INDEXING: "false",
-    PUBLIC_ENQUIRIES_ENABLED: "false",
-  };
+  const testEnv = editorialFixtureEnv();
   process.stdout.write("\nSynthetic CI-only editorial fixture build; not for deployment.\n");
   await run("npm", ["run", "build"], testEnv);
   await run("npx", ["playwright", "test", "--config=playwright.editorial.config.ts"], testEnv);

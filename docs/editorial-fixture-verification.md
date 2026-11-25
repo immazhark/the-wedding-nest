@@ -14,7 +14,7 @@ without placing fictional stories or service claims into the repository.
 2. Creates **two clearly synthetic checkerboard PNGs** and dummy editorial
    metadata that is marked CI-only throughout. The generated names and
    approval references must never be confused with real approvals.
-3. Builds only into `dist-editorial-fixtures`, with indexing and enquiry
+3. Builds only into `dist-editorial-fixtures`, with indexing, public release and enquiry
    submission forcibly off; serves that disposable build on a separate port.
 4. Checks rendered service and story pages in desktop/mobile Chromium, including
    link destinations, noindex, media alt text, accessibility and overflow.

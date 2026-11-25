@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { missingFixtureTargets } from "./editorial-fixture-targets.mjs";
+import { editorialFixtureEnv, missingFixtureTargets } from "./editorial-fixture-targets.mjs";
 
 const hospitality = "src/content/services/guest-hospitality-hyderabad.json";
 const decor = "src/content/services/nikah-decoration-hyderabad.json";
@@ -34,3 +34,20 @@ for (const collision of [story, media, photo]) {
     assert.throws(action, /Refusing to replace existing source/);
   });
 }
+
+test("fixture environment overrides all inherited publication switches", () => {
+  const inherited = {
+    ASTRO_OUT_DIR: "./dist",
+    PUBLIC_ALLOW_INDEXING: "true",
+    PUBLIC_ENQUIRIES_ENABLED: "true",
+    PUBLIC_SITE_RELEASED: "true",
+    TWN_ALLOW_LOCAL_FIXTURES: "1",
+  };
+  assert.deepEqual({ ...inherited, ...editorialFixtureEnv() }, {
+    ASTRO_OUT_DIR: "./dist-editorial-fixtures",
+    PUBLIC_ALLOW_INDEXING: "false",
+    PUBLIC_ENQUIRIES_ENABLED: "false",
+    PUBLIC_SITE_RELEASED: "false",
+    TWN_ALLOW_LOCAL_FIXTURES: "1",
+  });
+});
