@@ -1,0 +1,67 @@
+{
+  "images": [
+    {
+      "file": "../../assets/events/details/trousseau-baskets/01-tulle-wrapped-basket.jpg",
+      "alt": "A cane basket of clutches and pouches each wrapped in cream tulle and tied with a red bow, with dark rose petals scattered on white fabric.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0059"
+    },
+    {
+      "file": "../../assets/events/details/trousseau-baskets/02-wrapped-clutches-laid-out.jpg",
+      "alt": "Clutches and pouches laid out in two rows on white fabric, each wrapped in tulle with a red ribbon, with dark petals around them.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0060"
+    },
+    {
+      "file": "../../assets/events/details/trousseau-baskets/03-wrapped-shoes-basket.jpg",
+      "alt": "A cane basket of embellished flat shoes, each wrapped in cream tulle and finished with a red bow.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0061"
+    },
+    {
+      "file": "../../assets/events/details/trousseau-baskets/04-suitcases-tulle-ribbon.jpg",
+      "alt": "Three grey suitcases dressed in long cream tulle and red satin ribbon, each topped with a deep red rose and dried flowers.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0062"
+    },
+    {
+      "file": "../../assets/events/details/gift-packaging/03-satin-potli-pouches.jpg",
+      "alt": "A heap of cream and gold satin drawstring pouches with rope handles, pearls and lace trim, on white satin.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0063"
+    },
+    {
+      "file": "../../assets/events/mehndi/henna-cones/01-henna-cone-fan.jpg",
+      "alt": "A fan of henna cones tied with orange ribbon and labelled with gold stickers, beside a decorated coaster.",
+      "category": "mehndi",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0064"
+    },
+    {
+      "file": "../../assets/events/details/gift-packaging/04-cones-pouches-chocolates.jpg",
+      "alt": "A spread of gifts: henna cones with orange ribbon, embroidered pouches, wrapped chocolates and satin bags.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0065"
+    }
+  ]
+}

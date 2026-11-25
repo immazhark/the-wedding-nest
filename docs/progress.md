@@ -210,3 +210,10 @@ Reproduced from the owner's laptop screenshots (about 1900x870 Chrome) and Playw
 - **No service page is published.** Each page needs the owner's approval of its exact copy and an approval reference (`docs/service-publication.md`). Draft copy for four pages is in `docs/service-page-drafts.md`. I did not create approval references myself. Until records exist the site keeps linking those services to the planner.
 - CI coverage without publishing anything: the synthetic editorial fixture page (guest-hospitality slug, CI-only build) now renders the real gallery, and a new editorial test opens the lightbox, steps with the arrow key, closes with Escape and checks focus return; unit test `service-media.test.ts` checks every requested photograph is declared in a manifest and never repeated.
 - Cars (licence plates need blur), photography/film and makeup (no photography supplied) are not yet built.
+
+### 25 November 2026: living doors, converted photographs, real video review
+
+- ffmpeg 9.1 (winget `Gyan.FFmpeg`, local only, no uploads) now gives a real review toolchain: every video probed, scene cuts and audio levels measured, timestamped sheets at 1-2 s spacing (see `docs/media-inventory.md`). Playback and listening are still not done, so published clips stay silent.
+- The nine converted JPEGs (M365-M373, `Packing/`) are in: tulle-wrapped baskets, suitcases, satin pouches and henna cones. `tranche-seven.json` (T0059-T0065) feeds the trousseau and Mehndi galleries (pages still awaiting approval) and the home Gifting door photograph. Two HEIC originals (`1000002088.heic`, `Floral/IMG_1540.HEIC`) still have no JPEG.
+- Home service doors wake a short silent film on pointer hover or keyboard focus (desktop, fine pointer, no reduced motion, no Save-Data; nothing downloads before that): Catering, Décor, Photo & film, Cars. Four e2e tests (`living-doors.spec.ts`).
+- Cars loop uses M029 (decorated hood, no plate visible); plate blur is still required before any car footage with a visible plate (M362).

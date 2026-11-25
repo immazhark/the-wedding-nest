@@ -6,15 +6,16 @@ Source: `C:\Users\khana\OneDrive\Desktop\TWNMedia` (outside the repo; never comm
 
 | Measure | Count |
 | --- | --- |
-| Files discovered (recursive) | 364 |
+| Files discovered (recursive) | 373 (364 at first scan + 9 converted JPEGs, IDs M365-M373) |
 | Images (jpg/jpeg/heic/heif) | 308 |
 | Videos (mp4) | 56 |
 | Exact byte duplicates (extra copies) | 26 (23 images, 3 videos) |
 | Distinct images | 285 |
 | Distinct images viewed (300 px contact sheets) | 274 |
-| Blocked: HEIC/HEIF not decodable here (HEVC) | 12 files (11 distinct) |
+| Blocked: HEIC/HEIF not decodable here (HEVC); 9 now supplied as JPEG (M365-M373, in Packing/) | 12 files (11 distinct) |
 | Videos decoded and sampled (8 frames each + 1.2 s audio-decode probe) | 56, 0 decode errors |
-| **Videos reviewed in full at playback speed** | **0** |
+| Videos probed, cut-detected, audio-measured and dense-timeline sampled (ffmpeg) | 53 distinct (3 duplicates) |
+| **Videos watched at real-time playback / audio heard** | **0** |
 | GPS tags in image EXIF | none found in the 296 decodable images |
 | Assets integrated on the site (25 Nov) | 16 live, 27 more prepared for unpublished service pages (T0033-T0058 + trousseau film): catering page M350, M092, M091, M093, M340, M008 and video M107 (T0027-T0032); video M081 (home kitchen arch, #133); images M212, M174, M221, M185, M114, M316, M200 (gallery reel, #134, T0019-T0025); M154 (décor door, T0026) |
 
@@ -95,68 +96,73 @@ Needs conversion on the owner's phone/Windows HEIF extension to JPEG, or a decod
 | M211 | Dry-ice fog entry, people on a stage | Faces; atmospheric |
 | M208 | Black-and-white sofa and decor detail | Pleasing detail |
 
-## Videos (56; frame-sampled, audio presence probed; none reviewed in full)
+## Videos (56; ffmpeg 9.1 review: probe, scene cuts, audio levels, timestamped sheets)
 
-All but M119 contain an audio track. Speech/music content was **not** reviewed, so any retained clip should ship muted until audio is heard. Many TWN logo stings are appended; trim them.
+Every video was probed and scanned with ffmpeg (25 Nov, local only): true display size (phone clips carry
+rotation metadata), duration, frame rate, scene-cut count and mean audio level, plus a timestamped contact
+sheet at roughly one frame per 1-2 seconds across the whole timeline. The strongest candidates were
+inspected on those dense sheets before any clip was chosen. **Not done:** real-time playback and listening,
+so audio content (speech or music) is unverified; every published clip is encoded silent. "Loud" tracks are
+probably music from the phone or an editor: rights are unknown, another reason to publish silent.
 
-| ID | Path | Size | Dur | Subject and notes |
-| --- | --- | --- | --- | --- |
-| M020 | 1000011773.mp4 | 1920x1080 | 1s | Chef at kitchen counter plating; 1 s clip + logo sting (too short) |
-| M021 | 1000011776.mp4 | 1072x1922 | 7.3s | Dessert pot being stirred with wooden paddle; ends on TWN logo sting. Strong, no faces |
-| M022 | 1000115024.mp4 | 2160x3840 | 49.6s | Wedding highlight reel (groom, shoes, flame, hands, embraces). 2160x3840, 50 s. Identifiable people; likely third-party videographer work; confirm |
-| M023 | 1000130874.mp4 | 1920x1080 | 24.1s | Venue-at-night + wedding details reel, watermark top-left; confirm origin |
-| M025 | 20250811_180013.mp4 | 1080x1920 | 7.3s | Large pot of meat curry, steam. Strong texture, no faces |
-| M026 | 20250811_180919.mp4 | 1080x1920 | 10.1s | Pot with steaming bone-in meat curry, no faces |
-| M027 | 20251125_205931 (1).mp4 | 1080x1920 | 3.3s | Orange curry bubbling in copper pot, clean, 3.3 s loop candidate |
-| M028 | 20251125_205931.mp4 | 1080x1920 | 3.3s | Exact duplicate of M027 |
-| M029 | 20260115_212434.mp4 | 1080x1920 | 5.3s | Decorated white SUV with red ribbon; photographers visible (faces); handheld |
-| M030 | 20260405_163117.mp4 | 720x1280 | 6.5s | Guests eating at round tables, faces/backs; handheld |
-| M031 | 20260601_224642.mp4 | 720x1280 | 5.7s | Photographer in street at night beside decorated car; faces |
-| M032 | 20260603_205311.mp4 | 720x1280 | 7.8s | Saffron milk dessert stirred in huge pot. Strong, no faces |
-| M033 | 20260603_205810.mp4 | 720x1280 | 5.9s | Kheer/white dessert with nuts in pot. Good texture, no faces |
-| M066 | Catering/1000000429.mp4 | 540x960 | 16.2s | Kebab/biryani prep montage with burned-in "Hyderabadi pakwaan" text + logo sting |
-| M067 | Catering/1000011776.mp4 | 1072x1922 | 7.3s | Exact duplicate of M021 |
-| M068 | Catering/20250811_111749.mp4 | 1080x1920 | 5.5s | Raw goat carcasses, close. Not suitable for public use |
-| M069 | Catering/20250811_113101.mp4 | 1080x1920 | 11.3s | Raw meat being butchered on block. Not suitable for hero use |
-| M070 | Catering/20250811_114022.mp4 | 1080x1920 | 12.7s | Raw chicken piles. Not suitable for hero use |
-| M071 | Catering/20250811_121721.mp4 | 1080x1920 | 6.6s | Rice soaking in large pan; weak |
-| M072 | Catering/20250811_124940.mp4 | 1080x1920 | 10.5s | Dry-goods/ingredients tables; clutter, branded packaging; weak |
-| M073 | Catering/20250811_125009.mp4 | 1080x1920 | 6.4s | Packaged spices/branded bottles; third-party brands; weak |
-| M074 | Catering/20250811_165629.mp4 | 1080x1920 | 5.5s | Green chicken curry in pan; mediocre |
-| M075 | Catering/20250811_180303.mp4 | 1080x1920 | 8.5s | Dark masala meat in pan, steam; good texture |
-| M076 | Catering/20250811_180919.mp4 | 1080x1920 | 10.1s | Exact duplicate of M026 |
-| M077 | Catering/20250811_183734.mp4 | 1080x1920 | 16.1s | Capsicum-meat pan, 16 s static; usable b-roll |
-| M078 | Catering/20250811_183834.mp4 | 1080x1920 | 4.8s | Glossy dark masala being stirred; good |
-| M079 | Catering/20250811_224738.mp4 | 1080x1920 | 10.5s | Empty table settings pan; weak, wobbly |
-| M080 | Catering/20250811_230052.mp4 | 1080x1920 | 12.4s | Hall full of seated guests (faces); wobbly walk |
-| M081 | Catering/20250811_233230.mp4 | 1080x1920 | 6.5s | Chef (TWN apron) plating dish into plate with sauce; strong, shows craft; face visible |
-| M082 | Catering/20250811_233243.mp4 | 1080x1920 | 8.1s | Chef plating mutton from pot; strong; face visible |
-| M083 | Catering/20250811_233307.mp4 | 1080x1920 | 7.3s | Chef ladling haleem-like dish into bowl; strong; face visible |
-| M085 | Catering/20250812_005735.mp4 | 1080x1920 | 7.3s | Dry-ice fog over banquet table, guests (faces); atmospheric, shaky |
-| M098 | Catering/20251125_204505.mp4 | 1080x1920 | 35s | Walk along laden banquet table (35 s); food strong, some wobble |
-| M100 | Catering/20251221_224803.mp4 | 1080x1920 | 7.1s | Large hall dinner service (faces) |
-| M101 | Catering/20260104_133313.mp4 | 1080x1920 | 10.5s | Open-air kitchen yard, wobbly, messy; weak |
-| M102 | Catering/20260405_140629.mp4 | 1280x720 | 6.2s | Round table with PRIME carton and decor; landscape, weak |
-| M103 | Catering/20260603_204616.mp4 | 720x1280 | 4.4s | Crispy-crust dum biryani top, close; good, 4.4 s |
-| M104 | Catering/20260603_204639.mp4 | 720x1280 | 6.1s | Clay pots + curry pan; short; fair |
-| M105 | Catering/20260603_204714.mp4 | 720x1280 | 4s | Biryani layer with fried onions close; fair |
-| M107 | Catering/InShot_20251025_155158595.mp4 | 1080x1920 | 21.2s | Chef plates starter/biryani, TWN apron; InShot edit with logo sting; strong sequence |
-| M108 | Catering/InShot_20251126_150834901.mp4 | 1080x1920 | 20.1s | Haleem-like pot being stirred + plating; logo sting end |
-| M109 | Catering/InShot_20260622_153843867.mp4 | 1080x1920 | 43.1s | Personal talking/interview style: man seated beside mosque-style building, kitchen b-roll; speech audio unreviewed; personal/identifiable |
-| M119 | Catering/VID_20250613_050437_236.mp4 | 720x900 | 11.9s | Raw meat cutting on tarp; no audio. Not for public use |
-| M164 | Floral/20260601_153748.mp4 | 720x1280 | 23.4s | Floral door/bed decor in a flat; vertical phone walk-through |
-| M187 | Haldi.mp4 | 1080x1920 | 17.7s | Haldi decor marigold-jasmine backdrop walk-through; burned-in @twn.events (former domain) so unusable unedited |
-| M197 | InShot_20251217_010147774.mp4 | 1080x1920 | 18s | Plating starters/biryani; TWN apron; logo end; strong |
-| M198 | InShot_20260616_175109909.mp4 | 1080x1920 | 21.4s | Catering banner + buffet table walk; burned-in numbers; decent |
-| M203 | Mix/1000009166.mp4 | 720x1280 | 13.6s | Building facade lit for wedding with "shadi wala ghar", @thewedding.nest overlays; nice but overlaid text |
-| M230 | Packing/1000006623.mp4 | 720x1280 | 20.7s | Gifted trousseau packing with "Packed with perfection" overlay; logo sting |
-| M231 | Packing/1000007152.mp4 | 544x960 | 39.3s | Packed shoes/trousseau with overlay "Dream, delicately packed"; logo sting |
-| M343 | TWN/048A1404.MP4 | 1920x1080 | 4.6s | Round-table buffet spread + banner, 1080p static; clean |
-| M344 | TWN/048A1405.MP4 | 1920x1080 | 4.1s | Round-table spread + banner, static; clean |
-| M345 | TWN/048A1407.MP4 | 1920x1080 | 5.6s | Overhead-ish round table spread; clean |
-| M362 | VID-20250911-WA0010.mp4 | 720x1280 | 9.2s | Decorated Maybach, licence plate readable; privacy blur needed |
-| M363 | VID-20251021-WA0034.mp4 | 478x850 | 6.9s | Cook plating crispy starters; TWN apron; face visible |
-| M364 | VID-20251021-WA0038.mp4 | 478x850 | 17.1s | Cook plating a white dessert, garnish; TWN apron; strong |
+| ID | Path | Display size | Duration | fps | Audio | Scene cuts | Subject, notes, use |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| M020 | 1000011773.mp4 | 1920x1080 | 1.0 s | 31.2 | ambient (-20 dB) | 0 | Chef at kitchen counter plating; 1 s clip + logo sting (too short) |
+| M021 | 1000011776.mp4 | 1072x1920 | 7.3 s | 30.2 | silent track | 1 | Dessert pot being stirred with wooden paddle; ends on TWN logo sting. Strong, no faces |
+| M022 | 1000115024.mp4 | 2160x3840 | 49.6 s | 60 | loud (-11 dB), likely music | 35 | Wedding highlight reel (groom, shoes, flame, hands, embraces). 2160x3840, 50 s. Identifiable people; likely third-party videographer work; confirm; **used:** home films (portrait) |
+| M023 | 1000130874.mp4 | 1920x1080 | 24.1 s | 50 | loud (-11 dB), likely music | 9 | Venue-at-night + wedding details reel, watermark top-left; confirm origin; **used:** home films + photo-film door loop 4.8-10.8 s |
+| M025 | 20250811_180013.mp4 | 1080x1920 | 7.3 s | 30 | ambient (-19 dB) | 0 | Large pot of meat curry, steam. Strong texture, no faces |
+| M026 | 20250811_180919.mp4 | 1080x1920 | 10.1 s | 30 | ambient (-21 dB) | 0 | Pot with steaming bone-in meat curry, no faces |
+| M027 | 20251125_205931 (1).mp4 | 1080x1920 | 3.3 s | 28.7 | ambient (-28 dB) | 0 | Orange curry bubbling in copper pot, clean, 3.3 s loop candidate |
+| M028 | exact duplicate of M027 | | | | | | |
+| M029 | 20260115_212434.mp4 | 1080x1920 | 5.3 s | 30 | ambient (-28 dB) | 0 | Decorated white SUV with red ribbon; photographers visible (faces); handheld; **used:** home transport door loop 2.5-5.3 s |
+| M030 | 20260405_163117.mp4 | 720x1280 | 6.5 s | 30 | ambient (-23 dB) | 0 | Guests eating at round tables, faces/backs; handheld |
+| M031 | 20260601_224642.mp4 | 720x1280 | 5.7 s | 30 | ambient (-27 dB) | 0 | Photographer in street at night beside decorated car; faces |
+| M032 | 20260603_205311.mp4 | 720x1280 | 7.8 s | 30 | ambient (-19 dB) | 0 | Saffron milk dessert stirred in huge pot. Strong, no faces |
+| M033 | 20260603_205810.mp4 | 720x1280 | 5.9 s | 29.9 | ambient (-24 dB) | 0 | Kheer/white dessert with nuts in pot. Good texture, no faces |
+| M066 | Catering/1000000429.mp4 | 540x960 | 16.2 s | 30 | loud (-17 dB), likely music | 4 | Kebab/biryani prep montage with burned-in "Hyderabadi pakwaan" text + logo sting |
+| M067 | exact duplicate of M021 | | | | | | |
+| M068 | Catering/20250811_111749.mp4 | 1080x1920 | 5.5 s | 30 | ambient (-23 dB) | 0 | Raw goat carcasses, close. Not suitable for public use |
+| M069 | Catering/20250811_113101.mp4 | 1080x1920 | 11.3 s | 30 | ambient (-25 dB) | 0 | Raw meat being butchered on block. Not suitable for hero use |
+| M070 | Catering/20250811_114022.mp4 | 1080x1920 | 12.7 s | 30 | ambient (-26 dB) | 0 | Raw chicken piles. Not suitable for hero use |
+| M071 | Catering/20250811_121721.mp4 | 1080x1920 | 6.6 s | 30 | ambient (-21 dB) | 0 | Rice soaking in large pan; weak |
+| M072 | Catering/20250811_124940.mp4 | 1080x1920 | 10.5 s | 30 | ambient (-21 dB) | 0 | Dry-goods/ingredients tables; clutter, branded packaging; weak |
+| M073 | Catering/20250811_125009.mp4 | 1080x1920 | 6.4 s | 30.1 | ambient (-22 dB) | 0 | Packaged spices/branded bottles; third-party brands; weak |
+| M074 | Catering/20250811_165629.mp4 | 1080x1920 | 5.5 s | 30 | ambient (-19 dB) | 0 | Green chicken curry in pan; mediocre |
+| M075 | Catering/20250811_180303.mp4 | 1080x1920 | 8.5 s | 30 | ambient (-18 dB) | 0 | Dark masala meat in pan, steam; good texture |
+| M076 | exact duplicate of M026 | | | | | | |
+| M077 | Catering/20250811_183734.mp4 | 1080x1920 | 16.1 s | 30 | ambient (-18 dB) | 0 | Capsicum-meat pan, 16 s static; usable b-roll |
+| M078 | Catering/20250811_183834.mp4 | 1080x1920 | 4.8 s | 30 | ambient (-18 dB) | 0 | Glossy dark masala being stirred; good |
+| M079 | Catering/20250811_224738.mp4 | 1080x1920 | 10.5 s | 30 | ambient (-22 dB) | 0 | Empty table settings pan; weak, wobbly |
+| M080 | Catering/20250811_230052.mp4 | 1080x1920 | 12.4 s | 29.9 | ambient (-24 dB) | 0 | Hall full of seated guests (faces); wobbly walk |
+| M081 | Catering/20250811_233230.mp4 | 1080x1920 | 6.5 s | 30 | ambient (-18 dB) | 0 | Chef (TWN apron) plating dish into plate with sauce; strong, shows craft; face visible; **used:** home kitchen arch (#133) |
+| M082 | Catering/20250811_233243.mp4 | 1080x1920 | 8.1 s | 30 | ambient (-19 dB) | 0 | Chef plating mutton from pot; strong; face visible |
+| M083 | Catering/20250811_233307.mp4 | 1080x1920 | 7.3 s | 30 | ambient (-19 dB) | 0 | Chef ladling haleem-like dish into bowl; strong; face visible |
+| M085 | Catering/20250812_005735.mp4 | 1080x1920 | 7.3 s | 30 | ambient (-23 dB) | 0 | Dry-ice fog over banquet table, guests (faces); atmospheric, shaky |
+| M098 | Catering/20251125_204505.mp4 | 1080x1920 | 35.0 s | 29.9 | ambient (-29 dB) | 3 | Walk along laden banquet table (35 s); food strong, some wobble |
+| M100 | Catering/20251221_224803.mp4 | 1080x1920 | 7.1 s | 30 | ambient (-29 dB) | 0 | Large hall dinner service (faces) |
+| M101 | Catering/20260104_133313.mp4 | 1080x1920 | 10.5 s | 29.9 | loud (-17 dB), likely music | 0 | Open-air kitchen yard, wobbly, messy; weak |
+| M102 | Catering/20260405_140629.mp4 | 1280x720 | 6.2 s | 29.9 | ambient (-27 dB) | 0 | Round table with PRIME carton and decor; landscape, weak |
+| M103 | Catering/20260603_204616.mp4 | 720x1280 | 4.4 s | 30 | loud (-14 dB), likely music | 0 | Crispy-crust dum biryani top, close; good, 4.4 s |
+| M104 | Catering/20260603_204639.mp4 | 720x1280 | 6.1 s | 29.9 | loud (-15 dB), likely music | 0 | Clay pots + curry pan; short; fair |
+| M105 | Catering/20260603_204714.mp4 | 720x1280 | 4.0 s | 30 | loud (-17 dB), likely music | 0 | Biryani layer with fried onions close; fair |
+| M107 | Catering/InShot_20251025_155158595.mp4 | 1080x1920 | 21.2 s | 30.1 | silent track | 2 | Chef plates starter/biryani, TWN apron; InShot edit with logo sting; strong sequence; **used:** catering film (#138) |
+| M108 | Catering/InShot_20251126_150834901.mp4 | 1080x1920 | 20.1 s | 30.1 | silent track | 0 | Haleem-like pot being stirred + plating; logo sting end |
+| M109 | Catering/InShot_20260622_153843867.mp4 | 1080x1920 | 43.1 s | 30 | ambient (-25 dB) | 18 | Personal talking/interview style: man seated beside mosque-style building, kitchen b-roll; speech audio unreviewed; personal/identifiable |
+| M119 | Catering/VID_20250613_050437_236.mp4 | 720x900 | 11.9 s | 30 | none | 0 | Raw meat cutting on tarp; no audio. Not for public use |
+| M164 | Floral/20260601_153748.mp4 | 720x1280 | 23.4 s | 29.9 | near-silent (-36 dB) | 2 | Floral door/bed decor in a flat; vertical phone walk-through; **used:** home décor door loop 0.2-5.6 s |
+| M187 | Haldi.mp4 | 1080x1920 | 17.7 s | 60 | ambient (-18 dB) | 3 | Haldi decor marigold-jasmine backdrop walk-through; burned-in @twn.events (former domain) so unusable unedited |
+| M197 | InShot_20251217_010147774.mp4 | 1080x1920 | 18.0 s | 30.1 | silent track | 4 | Plating starters/biryani; TWN apron; logo end; strong; **used:** home catering door loop 5.9-9.7 s |
+| M198 | InShot_20260616_175109909.mp4 | 1080x1920 | 21.4 s | 30.1 | silent track | 2 | Catering banner + buffet table walk; burned-in numbers; decent |
+| M203 | Mix/1000009166.mp4 | 720x1280 | 13.6 s | 30 | loud (-17 dB), likely music | 2 | Building facade lit for wedding with "shadi wala ghar", @thewedding.nest overlays; nice but overlaid text |
+| M230 | Packing/1000006623.mp4 | 720x1280 | 20.7 s | 30 | loud (-15 dB), likely music | 10 | Gifted trousseau packing with "Packed with perfection" overlay; logo sting; **used:** trousseau film (prepared) |
+| M231 | Packing/1000007152.mp4 | 544x960 | 39.3 s | 30 | loud (-16 dB), likely music | 0 | Packed shoes/trousseau with overlay "Dream, delicately packed"; logo sting |
+| M343 | TWN/048A1404.MP4 | 1920x1080 | 4.6 s | 25 | near-silent (-43 dB) | 0 | Round-table buffet spread + banner, 1080p static; clean |
+| M344 | TWN/048A1405.MP4 | 1920x1080 | 4.1 s | 25 | near-silent (-42 dB) | 0 | Round-table spread + banner, static; clean |
+| M345 | TWN/048A1407.MP4 | 1920x1080 | 5.6 s | 25 | near-silent (-43 dB) | 0 | Overhead-ish round table spread; clean |
+| M362 | VID-20250911-WA0010.mp4 | 720x1280 | 9.2 s | 30 | ambient (-28 dB) | 1 | Decorated Maybach, licence plate readable; privacy blur needed |
+| M363 | VID-20251021-WA0034.mp4 | 478x850 | 6.9 s | 30.1 | ambient (-22 dB) | 1 | Cook plating crispy starters; TWN apron; face visible |
+| M364 | VID-20251021-WA0038.mp4 | 478x850 | 17.1 s | 30 | ambient (-25 dB) | 1 | Cook plating a white dessert, garnish; TWN apron; strong |
 
 ## Where the collection helps the current site (from `docs/progress.md` open items)
 
