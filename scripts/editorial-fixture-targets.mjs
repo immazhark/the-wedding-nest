@@ -10,3 +10,13 @@ export function missingFixtureTargets(paths, exists) {
     throw new Error("Refusing to replace existing source with CI fixture: " + relative);
   });
 }
+
+/** Never inherit publication switches from the caller's shell or CI environment. */
+export function editorialFixtureEnv() {
+  return {
+    ASTRO_OUT_DIR: "./dist-editorial-fixtures",
+    PUBLIC_ALLOW_INDEXING: "false",
+    PUBLIC_ENQUIRIES_ENABLED: "false",
+    PUBLIC_SITE_RELEASED: "false",
+  };
+}
