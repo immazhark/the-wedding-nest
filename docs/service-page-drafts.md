@@ -1,6 +1,6 @@
 # Service gallery pages: draft copy awaiting owner approval
 
-The gallery template, media and tests are built and merged-ready, but **no service page is published**:
+The gallery template, media and tests are built and merged-ready, but **only the catering service page is published**:
 `docs/service-publication.md` requires the owner to approve each page's exact copy and to issue an
 approval reference (`TWN-PUB-2026-XXXX`) logged outside the repository. The draft copy below was written
 to describe only what the photographs show and to promise nothing (no prices, availability, timings or
@@ -58,3 +58,18 @@ Slug: `guest-hospitality-hyderabad`
 
 **Planned with your guests in mind.** The number of guests, how they are seated and when they eat shape how a hall is arranged. Tell us your guest list and your venue, and we will talk through a layout and service that suits them.
 
+## Photography and cinematography — additional draft, not approved
+
+Slug: `wedding-photography-videography`
+
+**Description:** Explore wedding imagery from The Wedding Nest events, from portraits to ceremony details, and discuss photography and film requirements for your occasion.
+
+**Introduction:** A wedding is remembered in the people, gestures and small details as much as the setting. This selection brings together portraits, a nikah document signing, a clasp of hands and moments framed by flowers. Tell us which occasions you would like covered and what kind of photographs and films matter to your family.
+
+**Portraits and ceremony details.** Share the schedule, venue and moments that are important to you. Discuss family portraits, ceremony coverage and the details you would like captured before confirming the arrangements.
+
+**Discuss the film and privacy requirements.** Tell us whether you are considering a short highlight film or other coverage. Discuss the intended audience, permissions, any privacy preferences and the deliverables before booking.
+
+**Editorial preparation:** A dark split opening with the existing hand-and-bokeh still leads into a paired photographic sequence: doorway portrait, signing, hands among garlands, hall portrait and jasmine-bracelet handshake. All six photographs have existing reviewed manifest entries. The selection describes wedding imagery, not the identity of the photographer or ownership of the underlying copyright. Do not present it as TWN's own photography work without confirmation of authorship or coordination and the applicable permissions.
+
+The service route remains absent until the business owner confirms coverage and approves the exact copy. Existing edited wedding films are not newly embedded on this page: attribution, reuse rights and actual playback/audio review are still needed. Rendered composition and crop acceptance are pending; the media sequence is selected from the manifest descriptions, not a fresh full-resolution visual review.
