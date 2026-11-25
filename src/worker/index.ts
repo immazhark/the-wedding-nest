@@ -5,23 +5,14 @@
 import { handleEnquiry, type EnquiryEnv } from "./enquiry";
 import { authenticateOperator, type OperatorAuthEnv } from "./operator-auth";
 import { routeOperator } from "./operator-route";
+import { createAccessKeyReader } from "./operator-keys";
 import type { FetcherLike } from "./types";
 
 interface Env extends EnquiryEnv, OperatorAuthEnv {
   ASSETS: FetcherLike;
 }
 
-// Access signing keys rotate rarely; cache per isolate so each request is not a network call.
-let keyCache: { team: string; at: number; keys: (JsonWebKey & { kid?: string })[] } | undefined;
-const KEY_TTL_MS = 10 * 60_000;
-async function accessKeys(team: string) {
-  if (keyCache?.team === team && Date.now() - keyCache.at < KEY_TTL_MS) return keyCache.keys;
-  const res = await fetch(`https://${team}/cdn-cgi/access/certs`);
-  if (!res.ok) throw new Error("keys");
-  const { keys } = (await res.json()) as { keys: (JsonWebKey & { kid?: string })[] };
-  keyCache = { team, at: Date.now(), keys };
-  return keys;
-}
+const accessKeys = createAccessKeyReader((input, init) => fetch(input, init));
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
