@@ -1,5 +1,21 @@
 # Project progress — reconciled 21 November 2026
 
+## Retention and privacy follow-up — 24 November 2026 (not yet merged)
+
+Branch `feat/unsuccessful-enquiry-retention-20261124` follows the release-readiness candidate. Adds migration 0003 (not applied), explicit unsuccessful disposition/90-day clock, aggregate preview and bounded guarded deletion primitives. Active/booked/unknown-clock records are protected; pending deliveries are counted and held for review. No deletion job, API route, sender or migration execution is enabled. Adds an honest pre-launch privacy notice, linked from footer and planner; this is not a final operational/legal approval.
+
+Focused real-SQLite retention tests pass (14 tests in worker-sqlite suite). Full branch unit/component suite: 194 passed; Astro check: zero errors, warnings or hints; formatting passes. GitHub build/browser/runtime CI remains required. No customer database was read or modified.
+
+## Execution update — 24 November 2026 (not yet merged)
+
+Branch: `feat/prelaunch-release-readiness-20261124`, based on `e2f76d8a77a3fd8bdee31fced2bb00cbdce89fb5`. Scope: default-off public-display flag with test warning precedence, official-logo OG/Twitter sharing image, and a build-time indexing guard requiring explicit public release plus disabled default workers.dev/version previews. Current Wrangler flags and Cloudflare settings are unchanged. Main remains noindex with intake disabled.
+
+Owner confirmed notification destinations WhatsApp +91 86867 73095 and theweddingnest.events@gmail.com, privacy contact at that email, and 90 days for unsuccessful enquiries. Owner subsequently confirmed the clock starts when marked unsuccessful. Booked-client retention, pending-delivery handling and authenticated deletion process still need definition. No sender, retention job, migration or live intake is activated.
+
+Checks: 21 focused release/host/component tests pass. Prepared candidate previously passed 177 unit/component tests, three static build variants and six direct HTTP metadata/image checks; that is not a browser pass. Current full branch verification is in progress. This execution environment blocks browser sockets and local Workerd network enumeration; GitHub CI must establish those checks before acceptance. Existing owner-review PRs #114/#120, testimonial PR #122, rate-limit hold #64 and docs PR #123 remain open and are not duplicated.
+
+The following reconciliation is historical; the execution update above is newer.
+
 Current state first. GitHub and Cloudflare live records remain authoritative for commits, checks and exact deployed versions. This snapshot is not a production-launch approval.
 
 **Repository baseline at this update:** `main` at `4bf9612` (#118), CI green (run 44843967280). Open PRs, both drafts: #114 (lighter hero scrim, awaiting owner creative approval) and #64 (staging rate limiting, held for Cloudflare entitlement/cost review). Governance checked 21 Nov: no rulesets, `main` not branch-protected (owner decision, no change made). The repo is **public** although early docs said private: owner decision pending (founder's personal number, team photo and portrait film are in public view). Cloudflare deployment provenance was last confirmed 19 Nov; re-check before relying on it.
@@ -127,3 +143,70 @@ Initial tooling restrictions and scaffold-only handover reports are historical. 
 - Planner at 390: every field has a label; all planner buttons are 44px or taller. Remaining small targets are inline header and footer text links, which meet WCAG 2.5.8 through spacing.
 - Still awaiting owner: #114 scrim approval, catering hero and arch-loop imagery, makeup door photo, banner wording, repo visibility, and all production gates.
 - **#114 evidence (21 Nov):** compared the #114 preview with the main preview at 1440 and 390. Floral stage, sofas and stage floor are clearly visible on #114; headline, lede and CTA stay legible on both. Branch changes only `src/styles/global.css`, mergeable and clean against current `main`. Awaiting owner approval; not merged.
+
+### 22 November 2026
+
+- **Merged #121:** editorial fixtures now sweep 320/768/820/1024/1280px on the synthetic service and story pages (no overflow, no image past the viewport). Story template is therefore covered at tablet widths; it still has no real content.
+- **Draft #120 (owner review):** catering "Choose a menu" jump bar (no JS; name + approved tagline linking to each menu card). CI green. Needs owner visual approval.
+- **#122 (testimonial framework):** zero-by-default, owner-gated quote model (`src/lib/testimonials/`, content in `src/content/testimonials/`), editorial quote section on home that renders only when approved records exist. No ratings, counts or Google text by design. Needs real, permissioned quotes to show anything.
+- **Still awaiting owner:** #114, #120, catering hero and arch-loop imagery, makeup door photo, banner wording, repo visibility/branch protection, first real story facts, quote shortlist and permissions, all production gates.
+
+### Email delivery preparation, 24 November 2026
+
+- #124 release/share/indexing safeguards and #125 draft privacy/unsuccessful retention are merged; main `096b846` was verified against its tested tree and successful Cloudflare preview build.
+- Owner approved the four email-authentication DNS records; added DNS-only and read back without replacing existing records. Provider subsequently verified the domain and all four records.
+- Added a dormant single-attempt email adapter with a fixed operator recipient, event idempotency key, conservative age cutoff, timeout and safe result classifications. No Worker import, cron, credentials, live sends or migrations. See [email-notifications.md](email-notifications.md) for consumer/credential/receipt gates.
+
+### Durable email consumer preparation, 24 November 2026
+
+- Merged #127 after all GitHub checks succeeded, including verify, editorial fixtures and Workers Builds; merge commit `1fe3849`.
+- Added a dormant single-event consumer and unapplied migration 0004: immutable validated notice snapshots, guarded live leases, bounded retries, operator-review holds, atomic provider-acceptance acknowledgement and cascade deletion. No customer record was read, no migration applied, no secret created and no email sent. All new delivery tests use real in-memory SQLite with a mocked provider.
+- Public launch, indexing and real intake remain off; secure credentials, isolated staging migration/receipt test, operator/backup and held-record procedures remain activation gates. Owner-facing design PRs remain separately reviewable.
+
+### Manual receipt-test controls, 24 November 2026
+
+- #128 merged as `f4ac1d4` after full GitHub verify/editorial/Workers checks. Its migration and consumer remain inactive at the provider.
+- Prepared a manual-only fictional receipt workflow with an offline default, fixed test-labelled message, separate test idempotency namespace, explicit confirmation and protected-environment secret boundary. No new packages. Node 24 offline script and receipt gates are tested; no real send or key provisioning.
+- Secure owner-only setup and the exact fictional message are in [email-notifications.md](email-notifications.md). Environment protections and a domain-restricted sending-only secret must be configured directly in provider/GitHub dashboards before a separately approved real probe. The provider probe does not prove Worker/D1 delivery.
+
+### 25 November 2026: home catering loop from the new media
+
+- Owner cleared faces, client names, plate blur, `twn.events` (ignore) and no raw-meat imagery for the new collection (`docs/media-inventory.md`, #132).
+- Home kitchen arch now plays a silent 6.6 s plating clip (M081; 720x900, 0.9 MB, no audio, poster from the plated dish) instead of the flat saffron pot. Checked at 390 and 1440: plays, no horizontal overflow. Catering-page hero and Makeup door stay with #126.
+### 25 November 2026: media collection inventory
+
+- `docs/media-inventory.md`: 364 files in TWNMedia (308 images, 56 videos), 26 exact duplicates, 11 distinct HEIC files blocked (HEVC), all decodable images viewed on contact sheets, all videos frame-sampled but **none reviewed in full**. Nothing integrated yet. Owner decisions on faces, client names on cards, plates and overlays are listed there.
+- #123 conflicted with `main`; replaced by #131 (merged). #133 (merged) swaps the home catering loop for a real plating clip.
+
+### 25 November 2026: gallery reel (new media, first still-photo integration)
+
+- Home gallery gains a seven-frame mosaic below the original three (`src/content/media/tranche-four.json`, refs `TWN-REL-2026-T0019`-`T0025`, owner-attested 25 Nov): night garden seating, groom in a doorway, couple holding hands, nikah signing, gold place settings, saffron biryani, henna hands. Derivatives 1200-2400 px, 248-408 KB, EXIF stripped. Portraits sit in arches; desktop rows end level; one column on phones.
+- Checked on a production build at 1440, 820 and 390: all seven load, no horizontal overflow. New guard test `tests/unit/media-manifests.test.ts` (unique release refs and alts, files exist).
+- Still not integrated: décor/home-event backdrops, cars (plates need blur), favours beyond existing, more videos.
+
+### 25 November 2026: décor door no longer repeats the hall stage
+
+- The "Décor, florals & staging" door on home now uses the marigold-and-jasmine lattice backdrop (`M154`, `T0026`, 1300 px, 375 KB) instead of the stage-seating photo that also appears in the gallery and hero. Closes open item 4 from the 21 Nov visual review. Checked on a production build at 1440 and 390: title legible over the scrim, no overflow.
+
+### 25 November 2026: hero clipped on short windows (fix)
+
+- Owner reported overlap in the hero/header. Reproduced on the live preview: on windows shorter than the hero copy (about 1366x650 laptops, 1280x600, landscape phones) the stage was a fixed height with the copy pinned to its bottom and `overflow: hidden`, so the first headline line slid under the sticky header and was cut off. The stage now uses a `min-height` floor and grows with its copy.
+- Regression test `tests/e2e/hero-fit.spec.ts` (five viewport sizes): failed on main for four of them (headline top 1-80 px vs 106 px header), passes after the fix. Desktop and mobile e2e for site, visual-review and performance specs all pass locally (96).
+
+### 25 November 2026: catering recovery (owner-reported defects, reproduced and fixed)
+
+Reproduced from the owner's laptop screenshots (about 1900x870 Chrome) and Playwright captures of every page. Causes and fixes:
+
+- **Hero headline under the header:** fixed-height stage + bottom-pinned copy + `overflow: hidden` (fixed in #137, regression test `hero-fit.spec.ts`).
+- **Duplicate closing band and arches poking into the section above:** the footer always rendered its own "Begin planning" band, even right under a page's own closing invitation and on the planner page itself; its decorative arches had a fixed 3:4 aspect and grew taller than the band, so they rose 183 px into the previous section (on the plan page they were clipped by the hero). The band is now opt-out (`invite={false}` on service pages and the planner) and the arches are sized from the host, so they always fit. Tests fail on live main, pass here.
+- **Catering photographs "random between menus":** a hard-coded `index === 1` dropped a three-photo strip into the menu list; small derivatives (2000 px at about 150 KB) were upscaled into 580 px columns. Replaced by a composed page: split hero (crisp biryani/hall photograph beside the title, no scrim, no blur, `quality=80`), one fresh derivative per menu card (Deccani platter, Nawabi biryani, Daawat grill, Shahi haleem) paired in menu order, a "From the pot to the plate" kitchen film (silent, poster, visible-only autoplay, real Pause button, poster under reduced motion), a saffron-dessert arch composition listing only dessert names already approved in the menus, add-ons, the team and one closing invitation. The menu jump bar from #120 is folded in.
+- **Service journey:** the hero's primary action now goes to the menus (see the service first); planning stays as a secondary link and in the closing invitation.
+- New media: `src/content/media/tranche-five.json` (T0027-T0032), `public/media/catering-pot-to-plate*.{mp4,jpg}` (M107, 0.3-11 s). Supersedes #126 (hero swap) and #120 (jump bar); both can be closed.
+
+### 25 November 2026: service gallery template (pages awaiting owner approval)
+
+- Shared gallery primitives: `Gallery.astro` (mosaic that keeps each photograph's own proportions; native `<dialog>` lightbox with Escape, arrow keys, previous/next, focus returned to the tile) and `LoopFilm.astro` (silent film, poster first, visible-only autoplay, Pause control, poster under reduced motion), reused by catering. Gallery-first services open on a wide photograph, then the mosaic, then the particulars (see the work before planning).
+- Media prepared: `tranche-six.json` (T0033-T0058, 26 photographs: floral/décor, henna, trousseau trays and gift packaging, table settings), `public/media/trousseau-packing*.{mp4,jpg}` (M230, 0.9-14.5 s, silent), plus per-service selection and order in `src/lib/services/photos.ts` for décor, Mehndi, trousseau and hospitality.
+- **No service page is published.** Each page needs the owner's approval of its exact copy and an approval reference (`docs/service-publication.md`). Draft copy for four pages is in `docs/service-page-drafts.md`. I did not create approval references myself. Until records exist the site keeps linking those services to the planner.
+- CI coverage without publishing anything: the synthetic editorial fixture page (guest-hospitality slug, CI-only build) now renders the real gallery, and a new editorial test opens the lightbox, steps with the arrow key, closes with Escape and checks focus return; unit test `service-media.test.ts` checks every requested photograph is declared in a manifest and never repeated.
+- Cars (licence plates need blur), photography/film and makeup (no photography supplied) are not yet built.

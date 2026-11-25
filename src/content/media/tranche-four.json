@@ -1,0 +1,76 @@
+{
+  "images": [
+    {
+      "file": "../../assets/events/decor/garden-night-seating/01-string-lights-seating.jpg",
+      "alt": "A garden courtyard at night under rows of hanging bulb lights, with white-covered chairs set out in rows on the lawn.",
+      "category": "decor",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0019"
+    },
+    {
+      "file": "../../assets/events/shaadi/groom-orange-door/01-groom-in-doorway.jpg",
+      "alt": "A groom in a cream sherwani and turban leans against a tall orange panelled door in a beam of light.",
+      "category": "shaadi",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0020"
+    },
+    {
+      "file": "../../assets/events/celebrations/couple-garlands/01-couple-holding-hands.jpg",
+      "alt": "Two people holding hands between red and white flower garlands, one hand decorated with henna, beside a gold embroidered dupatta.",
+      "category": "celebrations",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0021"
+    },
+    {
+      "file": "../../assets/events/nikah/nikah-signing/01-signing-jasmine-bracelet.jpg",
+      "alt": "Hands signing a nikah document, one wrist wearing a jasmine and rose bracelet, beside a red brocade cloth.",
+      "category": "nikah",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0022"
+    },
+    {
+      "file": "../../assets/events/catering/table-setting-gold/01-gold-runner-place-settings.jpg",
+      "alt": "A long table set with a gold runner, patterned bowls on black mats and folded paper napkins in glasses.",
+      "category": "catering",
+      "focal": "bottom",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0023"
+    },
+    {
+      "file": "../../assets/events/catering/saffron-biryani/01-saffron-biryani-plate.jpg",
+      "alt": "A plate of golden saffron biryani with rice and pieces of meat, with other dishes softly blurred behind.",
+      "category": "catering",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0024"
+    },
+    {
+      "file": "../../assets/events/mehndi/mehndi-hands-vertical/01-henna-hands-portrait.jpg",
+      "alt": "Two open hands covered in detailed black henna designs, held over a striped woven mat.",
+      "category": "mehndi",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0025"
+    },
+    {
+      "file": "../../assets/events/decor/marigold-jasmine-backdrop/01-marigold-jasmine-backdrop.jpg",
+      "alt": "A freestanding backdrop of yellow marigold garlands and white jasmine strung in a diamond lattice over saffron fabric, on a patterned floor.",
+      "category": "decor",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0026"
+    }
+  ]
+}

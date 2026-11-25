@@ -1,3 +1,5 @@
+import { previewNoticeMode } from "./release";
+
 /**
  * Verified public facts only, as supplied by the owner. Opening days, service coverage and
  * any legal name stay absent until approved (see docs/full-project-handover.md §8).
@@ -51,6 +53,21 @@ const env = (name: string): string | undefined =>
 export const ENQUIRIES = {
   enabled: env("PUBLIC_ENQUIRIES_ENABLED") === "true",
   turnstileSiteKey: env("PUBLIC_TURNSTILE_SITE_KEY") ?? "",
+} as const;
+
+/** Owner-gated display state; independent of indexing and live intake. Defaults to preview. */
+export const PREVIEW_NOTICE = previewNoticeMode({
+  publicRelease: env("PUBLIC_SITE_RELEASED"),
+  enquiriesEnabled: env("PUBLIC_ENQUIRIES_ENABLED"),
+  turnstileSiteKey: env("PUBLIC_TURNSTILE_SITE_KEY"),
+});
+
+/** Existing approved single-colour logo, on the site's dark ground. */
+export const SOCIAL_IMAGE = {
+  url: new URL("/social/twn-brand.png", SITE.url).toString(),
+  width: 1200,
+  height: 630,
+  alt: "The Wedding Nest — official logo",
 } as const;
 
 export function pageTitle(page?: string): string {

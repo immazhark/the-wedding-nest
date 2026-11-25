@@ -1,0 +1,76 @@
+# Email notification preparation
+
+24 November 2026. This is a dormant transport, not an active delivery pipeline.
+
+## Implemented boundary
+
+`src/worker/notification-email.ts` performs one bounded Resend HTTP attempt only when explicitly enabled and supplied a server-side credential plus a verified-domain assertion. It is not imported by the Worker entry point. A separate dormant consumer now reads and freezes records only when explicitly invoked and enabled; no cron, route, credential binding, migration execution or sender activation is included.
+
+The prepared sender is `The Wedding Nest <enquiries@theweddingnest.in>`; the owner-approved operator recipient and reply address are `theweddingnest.events@gmail.com`. The sender mailbox is a proposed sending identity, not an inbox. No customer autoresponder, CC/BCC, HTML, attachments or WhatsApp automation is installed. The caller cannot override the recipient or provider URL.
+
+The plain-text notice must originate from the existing server validator/content builder. The consumer freezes the notice and contract version before its first attempt; changing the body on retry can cause an idempotency conflict. Never render private enquiry details in logs, browser bundles, analytics or PR evidence.
+
+## Acceptance, retry and holds
+
+- A successful provider response must contain a UUID message reference. `accepted` means provider acceptance, not inbox delivery. The existing outbox column named `delivered_at` must not be presented as recipient receipt.
+- Network/timeout failures, HTTP 429/5xx and malformed successful responses return a safe retry classification. The adapter never loops; the dormant consumer composes the existing outbox backoff/lease primitives.
+- Other HTTP failures, including idempotency conflicts, are held for review. No automatic key changes, recipient changes or fallback channel sends.
+- The immutable outbox UUID supplies the provider key. Events are blocked at 23 hours from original creation, including delayed first attempts, conservatively inside the provider's 24-hour key retention. This is bounded duplicate protection, not unlimited exactly-once delivery. Stale/unknown events require manual reconciliation; never reset their timestamp to bypass this guard.
+- Missing configuration, malformed events and disabled delivery cause no network access. The network target is fixed, redirects rejected and requests have a 10-second abort signal.
+
+Official references checked on 24 November 2026:
+- https://resend.com/docs/dashboard/emails/idempotency-keys
+- https://resend.com/docs/api-reference/emails/send-email
+
+## DNS and remaining activation work
+
+The owner approved the four prepared email-authentication DNS records on 24 November. They were added DNS-only with Auto TTL, and Cloudflare read-back matched their content. All four records and the sending domain were subsequently provider-verified. Recheck provider status before any activation; DNS configuration alone does not enable this adapter.
+
+Before live delivery:
+1. Complete provider verification and approve the exact sender identity and operating handler/backup.
+2. Provision a domain-scoped sending-only key directly into the Worker secret store through a secure owner-controlled flow. No key has been created/exported here; do not paste credentials into chat or repository files.
+3. Approve/apply required outbox migrations to isolated staging and review the dormant consumer's immutable snapshots, bounded retries and acknowledgement semantics. Add authenticated operator handling before activation. This adapter alone does not read or change outbox rows.
+4. Separately approve a fictional staging receipt test; confirm inbox receipt and failure handling before approving real delivery.
+5. Resolve pending-delivery retention holds and booked-client retention before live intake/cleanup. Preserve public launch, indexing and real-enquiry approval gates.
+
+## Dormant consumer implementation
+
+The single-event consumer in `notification-consumer.ts` now composes the existing lease/backoff core and email adapter. Migration `0004_email_delivery_state.sql` adds a frozen notice, transport version, provider-acceptance reference and operator-hold reason to each outbox row. It has not been applied to Cloudflare.
+
+Configuration is checked before any claim or private-data read. The consumer renders server-validated details once, persists the winning snapshot before the first network call, and reuses it on every retry. Database triggers prevent subsequent snapshot/identity changes; deletion still cascades with the parent enquiry. Frozen content is additional private data in the same retention boundary and must never be exported to monitoring. Existing records have no snapshot and will be checked against the conservative event-age cutoff; do not replay historical events automatically.
+
+Permanent failures, invalid/old snapshots and exhausted attempts are held by exhausting claim eligibility and recording a bounded reason. Provider acceptance and lease acknowledgement are recorded in one conditional database update. A failed ACK leaves the event unacknowledged: a later eligible retry reuses the identical provider key and payload within the age window. A transport-contract version change blocks old snapshots for review rather than silently sending a changed payload.
+
+There is still no Worker import, scheduler, HTTP trigger, secret or live consumer. No migration or real send was performed. Staging activation requires separate migration/credential/receipt-test approval. Before live operation, provide an authenticated operator workflow for held/exhausted/expired events and distinguish provider acceptance from inbox receipt. Deleting a lead cannot recall an email already accepted or in flight; provider-side retention/access and this race need inclusion in the operating/privacy procedure. No inbox webhook or automated resend/replay endpoint is introduced here.
+
+## Manual fictional provider receipt workflow
+
+`Manual fictional email receipt test` is a manual-only GitHub Actions workflow. It has no push, schedule, pull-request or webhook trigger. Its default `mock` job runs offline and has no credentials. Ordinary CI also runs the offline probe. The Node 24 script uses native TypeScript stripping and requires no new dependency.
+
+The optional `send` job runs only from `main`, with mode `send`, exact confirmation `SEND ONE FICTIONAL RECEIPT`, a confirmed current domain-verification flag, a valid stable UUID and an original UTC timestamp within the adapter's age window. It uses the `twn-email-receipt` GitHub environment and its `TWN_RESEND_STAGING_API_KEY` secret. No environment, reviewer protection or secret is created by this source change. Configure required reviewers and restrict the environment to `main` before adding the key. If a plan cannot enforce environment protection, leave its secret unset and keep real sends blocked.
+
+The probe sends at most one HTTP request per invocation. It does not poll the inbox, read/write D1, dispatch queued leads or activate a Worker. It only proves the provider sending path when the recipient separately confirms receipt. All logs contain a bounded status, never a key, message content or private provider error. `accepted` is not inbox receipt.
+
+### Secure owner setup (dashboard only; no laptop required)
+
+1. Approve sender `The Wedding Nest <enquiries@theweddingnest.in>` and one fictional receipt message to `theweddingnest.events@gmail.com`.
+2. In GitHub repository Settings → Environments, configure `twn-email-receipt` with required reviewer approval and deployment branch `main`. Do not add a secret before confirming these restrictions.
+3. In Resend, create a **sending-access-only** key restricted to `theweddingnest.in`. Copy it directly into that environment's `TWN_RESEND_STAGING_API_KEY` secret. Never paste it in chat, issue/PR text, a repository file or workflow input. No API key has been created or exported by the agent.
+4. Recheck the provider domain is verified. Run the workflow in `mock` mode first. For the separately approved real probe, choose `send`, enter the exact confirmation, and record a fresh UUID plus its original ISO UTC timestamp with milliseconds. Keep both unchanged for any same-test retry. Never refresh the timestamp or change reference just to bypass a hold/unknown result; reconcile first.
+5. Confirm receipt of the clearly marked test email, then remove the temporary environment key or revoke it once receipt testing is finished. No Worker sending key is installed by this workflow.
+
+### Exact receipt message contract
+
+Sender and recipient are fixed as above. Subject is `[TEST] The Wedding Nest | New enquiry <first eight reference characters>`. Test idempotency keys use a separate `twn-receipt/` namespace; real enquiry keys stay `twn-enquiry/`.
+
+Body (the only variable is the non-personal test UUID):
+
+```text
+FICTIONAL STAGING RECEIPT TEST — THE WEDDING NEST
+No customer enquiry. No booking or response to a customer is required.
+Test reference: <UUID>
+This checks the email provider path only, not the deployed Worker or database.
+Please confirm inbox receipt to the project owner using the test reference.
+```
+
+This workflow is prepared and mock-tested only. No real workflow send, secret provisioning, hosted migration, inbox confirmation or public activation has occurred. A later Worker integration test still needs its own isolated staging setup and explicit receipt authorisation.

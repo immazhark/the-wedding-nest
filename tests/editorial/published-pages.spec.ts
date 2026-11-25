@@ -12,8 +12,9 @@ test("approved service template renders a useful, accessible and linked page", a
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "CI-only service page — never publish",
   );
-  await expect(page.locator("main article").getByRole("heading", { level: 2 })).toHaveCount(2);
-  await expect(page.getByRole("link", { name: "Explore in the planner" })).toHaveAttribute(
+  // Gallery, details and closing invitation: three sections, each with one level-2 heading.
+  await expect(page.locator("main article").getByRole("heading", { level: 2 })).toHaveCount(3);
+  await expect(page.getByRole("link", { name: "Begin planning" })).toHaveAttribute(
     "href",
     "/plan-your-event/?service=hospitality",
   );
@@ -22,6 +23,24 @@ test("approved service template renders a useful, accessible and linked page", a
     "href",
     "https://theweddingnest.in" + SERVICE,
   );
+});
+
+test("service gallery opens a keyboard-operable lightbox with described photographs", async ({
+  page,
+}) => {
+  await page.goto(SERVICE);
+  const tiles = page.locator("[data-gallery-open]");
+  const total = await tiles.count();
+  expect(total).toBeGreaterThanOrEqual(5);
+  await tiles.first().click();
+  const dialog = page.locator("dialog[data-lightbox]");
+  await expect(dialog).toBeVisible();
+  expect(((await dialog.locator("img").getAttribute("alt")) ?? "").length).toBeGreaterThan(12);
+  await page.keyboard.press("ArrowRight");
+  await expect(dialog.locator("[data-lightbox-caption]")).toContainText(`2 of ${total}`);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(tiles.first()).toBeFocused();
 });
 
 test("approved story template renders only its released fixture photographs", async ({ page }) => {
@@ -75,4 +94,27 @@ for (const path of [SERVICE, STORY]) {
     const serious = axe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""));
     expect(serious.map((v) => v.id)).toEqual([]);
   });
+}
+
+// Tablet and in-between widths: no horizontal overflow and every released photograph stays inside the viewport.
+for (const path of [SERVICE, STORY]) {
+  for (const width of [320, 768, 820, 1024, 1280]) {
+    test(`${path} fits a ${width}px-wide viewport`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(path);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        ),
+      ).toBeLessThanOrEqual(0);
+      const overflowing = await page.evaluate(
+        () =>
+          [...document.querySelectorAll("article img")].filter(
+            (img) => img.getBoundingClientRect().right > document.documentElement.clientWidth + 1,
+          ).length,
+      );
+      expect(overflowing).toBe(0);
+    });
+  }
 }

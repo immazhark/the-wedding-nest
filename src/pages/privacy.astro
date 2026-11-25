@@ -1,0 +1,72 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../lib/site/config";
+---
+
+<BaseLayout
+  title="Privacy — pre-launch notice"
+  description="How The Wedding Nest's preview handles planning choices, and the privacy decisions being prepared before real enquiries open."
+>
+  <article>
+    <header class="page-hero on-dark">
+      <div class="mx-auto max-w-4xl px-4 sm:px-8 py-24 md:py-32">
+        <p class="eyebrow text-saffron">Before enquiries open</p>
+        <h1 class="mt-6 text-[length:var(--text-headline)] text-ivory">Privacy, in plain words.</h1>
+        <p class="mt-6 max-w-2xl text-lg text-stone">
+          This is a pre-launch notice for review. This preview does not accept real enquiries. Live
+          storage, notifications and retention operations must be verified before intake opens.
+        </p>
+      </div>
+    </header>
+    <div class="mx-auto max-w-4xl px-4 sm:px-8 py-16 md:py-24 text-ink">
+      <section aria-labelledby="preview-privacy" class="max-w-2xl">
+        <h2 id="preview-privacy" class="text-3xl">
+          What stays in this browser
+        </h2>
+        <p class="mt-4 leading-relaxed">
+          The planner can remember non-personal planning choices for seven days. Names, phone
+          numbers, venue details, notes and consent are not saved in that draft. Start again clears
+          it. Copy planning choices excludes those private fields too. Please do not enter sensitive
+          information or real contact details in this preview.
+        </p>
+      </section>
+      <section aria-labelledby="future-enquiries" class="mt-12 max-w-2xl">
+        <h2 id="future-enquiries" class="text-3xl">
+          When real enquiries open
+        </h2>
+        <p class="mt-4 leading-relaxed">
+          The planned enquiry collects your name, phone number, preferred way to talk and the event
+          choices you provide so the team can respond. Date, budget, venue and notes may remain
+          undecided. Optional marketing consent is separate; no marketing delivery is active.
+          Production storage, notification providers, access and the final notice still require
+          review. Test submissions belong only in the separately labelled fictional-data
+          environment.
+        </p>
+      </section>
+      <section aria-labelledby="retention" class="mt-12 max-w-2xl">
+        <h2 id="retention" class="text-3xl">
+          The retention decision
+        </h2>
+        <p class="mt-4 leading-relaxed">
+          The owner has selected 90 days from the date an enquiry is explicitly marked unsuccessful.
+          This does not classify old or active enquiries as unsuccessful. Booked-client records need
+          a separate rule. No live cleanup is active; the operator process and treatment of pending
+          notifications must be settled before this becomes an operational retention notice.
+        </p>
+      </section>
+      <section aria-labelledby="privacy-contact" class="mt-12 max-w-2xl">
+        <h2 id="privacy-contact" class="text-3xl">
+          Privacy requests
+        </h2>
+        <p class="mt-4 leading-relaxed">
+          For access, correction or deletion requests, contact{" "}
+          <a class="link-underline break-words" href={`mailto:${SITE.email}`}>
+            {SITE.email}
+          </a>
+          . Share only enough information to identify your enquiry. Please do not send passwords,
+          identity documents or unrelated sensitive information.
+        </p>
+      </section>
+    </div>
+  </article>
+</BaseLayout>

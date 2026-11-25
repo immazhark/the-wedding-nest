@@ -2,7 +2,10 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import { rm, writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
+import { parseConfigFileTextToJson } from "typescript";
 import { headersFile, robotsTxt, sitemapXml } from "./src/lib/site/seo-files.ts";
+import { assertIndexableRelease } from "./src/lib/site/release.ts";
 
 // One switch for robots.txt, X-Robots-Tag and <meta name="robots"> (set as a real build
 // environment variable, e.g. in Workers Builds settings, only for the approved production build).
@@ -11,6 +14,26 @@ const siteUrl = "https://theweddingnest.in";
 // Live enquiry submission (owner-gated). Off unless explicitly enabled for a build.
 const enquiries = process.env.PUBLIC_ENQUIRIES_ENABLED === "true";
 const TURNSTILE = "https://challenges.cloudflare.com";
+
+// Do not activate indexing on the same asset build while workers.dev/version previews remain on.
+// Parsing and the guard run only for an explicitly indexable build; current previews are unchanged.
+if (indexable) {
+  const deployment = parseConfigFileTextToJson(
+    "wrangler.jsonc",
+    readFileSync(new URL("./wrangler.jsonc", import.meta.url), "utf8"),
+  );
+  if (deployment.error)
+    throw new Error("Cannot verify release host policy: invalid wrangler.jsonc");
+  assertIndexableRelease(
+    {
+      indexable,
+      publicRelease: process.env.PUBLIC_SITE_RELEASED,
+      enquiriesEnabled: process.env.PUBLIC_ENQUIRIES_ENABLED,
+      turnstileSiteKey: process.env.PUBLIC_TURNSTILE_SITE_KEY,
+    },
+    deployment.config,
+  );
+}
 
 /** @type {import("astro").AstroIntegration} */
 const seoFiles = {
