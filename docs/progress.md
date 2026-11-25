@@ -2,6 +2,11 @@
 
 ## Current verified state (25 Nov 2026): read this first
 
+**Execution queue — ChatGPT Work takeover continuation.** GitHub integration is restored. PR #147 is merged as `af100d7` after successful CI `45539566164` (including 82 editorial browser tests); PR #148 is merged as `b7bdafe` after successful CI `45539914960`. PR [#147](https://github.com/immazhark/the-wedding-nest/pull/147) delivers gallery announcements and four-look regression coverage (`b2c9413`, CI `45539566164`); PR [#148](https://github.com/immazhark/the-wedding-nest/pull/148) fixes film visibility/play races/reduced-motion changes (`7a2730f`, CI `45539914960`); PR [#149](https://github.com/immazhark/the-wedding-nest/pull/149) prepares dormant operator status transitions (see `docs/operator-workflow.md`). Check GitHub for their current merge/check state before resuming. Required CI must pass and review threads must be resolved before integration.
+
+**Combined local verification.** All three changes were cherry-picked into `work/combined-verification-20261125`: 269/269 unit tests, zero Astro/TypeScript diagnostics, formatting, standard build and submission-test build passed. Film changes reproduced three baseline failures and add seven regressions. Operator changes add twenty real-SQLite tests and passed independent security review. Browser execution remains unavailable locally; hosted CI must establish browser/runtime acceptance. No production gate, live route, migration or notification was activated.
+
+
 **Repository.** Verified GitHub `main` at `c73404e6fd127cb499ea47f8bb9a844ed675020c` (#145, category-specific compositions). #142 (CSP fixes), #143 (progress reconciliation), #144 (Service structured data) and #145 are merged. GitHub CI run `45535164729` completed successfully. Only #64 and #130 remain open, both drafts. The earlier audit baseline is superseded.
 
 **Active development writer — ChatGPT Work, 25 Nov 2026.** Dedicated branch `work/service-look-regressions-20261125`, based on `c73404e`; no existing branches overwritten. No repository writer lock was found; unpushed Claude changes cannot be inspected. GitHub connector access is restored using the repository-owner account; terminal GitHub authentication remains unavailable. Repository-backed integration now uses the authenticated GitHub connector.
@@ -269,3 +274,16 @@ Reproduced from the owner's laptop screenshots (about 1900x870 Chrome) and Playw
 - Production approval gates are unchanged. The earlier GitHub connector blocker is resolved. Re-fetch main, reconcile concurrent changes and require the full GitHub checks before merging. No background continuation is scheduled.
 
 **Final local evidence for this branch:** `npm test` — 242/242 passed (30 files); `npm run check` — zero errors/warnings/hints; `npm run format:check` — passed; `npm run build` — passed (5 pages). Isolated fixture build generated all four service compositions (10 pages total), and static HTML checks confirmed each expected gallery/hero class and noindex. Its browser phase failed before page execution: Chromium binary is absent and Playwright browser download returns HTTP 403. No browser/axe/visual PASS is claimed for this branch. Disposable fixture sources/output were removed by the runner's `finally`; the final standard build contains none of the four unapproved service routes. The first unit run overlapped generated fixtures and rejected their old duplicate synthetic release reference; the runner now assigns distinct references and the clean-source rerun passed all 242 tests. Main-preview HTTP headers and robots remain noindex; existing deployed homepage inspected in the cloud browser at its default desktop viewport only, not this unpublished patch.
+
+### Next executable tasks after integrating the takeover PRs
+
+- Use current GitHub CI and review state, never the historical open-PR lists, before merging eligible changes. Re-check both Cloudflare build provenances after integration.
+- Extend the authenticated operator interface and audit trail only behind the documented activation prerequisites; the new core is not a functioning CRM or authenticated API.
+- Continue remaining service/media experiences and cross-browser acceptance while service-copy, testimonials, booked-client retention and production approvals remain outstanding. Do not manufacture approval references or re-open completed service looks.
+
+### Gallery fallback and retained visual evidence — takeover continuation
+
+- Gallery tiles are real approved-image links without JavaScript or native-dialog support; ordinary clicks still open the accessible lightbox, while modified clicks preserve native browser behavior. Eight unit regressions cover enhancement/fallback behavior; seven reproduced failures on the earlier implementation. A JavaScript-disabled browser regression verifies actual image navigation and response type.
+- CI now retains editorial composition PNGs as the `editorial-compositions` artifact for seven days, including failure screenshots where available. These are test evidence, not creative owner approval. No synthetic content is deployed.
+- Combined local candidate (gallery, film and dormant operator changes): 277 unit tests passed; type/format and both build variants were verified before integration (see current GitHub checks for the final branch tree). Local Chromium remains unavailable, so hosted browser acceptance is mandatory.
+- Main preview build `8523c8e9-78e0-4233-83cb-395fe5609a72`, version `8abc4300-64e8-4fa1-bf53-9e18ccd3782f`, independently verified successful at commit `af100d7`; main retains intake-off and no D1. Staging retained its isolated D1 and fictional intake. Later deployments must be rechecked rather than assumed.
