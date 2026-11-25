@@ -94,6 +94,35 @@ describe("operator API", () => {
     });
     expect(enquiries[0]).not.toHaveProperty("phone");
   });
+  it("pages equal timestamps without skipping records or offering a phantom next page", async () => {
+    const tiedId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+    const tiedAt = "2026-12-01T09:00:00.000Z";
+    insert(tiedId, tiedAt, "Tied Person");
+    const first = await call("GET", "/api/operator/enquiries?limit=1");
+    expect(await first.json()).toMatchObject({
+      enquiries: [{ id: tiedId }],
+      nextCursor: { createdAt: tiedAt, id: tiedId },
+    });
+    const params = new URLSearchParams({ limit: "2", before: tiedAt, beforeId: tiedId });
+    const next = await call("GET", `/api/operator/enquiries?${params}`);
+    expect(await next.json()).toMatchObject({
+      enquiries: [{ id: ID_B }, { id: ID_A }],
+      nextCursor: null,
+    });
+  });
+
+  it("rejects incomplete and invalid composite cursors", async () => {
+    for (const cursor of [
+      "before=2026-12-01T09:00:00.000Z",
+      `beforeId=${ID_A}`,
+      `before=2026-02-30T00:00:00.000Z&beforeId=${ID_A}`,
+      "before=2026-12-01T09:00:00.000Z&beforeId=bad",
+    ]) {
+      const response = await call("GET", `/api/operator/enquiries?${cursor}`);
+      expect(response.status).toBe(400);
+    }
+  });
+
   it("filters by status and caps the page size", async () => {
     sql.prepare("UPDATE enquiries SET status='contacted' WHERE id=?").run(ID_A);
     const r = await call("GET", "/api/operator/enquiries?status=contacted&limit=9999");
