@@ -5,6 +5,7 @@ import {
   pageTitle,
   robotsContent,
   organizationJsonLd,
+  serviceJsonLd,
 } from "../../src/lib/site/config";
 
 describe("site metadata", () => {
@@ -76,5 +77,28 @@ describe("site metadata", () => {
     expect(SITE.founder.phone).toBe("+918686773095");
     // twn.events was an earlier domain the business no longer uses or owns.
     expect(JSON.stringify(SITE)).not.toMatch(/https?:\/\/(www\.)?twn\.events/);
+  });
+});
+
+describe("service structured data", () => {
+  const doc = JSON.parse(
+    serviceJsonLd(
+      { title: "Hyderabadi wedding catering", description: "Four menus <b>shaped</b> around you." },
+      "/services/hyderabadi-wedding-catering/",
+    ),
+  );
+  it("describes the approved page and links to the organization", () => {
+    expect(doc["@type"]).toBe("Service");
+    expect(doc.url).toMatch(/\/services\/hyderabadi-wedding-catering\/$/);
+    expect(doc.provider["@id"]).toMatch(/#organization$/);
+    expect(doc.areaServed.name).toContain("Hyderabad");
+  });
+  it("never invents prices, ratings, reviews or offers", () => {
+    for (const key of ["offers", "aggregateRating", "review", "priceRange", "price"]) {
+      expect(doc).not.toHaveProperty(key);
+    }
+  });
+  it("is safe to embed in an inline script", () => {
+    expect(serviceJsonLd({ title: "x </script>", description: "y" }, "/s/")).not.toContain("<");
   });
 });

@@ -71,6 +71,21 @@ test.describe("catering page art direction", () => {
     await expect(frame.locator("video")).toHaveJSProperty("paused", true);
   });
 
+  test("declares Service structured data tied to the organization, with no invented offers", async ({
+    page,
+  }) => {
+    await page.goto(CATERING);
+    const docs = (await page.locator('script[type="application/ld+json"]').allTextContents()).map(
+      (text) => JSON.parse(text),
+    );
+    const service = docs.find((doc) => doc["@type"] === "Service");
+    expect(service, "Service JSON-LD present").toBeTruthy();
+    expect(service.provider["@id"]).toMatch(/#organization$/);
+    expect(service.url).toMatch(/\/services\/hyderabadi-wedding-catering\/$/);
+    expect(service).not.toHaveProperty("offers");
+    expect(service).not.toHaveProperty("aggregateRating");
+  });
+
   test("no horizontal overflow from 320 to 1920 px", async ({ page, isMobile }) => {
     test.skip(isMobile, "Width matrix is set explicitly on desktop Chromium");
     for (const width of [320, 390, 768, 1024, 1366, 1920]) {
