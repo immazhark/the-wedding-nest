@@ -13,7 +13,7 @@ interface Props {
   /** Accessible name for the group, e.g. "Floral decoration photographs". */
   label: string;
   /** Composition of the tiles; see ServiceLook. */
-  layout?: "mosaic" | "duo" | "editorial" | "rail";
+  layout?: "mosaic" | "duo" | "editorial" | "rows";
 }
 const { photos, label, layout = "mosaic" } = Astro.props;
 ---

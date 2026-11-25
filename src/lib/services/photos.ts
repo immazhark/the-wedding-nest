@@ -36,8 +36,8 @@ export interface ServiceLook {
   hero: "split" | "full";
   /** Tone of the gallery chapter: dark kohl, ivory paper, or warm saffron paper. */
   tone: "dark" | "ivory" | "saffron";
-  /** "mosaic": three columns. "duo": two large columns. "editorial": rows of fixed proportions. "rail": one row. */
-  gallery: "mosaic" | "duo" | "editorial" | "rail";
+  /** "mosaic": three columns. "duo": two large columns. "editorial": rows of fixed proportions. "rows": justified rows of equal height. */
+  gallery: "mosaic" | "duo" | "editorial" | "rows";
 }
 export const DEFAULT_LOOK: ServiceLook = { hero: "split", tone: "dark", gallery: "mosaic" };
 
@@ -143,7 +143,7 @@ const SOURCES: Record<string, Source> = {
     },
   },
   "guest-hospitality-hyderabad": {
-    look: { hero: "split", tone: "dark", gallery: "rail" },
+    look: { hero: "split", tone: "dark", gallery: "rows" },
     hero: `${ev}celebrations/banquet-table/01-long-banquet-table.jpg`,
     gallery: [
       `${ev}celebrations/table-settings/02-napkin-and-bowl-portrait.jpg`,
