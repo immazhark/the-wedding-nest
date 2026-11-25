@@ -47,7 +47,7 @@ const doorPhotos: Record<string, string> = {
   "photo-film": "../../assets/events/celebrations/film-stills/01-hands-bokeh.jpg",
   makeup: "../../assets/events/mehndi/mehndi-hands/01-mehndi-hands-gathering.jpg",
   transport: "../../assets/events/celebrations/decorated-car/01-garlanded-car.jpg",
-  gifting: "../../assets/events/details/gift-box-ribbon/01-gold-gift-box-ribbon.jpg",
+  gifting: "../../assets/events/details/trousseau-baskets/01-tulle-wrapped-basket.jpg",
 };
 // The gallery reel: seven more real moments, laid out as a mosaic (md+ columns / aspect are tuned so rows end level).
 const ev = "../../assets/events/";
@@ -97,6 +97,14 @@ const reel = [
     arch: true,
   },
 ].map((r) => ({ ...r, photo: approvedEventPhotos[ev + r.file] }));
+// Short silent loops that wake on a pointer hover or keyboard focus (desktop only, never with reduced
+// motion or Save-Data): each belongs to the service it sits on. Nothing downloads until then.
+const doorFilms: Record<string, string> = {
+  catering: "/media/door-catering.mp4",
+  decor: "/media/door-decor.mp4",
+  "photo-film": "/media/door-film.mp4",
+  transport: "/media/door-transport.mp4",
+};
 const thresholdPhoto =
   approvedEventPhotos["../../assets/events/catering/menu-table-details/04-white-dessert-glass.jpg"];
 ---
@@ -268,6 +276,19 @@ const thresholdPhoto =
                 loading="lazy"
                 class="door-photo"
                 aria-hidden="true"
+              />
+            )}
+            {doorFilms[s.id] && (
+              <video
+                class="door-film"
+                muted
+                loop
+                playsinline
+                preload="none"
+                tabindex="-1"
+                aria-hidden="true"
+                data-door-film
+                data-src={doorFilms[s.id]}
               />
             )}
             <a href={servicePageHref(s.id, publishedServicePages)} class="door-link">
@@ -782,6 +803,31 @@ const thresholdPhoto =
     };
     button.addEventListener("click", start);
   });
+  // Service doors: a short silent film wakes only on a fine pointer hover or keyboard focus.
+  const doorCalm = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const canHover = window.matchMedia("(hover: hover) and (pointer: fine)");
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
+    ?.saveData;
+  if (!doorCalm.matches && canHover.matches && !saveData) {
+    document.querySelectorAll<HTMLElement>(".door:has([data-door-film])").forEach((door) => {
+      const film = door.querySelector<HTMLVideoElement>("[data-door-film]")!;
+      const wake = () => {
+        if (!film.src) film.src = film.dataset["src"] ?? "";
+        film
+          .play()
+          .then(() => door.setAttribute("data-film-on", ""))
+          .catch(() => door.removeAttribute("data-film-on"));
+      };
+      const rest = () => {
+        film.pause();
+        door.removeAttribute("data-film-on");
+      };
+      door.addEventListener("pointerenter", wake);
+      door.addEventListener("pointerleave", rest);
+      door.addEventListener("focusin", wake);
+      door.addEventListener("focusout", rest);
+    });
+  }
   // The kitchen loop plays only while visible, never with reduced motion, and has no audio track.
   const arch = document.querySelector<HTMLElement>("[data-kitchen]");
   const video = document.querySelector<HTMLVideoElement>("[data-kitchen-video]");
