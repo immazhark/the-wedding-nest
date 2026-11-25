@@ -1,0 +1,44 @@
+---
+/**
+ * A short, silent film in a tall frame: poster first, plays only while visible, never under reduced
+ * motion, and always pausable (WCAG 2.2.2). Without JavaScript the poster simply stays.
+ */
+import type { ServiceFilm } from "../../lib/services/photos";
+
+interface Props {
+  film: ServiceFilm;
+}
+const { film } = Astro.props;
+---
+
+<div class="loop-frame" data-loop style={`aspect-ratio: ${film.width} / ${film.height}`}>
+  <img
+    src={film.poster}
+    alt=""
+    width={film.width}
+    height={film.height}
+    loading="lazy"
+    decoding="async"
+    class="loop-poster"
+  />
+  <video
+    class="loop-video"
+    muted
+    loop
+    playsinline
+    preload="none"
+    poster={film.poster}
+    aria-label={film.label}
+    data-loop-video
+  >
+    <source src={film.src} type="video/mp4" />
+  </video>
+  <button type="button" class="loop-toggle" data-loop-toggle hidden>
+    <span data-loop-toggle-label>Pause</span>
+    <span class="sr-only"> the film</span>
+  </button>
+</div>
+
+<script>
+  import "../../scripts/loop";
+</script>

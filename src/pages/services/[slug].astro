@@ -2,6 +2,8 @@
 import type { GetStaticPaths } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Frame from "../../components/media/Frame.astro";
+import Gallery from "../../components/media/Gallery.astro";
+import LoopFilm from "../../components/media/LoopFilm.astro";
 import { SITE } from "../../lib/site/config";
 import { servicePhotos } from "../../lib/services/photos";
 import { parseMenuBody } from "../../lib/services/menu";
@@ -38,6 +40,13 @@ const desserts = [
   ),
 ];
 const split = Boolean(photos.hero);
+const showcase = menus.length === 0 && photos.gallery.length > 0;
+const cta =
+  menus.length > 0
+    ? ["#menus", "See the menus"]
+    : showcase
+      ? ["#gallery", "See the work"]
+      : ["#menus", "See the details"];
 ---
 
 <BaseLayout title={page.title} description={page.description} invite={false}>
@@ -59,8 +68,8 @@ const split = Boolean(photos.hero);
           {page.introduction}
         </p>
         <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5 fade-in [--i:5]">
-          <a class="btn-grand" href="#menus">
-            <span>{menus.length > 0 ? "See the menus" : "See the details"}</span>
+          <a class="btn-grand" href={cta[0]}>
+            <span>{cta[1]}</span>
             <span class="btn-grand-chip" aria-hidden="true">
               ↓
             </span>
@@ -83,7 +92,32 @@ const split = Boolean(photos.hero);
       )}
     </header>
 
-    <section class="svc-details arch-over on-dark" aria-labelledby="service-details-heading">
+    {showcase && (
+      <section class="svc-gallery arch-over on-dark" aria-labelledby="gallery-title">
+        <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-32">
+          <p class="eyebrow text-saffron" id="gallery">
+            The work
+          </p>
+          <h2
+            id="gallery-title"
+            class="mt-6 text-[length:var(--text-headline)] max-w-[16ch] text-ivory"
+          >
+            A closer look.
+          </h2>
+          <p class="mt-6 max-w-xl text-stone">
+            Photographs from our own events. Choose any photograph to see it larger.
+          </p>
+          <div class="mt-12 md:mt-16">
+            <Gallery photos={photos.gallery} label={`${page.title}: photographs`} />
+          </div>
+        </div>
+      </section>
+    )}
+
+    <section
+      class:list={["svc-details on-dark", !showcase && "arch-over"]}
+      aria-labelledby="service-details-heading"
+    >
       <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36">
         <p class="eyebrow text-saffron" id="menus">
           Details to discuss
@@ -168,49 +202,21 @@ const split = Boolean(photos.hero);
       </div>
     </section>
 
-    {menus.length > 0 && (
+    {photos.film && (
       <section class="svc-reel on-dark" aria-labelledby="reel-title">
         <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-28 grid gap-12 md:grid-cols-12 md:items-center">
           <div class="md:col-span-6 lg:col-span-5">
-            <p class="eyebrow text-saffron">In the kitchen</p>
+            <p class="eyebrow text-saffron">{photos.film.eyebrow}</p>
             <h2
               id="reel-title"
               class="mt-6 text-[length:var(--text-headline)] max-w-[12ch] text-ivory"
             >
-              From the pot to the plate.
+              {photos.film.heading}
             </h2>
-            <p class="mt-6 max-w-md text-stone">
-              Preparation and plating, filmed in a Wedding Nest catering kitchen.
-            </p>
+            <p class="mt-6 max-w-md text-stone">{photos.film.caption}</p>
           </div>
           <div class="md:col-span-6 lg:col-span-6 lg:col-start-7">
-            <div class="loop-frame" data-loop>
-              <img
-                src="/media/catering-pot-to-plate-poster.jpg"
-                alt=""
-                width="720"
-                height="960"
-                loading="lazy"
-                decoding="async"
-                class="loop-poster"
-              />
-              <video
-                class="loop-video"
-                muted
-                loop
-                playsinline
-                preload="none"
-                poster="/media/catering-pot-to-plate-poster.jpg"
-                aria-label="A cook ladles curry from a large pot and plates it onto a foil platter of shredded cabbage"
-                data-loop-video
-              >
-                <source src="/media/catering-pot-to-plate.mp4" type="video/mp4" />
-              </video>
-              <button type="button" class="loop-toggle" data-loop-toggle hidden>
-                <span data-loop-toggle-label>Pause</span>
-                <span class="sr-only"> the kitchen film</span>
-              </button>
-            </div>
+            <LoopFilm film={photos.film} />
           </div>
         </div>
       </section>
@@ -319,44 +325,3 @@ const split = Boolean(photos.hero);
     </aside>
   </article>
 </BaseLayout>
-
-<script>
-  // Kitchen film: plays only while visible, never with reduced motion, has no audio track, and can
-  // always be paused (WCAG 2.2.2). Without JavaScript or with reduced motion the poster stays.
-  const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
-  document.querySelectorAll<HTMLElement>("[data-loop]").forEach((frame) => {
-    const video = frame.querySelector<HTMLVideoElement>("[data-loop-video]");
-    const toggle = frame.querySelector<HTMLButtonElement>("[data-loop-toggle]");
-    const label = frame.querySelector<HTMLElement>("[data-loop-toggle-label]");
-    if (!video || !toggle || !label || calm.matches || !("IntersectionObserver" in window)) return;
-    let userPaused = false;
-    const show = (playing: boolean) => {
-      frame.toggleAttribute("data-playing", playing);
-      label.textContent = playing ? "Pause" : "Play";
-    };
-    const start = () =>
-      video
-        .play()
-        .then(() => show(true))
-        .catch(() => show(false));
-    toggle.hidden = false;
-    toggle.addEventListener("click", () => {
-      userPaused = !video.paused;
-      if (userPaused) {
-        video.pause();
-        show(false);
-      } else void start();
-    });
-    new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        if (entry.isIntersecting && !userPaused) void start();
-        else {
-          video.pause();
-          if (!userPaused) show(false);
-        }
-      },
-      { threshold: 0.4 },
-    ).observe(frame);
-  });
-</script>

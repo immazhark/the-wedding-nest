@@ -12,7 +12,8 @@ test("approved service template renders a useful, accessible and linked page", a
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "CI-only service page — never publish",
   );
-  await expect(page.locator("main article").getByRole("heading", { level: 2 })).toHaveCount(2);
+  // Gallery, details and closing invitation: three sections, each with one level-2 heading.
+  await expect(page.locator("main article").getByRole("heading", { level: 2 })).toHaveCount(3);
   await expect(page.getByRole("link", { name: "Begin planning" })).toHaveAttribute(
     "href",
     "/plan-your-event/?service=hospitality",
@@ -22,6 +23,24 @@ test("approved service template renders a useful, accessible and linked page", a
     "href",
     "https://theweddingnest.in" + SERVICE,
   );
+});
+
+test("service gallery opens a keyboard-operable lightbox with described photographs", async ({
+  page,
+}) => {
+  await page.goto(SERVICE);
+  const tiles = page.locator("[data-gallery-open]");
+  const total = await tiles.count();
+  expect(total).toBeGreaterThanOrEqual(5);
+  await tiles.first().click();
+  const dialog = page.locator("dialog[data-lightbox]");
+  await expect(dialog).toBeVisible();
+  expect(((await dialog.locator("img").getAttribute("alt")) ?? "").length).toBeGreaterThan(12);
+  await page.keyboard.press("ArrowRight");
+  await expect(dialog.locator("[data-lightbox-caption]")).toContainText(`2 of ${total}`);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(tiles.first()).toBeFocused();
 });
 
 test("approved story template renders only its released fixture photographs", async ({ page }) => {
