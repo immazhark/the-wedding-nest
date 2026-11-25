@@ -21,15 +21,15 @@ async function probe(path, headers = {}) {
 }
 
 function assertAccessRedirect(path, response) {
-  assert.ok(REDIRECT.has(response.status), `${path}: expected Access redirect, got ${response.status}`);
+  assert.ok(
+    REDIRECT.has(response.status),
+    `${path}: expected Access redirect, got ${response.status}`,
+  );
   assert.ok(response.location, `${path}: missing redirect location`);
   const target = new URL(response.location, HOST);
   assert.equal(target.protocol, "https:", `${path}: login must use HTTPS`);
   assert.equal(target.hostname, TEAM, `${path}: unexpected login host`);
-  assert.ok(
-    target.pathname.startsWith("/cdn-cgi/access/login/"),
-    `${path}: unexpected login path`,
-  );
+  assert.ok(target.pathname.startsWith("/cdn-cgi/access/login/"), `${path}: unexpected login path`);
 }
 
 test("Access redirects unauthenticated operator entry points and static assets", async () => {
