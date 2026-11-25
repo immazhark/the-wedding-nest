@@ -78,7 +78,7 @@ function field(dl, k, v) {
 async function show(id, note) {
   say("Loading…");
   try {
-    const { enquiry: e } = await api(`/api/operator/enquiries/${id}`);
+    const { enquiry: e, history } = await api(`/api/operator/enquiries/${id}`);
     const p = e.payload;
     $("detail-title").textContent = p.name || "(no name)";
     const dl = $("fields");
@@ -94,6 +94,13 @@ async function show(id, note) {
     field(dl, "Location", p.location);
     field(dl, "Notes", p.notes);
     field(dl, "Marketing consent", e.marketingConsent ? "Yes" : "No");
+    field(
+      dl,
+      "History",
+      (history || []).map(
+        (h) => `${when(h.at)}: ${h.operator} · ${LABEL[h.from]} → ${LABEL[h.to]}`,
+      ),
+    );
     const actions = $("actions");
     actions.replaceChildren();
     for (const to of NEXT[e.status] || [])
