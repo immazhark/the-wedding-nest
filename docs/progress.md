@@ -211,6 +211,10 @@ Reproduced from the owner's laptop screenshots (about 1900x870 Chrome) and Playw
 - CI coverage without publishing anything: the synthetic editorial fixture page (guest-hospitality slug, CI-only build) now renders the real gallery, and a new editorial test opens the lightbox, steps with the arrow key, closes with Escape and checks focus return; unit test `service-media.test.ts` checks every requested photograph is declared in a manifest and never repeated.
 - Cars (licence plates need blur), photography/film and makeup (no photography supplied) are not yet built.
 
+### 25 November 2026: lighter hero scrim (supersedes #114)
+
+- #114's scrim, rebased onto the current hero (after #137): the floral stage and floor now read as the subject; headline, lede and CTA stay legible (compared against main at 1440x900 and 390x844, same capture method). CSS only (`.grand-scrim`, plus a soft text shadow on hero copy). #114 closed as superseded.
+
 ### 25 November 2026: living doors, converted photographs, real video review
 
 - ffmpeg 9.1 (winget `Gyan.FFmpeg`, local only, no uploads) now gives a real review toolchain: every video probed, scene cuts and audio levels measured, timestamped sheets at 1-2 s spacing (see `docs/media-inventory.md`). Playback and listening are still not done, so published clips stay silent.
