@@ -75,9 +75,7 @@ it("executes operator audit transactions through isolated workerd D1", async () 
       });
       await db.prepare("DROP TABLE operator_audit").run();
       expect((await change("contacted", "unsuccessful")).status).toBe(503);
-      expect(
-        await db.prepare("SELECT status, unsuccessful_at FROM enquiries").first(),
-      ).toEqual({
+      expect(await db.prepare("SELECT status, unsuccessful_at FROM enquiries").first()).toEqual({
         status: "contacted",
         unsuccessful_at: null,
       });
