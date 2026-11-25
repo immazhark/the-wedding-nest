@@ -12,11 +12,13 @@ interface Props {
   photos: ApprovedPhoto[];
   /** Accessible name for the group, e.g. "Floral decoration photographs". */
   label: string;
+  /** Composition of the tiles; see ServiceLook. */
+  layout?: "mosaic" | "duo" | "editorial" | "rail";
 }
-const { photos, label } = Astro.props;
+const { photos, label, layout = "mosaic" } = Astro.props;
 ---
 
-<div class="gallery-mosaic" role="group" aria-label={label} data-gallery>
+<div class:list={["gallery", `gallery-${layout}`]} role="group" aria-label={label} data-gallery>
   {photos.map((photo, index) => (
     <button
       type="button"

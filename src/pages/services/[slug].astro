@@ -39,8 +39,14 @@ const desserts = [
     ),
   ),
 ];
-const split = Boolean(photos.hero);
 const showcase = menus.length === 0 && photos.gallery.length > 0;
+const { look } = photos;
+const full = look.hero === "full" && Boolean(photos.hero);
+const split = Boolean(photos.hero) && look.hero === "split";
+const light = look.tone !== "dark";
+const ink = light ? "text-ink" : "text-ivory";
+const soft = light ? "text-muted" : "text-stone";
+const eyebrowTone = light ? "text-brass-deep" : "text-saffron";
 const cta =
   menus.length > 0
     ? ["#menus", "See the menus"]
@@ -56,11 +62,12 @@ const cta =
   jsonLd={[serviceJsonLd(page, `/services/${page.slug}/`)]}
 >
   <article>
-    <header class:list={["svc-hero on-dark", split && "svc-hero-split"]}>
+    <header class:list={["svc-hero on-dark", split && "svc-hero-split", full && "svc-hero-full"]}>
       <div
         class:list={[
           "svc-hero-copy mx-auto w-full max-w-[90rem] px-4 sm:px-8 lg:px-12",
           !split && "pt-24 pb-14 md:pt-40 md:pb-20",
+          full && "md:pt-56",
         ]}
       >
         <p class="eyebrow text-saffron fade-in [--i:1]">Explore an event service</p>
@@ -84,7 +91,21 @@ const cta =
           </a>
         </div>
       </div>
-      {photos.hero && (
+      {full && photos.hero && (
+        <>
+          <Frame
+            photo={photos.hero}
+            aspectClass="h-full"
+            tone="dark"
+            priority
+            quality={80}
+            sizes="100vw"
+            class="svc-hero-photo"
+          />
+          <div class="svc-hero-scrim" aria-hidden="true"></div>
+        </>
+      )}
+      {split && photos.hero && (
         <Frame
           photo={photos.hero}
           aspectClass="aspect-[4/3] lg:aspect-auto lg:h-full"
@@ -98,29 +119,37 @@ const cta =
     </header>
 
     {showcase && (
-      <section class="svc-gallery arch-over on-dark" aria-labelledby="gallery-title">
+      <section
+        class:list={["svc-gallery arch-over", !light && "on-dark"]}
+        data-tone={look.tone}
+        aria-labelledby="gallery-title"
+      >
         <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-20 md:py-32">
-          <p class="eyebrow text-saffron" id="gallery">
+          <p class:list={["eyebrow", eyebrowTone]} id="gallery">
             The work
           </p>
           <h2
             id="gallery-title"
-            class="mt-6 text-[length:var(--text-headline)] max-w-[16ch] text-ivory"
+            class:list={["mt-6 text-[length:var(--text-headline)] max-w-[16ch]", ink]}
           >
             A closer look.
           </h2>
-          <p class="mt-6 max-w-xl text-stone">
+          <p class:list={["mt-6 max-w-xl", soft]}>
             Photographs from our own events. Choose any photograph to see it larger.
           </p>
           <div class="mt-12 md:mt-16">
-            <Gallery photos={photos.gallery} label={`${page.title}: photographs`} />
+            <Gallery
+              photos={photos.gallery}
+              label={`${page.title}: photographs`}
+              layout={look.gallery}
+            />
           </div>
         </div>
       </section>
     )}
 
     <section
-      class:list={["svc-details on-dark", !showcase && "arch-over"]}
+      class:list={["svc-details on-dark", (!showcase || light) && "arch-over"]}
       aria-labelledby="service-details-heading"
     >
       <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36">

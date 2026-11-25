@@ -246,3 +246,8 @@ Reproduced from the owner's laptop screenshots (about 1900x870 Chrome) and Playw
 
 - A full viewport sweep (13 sizes x 5 pages, including 320 px, short laptops and landscape phones) found one real defect: the film frame and gallery tiles set `aspect-ratio` through an inline `style` attribute, which the site's Content-Security-Policy blocks. On the live site the gallery tiles would have collapsed once service pages publish. Both now use the image's own width/height (gallery) and a CSS ratio (film).
 - Why it was missed: the real catering page was not in the site-wide axe/console/overflow/metadata tests, and the editorial fixture test only clicked the lightbox. The catering page is now in `PAGES`, and the fixture service page has a no-console-or-CSP-error test.
+
+### 25 November 2026: service looks (category-specific compositions)
+
+- The four prepared service pages no longer share one recipe. Each service declares a `look` in `src/lib/services/photos.ts` (shared accessible gallery and lightbox, different composition): Décor opens full-bleed and uses an editorial grid of fixed row proportions; Mehndi sits on saffron paper in two large columns; Trousseau on ivory in three columns with the packing film; Hospitality opens on the banquet photograph and uses a horizontal scroll-snap rail. Catering is unchanged. A light chapter breaks the dark-and-gold sameness the audit flagged.
+- Reviewed as rendered pages at 1440 and 390 using throwaway local drafts (deleted); the pages themselves remain unpublished pending approval of `docs/service-page-drafts.md`.

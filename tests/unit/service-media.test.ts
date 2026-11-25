@@ -27,6 +27,10 @@ describe("service page media", () => {
   });
 
   it("returns no media for a service without an art direction", () => {
-    expect(servicePhotos("bridal-makeup-hyderabad")).toEqual({ menus: [], gallery: [] });
+    expect(servicePhotos("bridal-makeup-hyderabad")).toEqual({
+      menus: [],
+      gallery: [],
+      look: { hero: "split", tone: "dark", gallery: "mosaic" },
+    });
   });
 });
