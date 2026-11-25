@@ -221,3 +221,7 @@ Reproduced from the owner's laptop screenshots (about 1900x870 Chrome) and Playw
 - The nine converted JPEGs (M365-M373, `Packing/`) are in: tulle-wrapped baskets, suitcases, satin pouches and henna cones. `tranche-seven.json` (T0059-T0065) feeds the trousseau and Mehndi galleries (pages still awaiting approval) and the home Gifting door photograph. Two HEIC originals (`1000002088.heic`, `Floral/IMG_1540.HEIC`) still have no JPEG.
 - Home service doors wake a short silent film on pointer hover or keyboard focus (desktop, fine pointer, no reduced motion, no Save-Data; nothing downloads before that): Catering, Décor, Photo & film, Cars. Four e2e tests (`living-doors.spec.ts`).
 - Cars loop uses M029 (decorated hood, no plate visible); plate blur is still required before any car footage with a visible plate (M362).
+
+### 25 November 2026: Service structured data
+
+- Service pages now emit schema.org `Service` JSON-LD (name, description, canonical URL, provider linked to the Organization `@id`, area served = Hyderabad, Telangana), built only from the owner-approved page record. It never carries prices, ratings, reviews, offers or availability (unit and e2e tests assert this). Applies automatically to every service page that is later approved.
