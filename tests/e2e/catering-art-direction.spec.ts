@@ -18,14 +18,18 @@ test.describe("catering page art direction", () => {
     }
   });
 
-  test("approved catering answers are visible as static text without FAQ claims", async ({ page }) => {
+  test("approved catering answers are visible as static text without FAQ claims", async ({
+    page,
+  }) => {
     await page.goto(CATERING);
     const answers = page.getByRole("region", { name: "Before you choose" });
     await expect(answers.getByText("Can I customise the menu?")).toBeVisible();
     await expect(answers.getByText("Are set prices published?")).toBeVisible();
     await expect(answers).toContainText("Each menu is a starting point");
     await expect(answers).toContainText("We do not publish set prices");
-    const structuredData = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const structuredData = await page
+      .locator('script[type="application/ld+json"]')
+      .allTextContents();
     expect(structuredData.join(" ")).not.toContain("FAQPage");
   });
 
