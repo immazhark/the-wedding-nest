@@ -23,7 +23,6 @@ const { photos, label } = Astro.props;
       class="gallery-tile"
       data-gallery-open={index}
       aria-label={`View larger: ${photo.entry.alt}`}
-      style={`aspect-ratio: ${photo.image.width} / ${photo.image.height}`}
     >
       <Picture
         src={photo.image}

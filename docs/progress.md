@@ -225,3 +225,8 @@ Reproduced from the owner's laptop screenshots (about 1900x870 Chrome) and Playw
 ### 25 November 2026: Service structured data
 
 - Service pages now emit schema.org `Service` JSON-LD (name, description, canonical URL, provider linked to the Organization `@id`, area served = Hyderabad, Telangana), built only from the owner-approved page record. It never carries prices, ratings, reviews, offers or availability (unit and e2e tests assert this). Applies automatically to every service page that is later approved.
+
+### 25 November 2026: CSP inline-style defect and test gap (fixed)
+
+- A full viewport sweep (13 sizes x 5 pages, including 320 px, short laptops and landscape phones) found one real defect: the film frame and gallery tiles set `aspect-ratio` through an inline `style` attribute, which the site's Content-Security-Policy blocks. On the live site the gallery tiles would have collapsed once service pages publish. Both now use the image's own width/height (gallery) and a CSS ratio (film).
+- Why it was missed: the real catering page was not in the site-wide axe/console/overflow/metadata tests, and the editorial fixture test only clicked the lightbox. The catering page is now in `PAGES`, and the fixture service page has a no-console-or-CSP-error test.
