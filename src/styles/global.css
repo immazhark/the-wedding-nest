@@ -1921,5 +1921,9 @@ body:has(.lightbox[open]) {
 .svc-hero-full .svc-hero-scrim {
   background:
     linear-gradient(to top, rgb(11 17 14 / 0.78) 0%, rgb(11 17 14 / 0.25) 42%, transparent 70%),
-    linear-gradient(to right, rgb(11 17 14 / 0.7) 0%, rgb(11 17 14 / 0.25) 45%, transparent 70%);
+    linear-gradient(to right, rgb(11 17 14 / 0.82) 0%, rgb(11 17 14 / 0.45) 50%, transparent 78%);
+}
+.svc-hero-full .svc-hero-copy p,
+.svc-hero-full .svc-hero-copy a:not(.btn-grand) {
+  text-shadow: 0 1px 14px rgb(0 0 0 / 0.65);
 }

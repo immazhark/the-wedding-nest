@@ -29,7 +29,10 @@ export interface ServiceFilm {
  * the photographs are laid out.
  */
 export interface ServiceLook {
-  /** "split": copy beside a crisp photograph. "full": a full-bleed cinematic opening. */
+  /**
+   * "split": copy beside a crisp photograph (any photograph). "full": a full-bleed cinematic opening,
+   * only for darker, calmer photographs, because the copy sits on top of the picture.
+   */
   hero: "split" | "full";
   /** Tone of the gallery chapter: dark kohl, ivory paper, or warm saffron paper. */
   tone: "dark" | "ivory" | "saffron";
@@ -140,7 +143,7 @@ const SOURCES: Record<string, Source> = {
     },
   },
   "guest-hospitality-hyderabad": {
-    look: { hero: "full", tone: "dark", gallery: "rail" },
+    look: { hero: "split", tone: "dark", gallery: "rail" },
     hero: `${ev}celebrations/banquet-table/01-long-banquet-table.jpg`,
     gallery: [
       `${ev}celebrations/table-settings/02-napkin-and-bowl-portrait.jpg`,
