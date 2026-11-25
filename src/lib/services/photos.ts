@@ -23,6 +23,24 @@ export interface ServiceFilm {
   label: string;
 }
 
+/**
+ * Each service keeps the shared, accessible gallery machinery but has its own composition, so the
+ * pages are not one recipe repeated: how the page opens, the tone of the gallery chapter, and how
+ * the photographs are laid out.
+ */
+export interface ServiceLook {
+  /**
+   * "split": copy beside a crisp photograph (any photograph). "full": a full-bleed cinematic opening,
+   * only for darker, calmer photographs, because the copy sits on top of the picture.
+   */
+  hero: "split" | "full";
+  /** Tone of the gallery chapter: dark kohl, ivory paper, or warm saffron paper. */
+  tone: "dark" | "ivory" | "saffron";
+  /** "mosaic": three columns. "duo": two large columns. "editorial": rows of fixed proportions. "rows": justified rows of equal height. */
+  gallery: "mosaic" | "duo" | "editorial" | "rows";
+}
+export const DEFAULT_LOOK: ServiceLook = { hero: "split", tone: "dark", gallery: "mosaic" };
+
 export interface ServicePhotos {
   hero?: ApprovedPhoto;
   /** One per menu card, in menu order; a missing approval leaves that card typographic. */
@@ -32,6 +50,7 @@ export interface ServicePhotos {
   /** The explorable showcase, in display order. */
   gallery: ApprovedPhoto[];
   film?: ServiceFilm;
+  look: ServiceLook;
 }
 
 interface Source {
@@ -41,6 +60,7 @@ interface Source {
   team?: string;
   gallery?: readonly string[];
   film?: ServiceFilm;
+  look?: ServiceLook;
 }
 
 const SOURCES: Record<string, Source> = {
@@ -67,20 +87,21 @@ const SOURCES: Record<string, Source> = {
     },
   },
   "nikah-decoration-hyderabad": {
+    look: { hero: "full", tone: "dark", gallery: "editorial" },
     hero: `${ev}decor/stage-cream-florals/01-stage-wide-cream-florals.jpg`,
     gallery: [
-      `${ev}decor/marigold-jasmine-backdrop/02-marigold-backdrop-front.jpg`,
       `${ev}decor/stage-cream-florals/02-stage-sofas-close.jpg`,
+      `${ev}decor/marigold-jasmine-backdrop/02-marigold-backdrop-front.jpg`,
+      `${ev}decor/marigold-jasmine-backdrop/03-marigold-backdrop-angle.jpg`,
       `${ev}decor/pink-gold-backdrop/01-pink-backdrop-sequin-drapes.jpg`,
       `${ev}decor/bridal-room-petals/01-bed-rose-petals.jpg`,
       `${ev}decor/garden-night-seating/01-string-lights-seating.jpg`,
-      `${ev}decor/marigold-jasmine-backdrop/03-marigold-backdrop-angle.jpg`,
       `${ev}decor/doorway-garlands/01-flower-garland-doorway.jpg`,
       `${ev}decor/hall-stage-decor/02-stage-seating.jpg`,
-      `${ev}decor/bridal-room-petals/02-bed-flowers-evening.jpg`,
     ],
   },
   "mehndi-artist-hyderabad": {
+    look: { hero: "split", tone: "saffron", gallery: "duo" },
     hero: `${ev}mehndi/mehndi-hands/01-mehndi-hands-gathering.jpg`,
     gallery: [
       `${ev}mehndi/henna-detail/01-henna-forearms-hands.jpg`,
@@ -92,6 +113,7 @@ const SOURCES: Record<string, Source> = {
     ],
   },
   "trousseau-packing-hyderabad": {
+    look: { hero: "split", tone: "ivory", gallery: "mosaic" },
     hero: `${ev}details/trousseau-trays/00-trays-overview.jpg`,
     gallery: [
       `${ev}details/trousseau-baskets/01-tulle-wrapped-basket.jpg`,
@@ -121,10 +143,11 @@ const SOURCES: Record<string, Source> = {
     },
   },
   "guest-hospitality-hyderabad": {
-    hero: `${ev}celebrations/table-settings/01-long-table-shallow-focus.jpg`,
+    look: { hero: "split", tone: "dark", gallery: "rows" },
+    hero: `${ev}celebrations/banquet-table/01-long-banquet-table.jpg`,
     gallery: [
       `${ev}celebrations/table-settings/02-napkin-and-bowl-portrait.jpg`,
-      `${ev}celebrations/banquet-table/01-long-banquet-table.jpg`,
+      `${ev}celebrations/table-settings/01-long-table-shallow-focus.jpg`,
       `${ev}celebrations/table-settings/04-gold-rim-bowl.jpg`,
       `${ev}celebrations/table-settings/06-round-table-layout.jpg`,
       `${ev}celebrations/table-settings/03-vase-and-basket-portrait.jpg`,
@@ -152,7 +175,7 @@ export const SERVICE_MEDIA_SLUGS = Object.keys(SOURCES);
 
 export function servicePhotos(slug: string): ServicePhotos {
   const s = SOURCES[slug];
-  if (!s) return { menus: [], gallery: [] };
+  if (!s) return { menus: [], gallery: [], look: DEFAULT_LOOK };
   const hero = approvedEventPhotos[s.hero];
   const dessert = s.dessert ? approvedEventPhotos[s.dessert] : undefined;
   const team = s.team ? approvedEventPhotos[s.team] : undefined;
@@ -163,5 +186,6 @@ export function servicePhotos(slug: string): ServicePhotos {
     ...(team ? { team } : {}),
     gallery: pick(s.gallery),
     ...(s.film ? { film: s.film } : {}),
+    look: s.look ?? DEFAULT_LOOK,
   };
 }

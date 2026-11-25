@@ -1814,3 +1814,112 @@ body:has(.lightbox[open]) {
   line-height: 1.3;
   color: var(--color-ivory);
 }
+
+/* ==========================================================================
+ * Service looks: tone of the gallery chapter, full-bleed opening, gallery layouts.
+ * ========================================================================== */
+.svc-hero-full {
+  min-height: min(88svh, 56rem);
+}
+.svc-hero-full .svc-hero-copy {
+  z-index: 1;
+}
+.svc-gallery[data-tone="ivory"] {
+  background: var(--color-ivory);
+  color: var(--color-ink);
+}
+.svc-gallery[data-tone="saffron"] {
+  background: color-mix(in srgb, var(--color-saffron) 20%, var(--color-ivory));
+  color: var(--color-ink);
+}
+.svc-gallery[data-tone="ivory"] .gallery-tile,
+.svc-gallery[data-tone="saffron"] .gallery-tile {
+  box-shadow: 0 1.25rem 2.5rem -1.25rem rgb(29 26 22 / 0.35);
+}
+.svc-gallery[data-tone="ivory"] .gallery-tile::after,
+.svc-gallery[data-tone="saffron"] .gallery-tile::after {
+  border-color: color-mix(in srgb, var(--color-brass-deep) 35%, transparent);
+}
+
+.gallery-duo {
+  column-count: 1;
+  column-gap: 1.5rem;
+}
+@media (min-width: 40rem) {
+  .gallery-duo {
+    column-count: 2;
+    column-gap: 2rem;
+  }
+  .gallery-duo .gallery-tile {
+    margin-bottom: 2rem;
+  }
+}
+
+/* Editorial: rows of fixed proportions (7|5, 5|7, 6|6) so no row leaves holes. Photographs are cropped
+   deliberately: the gallery order puts landscapes in the wide slots and portraits in the square ones. */
+.gallery-editorial {
+  display: grid;
+  gap: 1rem;
+}
+.gallery-editorial .gallery-tile {
+  margin: 0;
+}
+@media (min-width: 48rem) {
+  .gallery-editorial {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+  .gallery-editorial .gallery-img {
+    height: 100%;
+    object-fit: cover;
+  }
+  .gallery-editorial .gallery-tile:nth-child(6n + 1) {
+    grid-column: span 7;
+    aspect-ratio: 7 / 5;
+  }
+  .gallery-editorial .gallery-tile:nth-child(6n + 2) {
+    grid-column: span 5;
+    aspect-ratio: 1 / 1;
+  }
+  .gallery-editorial .gallery-tile:nth-child(6n + 3) {
+    grid-column: span 5;
+    aspect-ratio: 1 / 1;
+  }
+  .gallery-editorial .gallery-tile:nth-child(6n + 4) {
+    grid-column: span 7;
+    aspect-ratio: 7 / 5;
+  }
+  .gallery-editorial .gallery-tile:nth-child(6n + 5),
+  .gallery-editorial .gallery-tile:nth-child(6n) {
+    grid-column: span 6;
+    aspect-ratio: 6 / 5;
+  }
+}
+
+/* Rows: justified rows of equal height; tiles grow to fill the row, photographs are cropped to it. */
+.gallery-rows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.gallery-rows .gallery-tile {
+  flex: 1 1 15rem;
+  width: auto;
+  height: clamp(12rem, 26vw, 17rem);
+  margin: 0;
+}
+.gallery-rows .gallery-img {
+  height: 100%;
+  object-fit: cover;
+}
+
+/* A full-bleed opening keeps the photograph luminous: dark where the words sit, open elsewhere. */
+.svc-hero-full .svc-hero-scrim {
+  background:
+    linear-gradient(to top, rgb(11 17 14 / 0.78) 0%, rgb(11 17 14 / 0.25) 42%, transparent 70%),
+    linear-gradient(to right, rgb(11 17 14 / 0.82) 0%, rgb(11 17 14 / 0.45) 50%, transparent 78%);
+}
+.svc-hero-full .svc-hero-copy p,
+.svc-hero-full .svc-hero-copy a:not(.btn-grand) {
+  text-shadow: 0 1px 14px rgb(0 0 0 / 0.65);
+}
