@@ -24,7 +24,7 @@ Static HTML for all content (menus are real text), unique titles and description
 
 ## Next (executable now, no approval needed)
 
-1. **Answer content on approved pages.** A short "Questions we are asked" block per service page, written from approved copy only (what the service covers, how enquiry works, that availability is discussed before anything is confirmed). Direct answer first, then detail. No invented FAQs.
+1. **Answer content on approved pages.** Catering now has a candidate "Before you choose" block with direct answers drawn verbatim from current approved copy. The answers disappear if their source text is withdrawn. Other services follow after individual approvals. No claim that the questions are frequently asked, no FAQ structured data, and no new price or availability promises.
 2. **Entity consistency checklist** for the owner to verify against Google Business Profile, Instagram, Facebook (name, phone, address, hours, category, website URL). Added to `docs/launch-decisions.md` when the owner confirms the facts.
 3. **Search Console and Bing Webmaster** verification files and sitemap submission prepared for launch day; no analytics added without a privacy decision.
 4. **Guide content** (Hyderabadi wedding planning, choosing a catering menu, Nikah and Walima arrangements) only from the owner's real knowledge; drafts go to the owner first. No generated articles, no invented statistics or experience.
