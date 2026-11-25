@@ -41,7 +41,14 @@ const seoFiles = {
   hooks: {
     "astro:build:done": async ({ dir, pages }) => {
       await writeFile(new URL("_headers", dir), headersFile(indexable));
-      await writeFile(new URL("robots.txt", dir), robotsTxt(indexable, siteUrl));
+      await writeFile(
+        new URL("robots.txt", dir),
+        robotsTxt(
+          indexable,
+          siteUrl,
+          process.env.PUBLIC_AI_TRAINING === "disallow" ? "disallow" : "allow",
+        ),
+      );
       const sitemap = new URL("sitemap.xml", dir);
       if (indexable) {
         await writeFile(

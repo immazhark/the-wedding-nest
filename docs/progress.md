@@ -246,3 +246,8 @@ Reproduced from the owner's laptop screenshots (about 1900x870 Chrome) and Playw
 
 - A full viewport sweep (13 sizes x 5 pages, including 320 px, short laptops and landscape phones) found one real defect: the film frame and gallery tiles set `aspect-ratio` through an inline `style` attribute, which the site's Content-Security-Policy blocks. On the live site the gallery tiles would have collapsed once service pages publish. Both now use the image's own width/height (gallery) and a CSS ratio (film).
 - Why it was missed: the real catering page was not in the site-wide axe/console/overflow/metadata tests, and the editorial fixture test only clicked the lightbox. The catering page is now in `PAGES`, and the fixture service page has a no-console-or-CSP-error test.
+
+### 25 November 2026: search, answer-engine and AI-discovery foundations
+
+- `docs/search-visibility-plan.md`: verified (25 Nov, official sources) what Google, OpenAI and Anthropic document about search, user-request and training crawlers; what stays gated; what is executable next.
+- robots.txt now has an owner-decision switch for model-training crawlers (`GPTBot`, `ClaudeBot`, `Google-Extended`, `CCBot`; build variable `PUBLIC_AI_TRAINING=disallow`). Default unchanged; the preview stays `Disallow: /` for everyone; search and user-request crawlers are never listed. **Owner decision:** recommended to opt out of training crawlers.
