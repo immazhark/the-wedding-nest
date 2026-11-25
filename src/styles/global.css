@@ -952,6 +952,20 @@ footer.on-dark {
 .door:focus-within .door-photo {
   transform: scale(1.12);
 }
+.door-film {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.7s var(--ease-editorial);
+  pointer-events: none;
+}
+.door[data-film-on] .door-film {
+  opacity: 1;
+}
 .door:has(.door-photo)::after {
   content: "";
   position: absolute;
