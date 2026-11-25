@@ -16,3 +16,5 @@ An unsuccessful disposition must use the separate `markEnquiryUnsuccessful` prim
 Before activation, establish owner-approved operator/backup authority, authentication and authorization, access controls for customer details, audit records, conflict handling, pending-delivery handling and the booked-client retention policy. The operator interface and its end-to-end workflow remain unfinished. These helpers must not be exposed directly as unauthenticated endpoints.
 
 Verification uses real in-memory SQLite and the committed migrations: allowed transitions, stale actions, terminal/unknown states, inconsistent clocks, malformed arguments, missing records and unchanged outbox rows. No live customer data is used.
+
+Retention preview and bounded deletion require canonical UTC millisecond timestamps for both creation and unsuccessful disposition, with creation no later than disposition. Malformed or reversed stored clocks are held rather than interpreted as expired. The disposition write also rejects invalid creation clocks. These are defensive query predicates, not a migration or an automatic repair process; inconsistent records require authorised review.
