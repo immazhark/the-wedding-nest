@@ -53,6 +53,24 @@ test("service gallery opens a keyboard-operable lightbox with described photogra
   await expect(tiles.first()).toBeFocused();
 });
 
+test.describe("service gallery without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("photographs remain explorable through genuine image links", async ({ page, request }) => {
+    await page.goto(SERVICE);
+    const tile = page.locator("a[data-gallery-open]").first();
+    await expect(tile).toHaveAccessibleName(/View larger: .+/);
+    const href = await tile.getAttribute("href");
+    expect(href).toMatch(/^\/_astro\/.+\.(?:avif|webp|jpe?g|png)$/);
+    const destination = new URL(href!, page.url()).href;
+    await tile.click();
+    await expect(page).toHaveURL(destination);
+    const response = await request.get(destination);
+    expect(response.ok()).toBe(true);
+    expect(response.headers()["content-type"]).toMatch(/^image\//);
+  });
+});
+
 test("approved story template renders only its released fixture photographs", async ({ page }) => {
   const response = await page.goto(STORY);
   expect(response?.status()).toBe(200);

@@ -8,7 +8,7 @@ const root = document.querySelector<HTMLElement>("[data-gallery]");
 const dialog = document.querySelector<HTMLDialogElement>("[data-lightbox]");
 
 if (root && dialog && typeof dialog.showModal === "function") {
-  const tiles = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-gallery-open]"));
+  const tiles = Array.from(root.querySelectorAll<HTMLAnchorElement>("[data-gallery-open]"));
   const stage = dialog.querySelector<HTMLElement>("[data-lightbox-stage]")!;
   const caption = dialog.querySelector<HTMLElement>("[data-lightbox-caption]")!;
   let current = 0;
@@ -31,9 +31,20 @@ if (root && dialog && typeof dialog.showModal === "function") {
   };
 
   tiles.forEach((tile, index) =>
-    tile.addEventListener("click", () => {
+    tile.addEventListener("click", (event) => {
+      // Modified clicks retain the link's native new-tab/window/download behavior.
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey ||
+        event.altKey
+      )
+        return;
       show(index);
       dialog.showModal();
+      event.preventDefault();
     }),
   );
   dialog.querySelector("[data-lightbox-close]")?.addEventListener("click", () => dialog.close());
