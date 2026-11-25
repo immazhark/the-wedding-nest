@@ -9,7 +9,7 @@
  * same database statement, preventing future notifications for a deleted lead.
  * No personal data is returned or logged.
  */
-import type { D1Like } from "./types";
+import type { D1Like, D1PreparedLike } from "./types";
 
 const ENQUIRY_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -117,12 +117,12 @@ function unsuccessfulCutoff(nowIso: string): string {
  * match at write time, and repeating a call never resets the clock. Caller authentication and
  * authority are required before any future live use.
  */
-export async function markEnquiryUnsuccessful(
+export function prepareMarkEnquiryUnsuccessful(
   db: D1Like,
   enquiryId: string,
   expectedStatus: unknown,
   atIso: string,
-): Promise<boolean> {
+): D1PreparedLike {
   if (typeof enquiryId !== "string" || !ENQUIRY_ID.test(enquiryId)) {
     throw new Error("Invalid enquiry id");
   }
@@ -134,14 +134,22 @@ export async function markEnquiryUnsuccessful(
     throw new Error("Invalid expected enquiry status");
   }
   retentionTime(atIso);
-  const result = await db
+  return db
     .prepare(
       "UPDATE enquiries SET status = 'unsuccessful', unsuccessful_at = ?1 " +
         "WHERE id = ?2 AND status = ?3 AND status IN ('new', 'contacted', 'in_progress') " +
         `AND unsuccessful_at IS NULL AND created_at <= ?1 AND ${canonicalClock("created_at")}`,
     )
-    .bind(atIso, enquiryId, expectedStatus)
-    .run();
+    .bind(atIso, enquiryId, expectedStatus);
+}
+
+export async function markEnquiryUnsuccessful(
+  db: D1Like,
+  enquiryId: string,
+  expectedStatus: unknown,
+  atIso: string,
+): Promise<boolean> {
+  const result = await prepareMarkEnquiryUnsuccessful(db, enquiryId, expectedStatus, atIso).run();
   return result.meta.changes === 1;
 }
 

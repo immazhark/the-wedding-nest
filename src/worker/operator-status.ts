@@ -4,7 +4,7 @@
  * Caller authentication and operator authority must be established before live use.
  * Unsuccessful disposition continues to use privacy.ts and its explicit 90-day clock.
  */
-import type { D1Like } from "./types";
+import type { D1Like, D1PreparedLike } from "./types";
 
 const ENQUIRY_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const STATUS_ORDER = new Map([
@@ -20,12 +20,12 @@ const STATUS_ORDER = new Map([
  * Booked, unsuccessful and unknown stored states cannot be overwritten. This never
  * starts/resets retention, reads customer payloads or changes notification delivery.
  */
-export async function advanceEnquiryStatus(
+export function prepareAdvanceEnquiryStatus(
   db: D1Like,
   enquiryId: string,
   expectedStatus: unknown,
   nextStatus: unknown,
-): Promise<boolean> {
+): D1PreparedLike {
   if (typeof enquiryId !== "string" || !ENQUIRY_ID.test(enquiryId)) {
     throw new Error("Invalid enquiry id");
   }
@@ -34,12 +34,20 @@ export async function advanceEnquiryStatus(
   if (from === undefined || to === undefined || to <= from) {
     throw new Error("Invalid enquiry status transition");
   }
-  const result = await db
+  return db
     .prepare(
       "UPDATE enquiries SET status = ?1 WHERE id = ?2 AND status = ?3 " +
         "AND unsuccessful_at IS NULL",
     )
-    .bind(nextStatus, enquiryId, expectedStatus)
-    .run();
+    .bind(nextStatus, enquiryId, expectedStatus);
+}
+
+export async function advanceEnquiryStatus(
+  db: D1Like,
+  enquiryId: string,
+  expectedStatus: unknown,
+  nextStatus: unknown,
+): Promise<boolean> {
+  const result = await prepareAdvanceEnquiryStatus(db, enquiryId, expectedStatus, nextStatus).run();
   return result.meta.changes === 1;
 }
