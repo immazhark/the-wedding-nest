@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { readFileSync } from "node:fs";
+import { publishedStorySlugs, publishedServiceSlugs } from "../support/publication-records";
 
 // This file runs only in the isolated synthetic-fixture build. The files and
 // their source records are never committed or deployed to TWN public Workers.
@@ -9,9 +11,10 @@ const STORY = "/stories/ci-test-only-walima/";
 test("approved service template renders a useful, accessible and linked page", async ({ page }) => {
   const response = await page.goto(SERVICE);
   expect(response?.status()).toBe(200);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "CI-only service page — never publish",
+  const record = JSON.parse(
+    readFileSync("src/content/services/guest-hospitality-hyderabad.json", "utf8"),
   );
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(record.title);
   // Gallery, details and closing invitation: three sections, each with one level-2 heading.
   await expect(page.locator("main article").getByRole("heading", { level: 2 })).toHaveCount(3);
   await expect(page.getByRole("link", { name: "Begin planning" })).toHaveAttribute(
@@ -99,9 +102,12 @@ test("approved content is discoverable; unrelated unapproved routes remain absen
   );
   await expect(page.getByRole("link", { name: "Read an event story" })).toHaveAttribute(
     "href",
-    STORY,
+    `/stories/${publishedStorySlugs()[0]}/`,
   );
-  expect((await request.get("/services/bridal-makeup-hyderabad/")).status()).toBe(404);
+  const makeup = await request.get("/services/bridal-makeup-hyderabad/");
+  expect(makeup.status()).toBe(
+    publishedServiceSlugs().includes("bridal-makeup-hyderabad") ? 200 : 404,
+  );
   expect((await request.get("/stories/unapproved-event/")).status()).toBe(404);
 });
 

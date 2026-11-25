@@ -14,6 +14,7 @@ import { existsSync } from "node:fs";
 import { mkdir, open, rm, rmdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { deflateSync } from "node:zlib";
+import { missingFixtureTargets } from "./editorial-fixture-targets.mjs";
 
 if (process.env.CI !== "true" && process.env.TWN_ALLOW_LOCAL_FIXTURES !== "1") {
   throw new Error("Fixture build requires CI=true or explicit TWN_ALLOW_LOCAL_FIXTURES=1");
@@ -166,12 +167,14 @@ function run(command, args, env) {
 }
 
 try {
-  // Never overwrite approved originals. A real file at any test target is a
-  // hard collision rather than a reason to delete or change that file.
+  // Real service records already exercise the composition. Leave them byte-for-byte
+  // intact and let the normal build validate their approval. Synthetic story/media
+  // targets remain reserved and any collision is a hard error.
+  const missing = new Set(
+    missingFixtureTargets(paths, (relative) => existsSync(resolve(root, relative))),
+  );
   for (const relative of paths) {
-    if (existsSync(resolve(root, relative))) {
-      throw new Error("Refusing to replace existing source with CI fixture: " + relative);
-    }
+    if (!missing.has(relative)) sources.delete(relative);
   }
   if (existsSync(output)) {
     throw new Error("Refusing to overwrite pre-existing editorial fixture output");

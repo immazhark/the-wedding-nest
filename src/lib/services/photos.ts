@@ -142,6 +142,18 @@ const SOURCES: Record<string, Source> = {
       label: "Suitcases and gold-wrapped gift boxes tied with red ribbon, cream tulle and roses",
     },
   },
+  "wedding-photography-videography": {
+    look: { hero: "split", tone: "dark", gallery: "duo" },
+    hero: `${ev}celebrations/film-stills/01-hands-bokeh.jpg`,
+    gallery: [
+      `${ev}shaadi/groom-orange-door/01-groom-in-doorway.jpg`,
+      `${ev}nikah/nikah-signing/01-signing-jasmine-bracelet.jpg`,
+      `${ev}celebrations/couple-garlands/01-couple-holding-hands.jpg`,
+      `${ev}shaadi/groom-portrait-hall/01-groom-with-flowers.jpg`,
+      `${ev}nikah/nikah-details/01-handshake-jasmine-bracelet.jpg`,
+    ],
+    // Existing edited films need attribution, audio and reuse review before this page embeds them.
+  },
   "guest-hospitality-hyderabad": {
     look: { hero: "split", tone: "dark", gallery: "rows" },
     hero: `${ev}celebrations/banquet-table/01-long-banquet-table.jpg`,

@@ -26,3 +26,13 @@ are approved. The design preview remains globally noindex.
 An unapproved, misnamed, malformed or unrecognized service source causes a
 build failure instead of quietly publishing an unreviewed page. The route
 allowlist is intentional; expanding it needs explicit review.
+
+## Verification after individual approvals
+
+The normal browser suite derives expected service routes from reviewed source
+records and still checks that missing records produce 404s. The disposable
+editorial runner creates synthetic service records only for missing targets;
+existing records are validated by Astro and never overwritten or removed.
+Reserved synthetic story/media collisions still fail closed.
+
+CI screenshots are evidence for review, not publication permission.
