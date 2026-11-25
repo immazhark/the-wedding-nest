@@ -27,6 +27,12 @@ const paths = [
   "src/assets/events/walima/ci-test-only-walima/01-geometry.png",
   "src/assets/events/walima/ci-test-only-walima/02-geometry.png",
 ];
+const additionalServices = [
+  "nikah-decoration-hyderabad",
+  "mehndi-artist-hyderabad",
+  "trousseau-packing-hyderabad",
+];
+paths.push(...additionalServices.map((slug) => `src/content/services/${slug}.json`));
 const output = resolve(root, "dist-editorial-fixtures");
 let ownsOutput = false;
 const created = [];
@@ -90,7 +96,7 @@ const photos = photoNames.map((name, index) => ({
   orientation: "landscape",
   focal: "center",
   permission: true, // schema-only CI declaration, NOT a human approval
-  releaseRef: `TWN-REL-2026-CITEST`,
+  releaseRef: `TWN-REL-2026-CITEST${index + 1}`,
   // No homepage slot: real approved photographs now occupy every homepage slot.
 }));
 
@@ -135,6 +141,15 @@ const sources = new Map([
   [paths[3], geometricPng(0)],
   [paths[4], geometricPng(1)],
 ]);
+
+// Exercise each production composition without approving or publishing its draft copy.
+// Include every target in the collision check and the same finally-based cleanup.
+for (const slug of additionalServices) {
+  sources.set(
+    `src/content/services/${slug}.json`,
+    Buffer.from(JSON.stringify({ ...service, slug }, null, 2)),
+  );
+}
 
 function run(command, args, env) {
   return new Promise((resolvePromise, reject) => {

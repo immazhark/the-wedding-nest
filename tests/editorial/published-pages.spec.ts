@@ -128,3 +128,75 @@ for (const path of [SERVICE, STORY]) {
     });
   }
 }
+
+// All category compositions must stay usable before their copy is approved for publication.
+const SERVICE_LOOKS = [
+  { slug: "nikah-decoration-hyderabad", layout: "editorial", hero: "full" },
+  { slug: "mehndi-artist-hyderabad", layout: "duo", hero: "split" },
+  { slug: "trousseau-packing-hyderabad", layout: "mosaic", hero: "split" },
+  { slug: "guest-hospitality-hyderabad", layout: "rows", hero: "split" },
+] as const;
+
+for (const { slug, layout, hero } of SERVICE_LOOKS) {
+  test(`${slug} preserves its composition, accessibility and lightbox`, async ({
+    page,
+  }, testInfo) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("console", (message) => {
+      if (message.type() === "error") errors.push(message.text());
+    });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const response = await page.goto(`/services/${slug}/`, { waitUntil: "networkidle" });
+    expect(response?.status()).toBe(200);
+    await expect(page.locator(`.svc-hero-${hero}`)).toBeVisible();
+    await expect(page.locator(`[data-gallery].gallery-${layout}`)).toBeVisible();
+    const axe = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze();
+    expect(axe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""))).toEqual(
+      [],
+    );
+    await page.screenshot({ path: testInfo.outputPath("service-composition.png"), fullPage: true });
+    const tiles = page.locator("[data-gallery-open]");
+    await tiles.last().click();
+    const dialog = page.locator("[data-lightbox]");
+    await expect(dialog).toBeVisible();
+    await expect(dialog.locator("[data-lightbox-caption]")).toHaveAttribute("aria-live", "polite");
+    await page.keyboard.press("ArrowRight");
+    await expect(dialog.locator("[data-lightbox-caption]")).toContainText(
+      `1 of ${await tiles.count()}`,
+    );
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(tiles.last()).toBeFocused();
+    expect(errors).toEqual([]);
+  });
+
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    test(`${slug} clears the header and contains photographs at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 600 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(`/services/${slug}/`);
+      await page.evaluate(() => document.fonts.ready);
+      const bounds = await page.evaluate(() => {
+        const header = document.querySelector("body > header")!;
+        const heading = document.querySelector("h1")!;
+        return {
+          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          headerBottom: header.getBoundingClientRect().bottom,
+          headingTop: heading.getBoundingClientRect().top,
+          clippedPhotos: [...document.querySelectorAll("article img")].filter((image) => {
+            const rect = image.getBoundingClientRect();
+            return (
+              rect.width <= 0 || rect.height <= 0 || rect.left < -1 || rect.right > innerWidth + 1
+            );
+          }).length,
+        };
+      });
+      expect(bounds.overflow).toBeLessThanOrEqual(0);
+      expect(bounds.headingTop).toBeGreaterThanOrEqual(bounds.headerBottom);
+      expect(bounds.clippedPhotos).toBe(0);
+    });
+  }
+}

@@ -43,7 +43,7 @@ const { photos, label, layout = "mosaic" } = Astro.props;
 
 <dialog class="lightbox" data-lightbox aria-label={label}>
   <div class="lightbox-stage" data-lightbox-stage></div>
-  <p class="lightbox-caption" data-lightbox-caption></p>
+  <p class="lightbox-caption" data-lightbox-caption aria-live="polite" aria-atomic="true"></p>
   <button type="button" class="lightbox-btn lightbox-close" data-lightbox-close>
     Close<span class="sr-only"> the photograph</span>
   </button>
