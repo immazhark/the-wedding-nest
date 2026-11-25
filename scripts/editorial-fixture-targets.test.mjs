@@ -23,7 +23,11 @@ test("existing service records are excluded from fixture creation and cleanup", 
 
 test("multiple real service records coexist without synthetic replacements", () => {
   const existing = new Set([hospitality, decor]);
-  assert.deepEqual(missingFixtureTargets(paths, (path) => existing.has(path)), [story, media, photo]);
+  assert.deepEqual(missingFixtureTargets(paths, (path) => existing.has(path)), [
+    story,
+    media,
+    photo,
+  ]);
 });
 
 for (const collision of [story, media, photo]) {
