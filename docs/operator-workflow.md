@@ -29,4 +29,4 @@ Activation (owner-gated, staging first): create a Cloudflare Access self-hosted 
 
 API: `GET /api/operator/enquiries` (newest first, keyset `before`, `status`, `limit` ≤ 100; summary only, no phone), `GET /api/operator/enquiries/:id` (full detail), `POST /api/operator/enquiries/:id/status` `{from, to}` (same-origin JSON only; `409` for a stale `from`; `unsuccessful` starts the 90-day clock once via `markEnquiryUnsuccessful`). Responses are `no-store`; the UI sends a strict no-inline CSP and `noindex`, and robots disallows `/operator/`.
 
-Known limits: no DB audit trail (actions are logged as enquiry id, target status and outcome only), no pending-delivery override or booked-client retention (policy still owner-pending), no browser test of the page yet (needs an authenticated harness), and no pagination beyond "Load older".
+Known limits: no DB audit trail (actions are logged as enquiry id, target status and outcome only), no pending-delivery override or booked-client retention (policy still owner-pending), no live-Access browser test (the page is covered by a mocked-API Playwright test), and no pagination beyond "Load older".
