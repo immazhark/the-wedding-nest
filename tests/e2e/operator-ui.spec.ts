@@ -4,9 +4,22 @@ import { expect, test } from "@playwright/test";
 const ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const HOSTILE = '<img src=x onerror="window.__pwned=1">';
 
+const workerd = process.env["E2E_TARGET"] === "workerd";
+
+// Real Worker runtime, no Access configuration: every operator surface must fail closed (404).
+test("operator surfaces are invisible when Access is not configured", async ({ request }) => {
+  test.skip(!workerd, "needs the Workers runtime");
+  for (const path of ["/operator/", "/operator/operator.js", "/api/operator/enquiries"]) {
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(404);
+    expect(response.headers()["cache-control"]).toBe("no-store");
+  }
+});
+
 test("operator page renders hostile text inertly, updates status and survives a stale conflict", async ({
   page,
 }) => {
+  test.skip(workerd, "static page is gated by the Worker; covered by the fail-closed test");
   let status = "new";
   let conflictNext = false;
   const posts: unknown[] = [];
