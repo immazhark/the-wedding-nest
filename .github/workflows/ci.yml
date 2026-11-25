@@ -24,7 +24,13 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Format
+        id: format
         run: npm run format:check
+      - name: Show formatter corrections on failure
+        if: failure() && steps.format.outcome == 'failure'
+        run: |
+          npx prettier --write . > /dev/null
+          git diff --no-ext-diff
       - name: Type and Astro check
         run: npm run check
       - name: Unit tests
