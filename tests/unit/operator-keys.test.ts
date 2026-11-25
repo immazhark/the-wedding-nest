@@ -54,9 +54,7 @@ describe("Access signing key retrieval", () => {
   it("bounds a stalled response body within the same deadline", async () => {
     vi.useFakeTimers();
     try {
-      const fetcher = vi
-        .fn()
-        .mockResolvedValue(new Response(new ReadableStream<Uint8Array>()));
+      const fetcher = vi.fn().mockResolvedValue(new Response(new ReadableStream<Uint8Array>()));
       const pending = createAccessKeyReader(fetcher)(TEAM);
       const rejected = expect(pending).rejects.toThrow();
       await vi.advanceTimersByTimeAsync(10_000);
