@@ -26,6 +26,18 @@ describe("service page media", () => {
     }
   });
 
+  it("prepares a portrait-and-ceremony photography sequence without adding unreviewed films", () => {
+    const slug = "wedding-photography-videography";
+    const files = requestedFiles(slug);
+    expect(files).toHaveLength(6);
+    expect(files[0]).toContain("/film-stills/");
+    expect(files.slice(1).filter((file) => file.includes("/shaadi/"))).toHaveLength(2);
+    expect(files.slice(1).filter((file) => file.includes("/nikah/"))).toHaveLength(2);
+    const photos = servicePhotos(slug);
+    expect(photos.look).toEqual({ hero: "split", tone: "dark", gallery: "duo" });
+    expect(photos.film).toBeUndefined();
+  });
+
   it("returns no media for a service without an art direction", () => {
     expect(servicePhotos("bridal-makeup-hyderabad")).toEqual({
       menus: [],
