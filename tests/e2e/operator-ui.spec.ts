@@ -42,6 +42,7 @@ test("operator page renders hostile text inertly, updates status and survives a 
   await page.route(`**/api/operator/enquiries/${ID}`, (route) =>
     route.fulfill({
       json: {
+        history: [],
         enquiry: {
           id: ID,
           createdAt: "2026-12-01T09:00:00.000Z",
@@ -249,4 +250,31 @@ test("operator navigation ignores late details and status writes from abandoned 
   await deliver(2, { ok: true });
   await expect(page.getByRole("heading", { level: 2 })).toHaveText("First fixture");
   expect(await count()).toBe(4);
+});
+
+test("operator distinguishes an unavailable audit trail from an empty one", async ({ page }) => {
+  test.skip(workerd, "static page is gated by the Worker");
+  let history: unknown[] | null = null;
+  const at = "2026-12-01T09:00:00.000Z";
+  const entry = { id: ID, name: "Audit fixture", createdAt: at, status: "new", occasions: [] };
+  await page.route("**/api/operator/enquiries?**", (route) =>
+    route.fulfill({ json: { enquiries: [entry], nextCursor: null } }),
+  );
+  await page.route(`**/api/operator/enquiries/${ID}`, (route) =>
+    route.fulfill({
+      json: {
+        history,
+        enquiry: { ...entry, marketingConsent: false, payload: { name: entry.name } },
+      },
+    }),
+  );
+  await page.goto("/operator/");
+  await page.getByRole("button", { name: /Audit fixture/ }).click();
+  await expect(page.locator("#fields")).toContainText("Audit history unavailable");
+  await expect(page.getByRole("button", { name: "Mark contacted" })).toHaveCount(0);
+  await page.getByRole("button", { name: /Back to list/ }).click();
+  history = [];
+  await page.getByRole("button", { name: /Audit fixture/ }).click();
+  await expect(page.locator("#fields")).toContainText("No recorded status changes.");
+  await expect(page.getByRole("button", { name: "Mark contacted" })).toBeEnabled();
 });
