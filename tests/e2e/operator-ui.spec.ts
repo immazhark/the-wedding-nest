@@ -93,3 +93,76 @@ test("operator page renders hostile text inertly, updates status and survives a 
   );
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test("operator list ignores superseded filters and blocks duplicate pagination requests", async ({
+  page,
+}) => {
+  test.skip(workerd, "static page is gated by the Worker");
+  const at = "2026-12-01T09:00:00.000Z";
+  const olderId = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+  const entry = (id: string, name: string, status: string) => ({
+    id,
+    name,
+    status,
+    createdAt: at,
+    occasions: ["nikah"],
+  });
+  // Resolve fetches explicitly in the browser, so request order is deterministic
+  // without relying on fixed sleeps or network latency.
+  await page.addInitScript(() => {
+    const original = window.fetch.bind(window);
+    const pending: {
+      url: string;
+      resolve: (response: Response) => void;
+    }[] = [];
+    Object.assign(window, { operatorTestPending: pending });
+    window.fetch = (input, init) => {
+      const url = String(input);
+      if (!url.startsWith("/api/operator/enquiries?")) return original(input, init);
+      return new Promise<Response>((resolve) => pending.push({ url, resolve }));
+    };
+  });
+  type Pending = { url: string; resolve: (response: Response) => void };
+  const count = () =>
+    page.evaluate(
+      () => (window as unknown as { operatorTestPending: Pending[] }).operatorTestPending.length,
+    );
+  const deliver = (index: number, body: unknown) =>
+    page.evaluate(
+      async ({ index, body }) => {
+        const pending = (window as unknown as { operatorTestPending: Pending[] })
+          .operatorTestPending;
+        pending[index]!.resolve(Response.json(body));
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      },
+      { index, body },
+    );
+
+  await page.goto("/operator/");
+  await expect.poll(count).toBe(1);
+  await page.getByLabel("Show").selectOption("booked");
+  await expect.poll(count).toBe(2);
+  await deliver(1, {
+    enquiries: [entry(ID, "Booked fixture", "booked")],
+    nextCursor: { createdAt: at, id: ID },
+  });
+  await expect(page.getByRole("button", { name: /Booked fixture/ })).toBeVisible();
+  await deliver(0, {
+    enquiries: [entry(olderId, "Obsolete fixture", "new")],
+    nextCursor: null,
+  });
+  await expect(page.getByRole("button", { name: /Obsolete fixture/ })).toHaveCount(0);
+  const more = page.getByRole("button", { name: "Load older" });
+  await expect(more).toBeVisible();
+  await more.click();
+  await expect.poll(count).toBe(3);
+  await expect(more).toBeDisabled();
+  await more.evaluate((button) => button.dispatchEvent(new Event("click")));
+  expect(await count()).toBe(3);
+  await deliver(2, {
+    enquiries: [entry(olderId, "Older booked fixture", "booked")],
+    nextCursor: null,
+  });
+  await expect(page.getByRole("button", { name: /Older booked fixture/ })).toBeVisible();
+  await expect(more).toBeHidden();
+});
