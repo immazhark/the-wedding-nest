@@ -124,15 +124,22 @@ async function show(id, note) {
     field(dl, "Location", p.location);
     field(dl, "Notes", p.notes);
     field(dl, "Marketing consent", e.marketingConsent ? "Yes" : "No");
+    const historyAvailable = Array.isArray(history);
     field(
       dl,
       "History",
-      (history || []).map(
-        (h) => `${when(h.at)}: ${h.operator} · ${LABEL[h.from]} → ${LABEL[h.to]}`,
-      ),
+      !historyAvailable
+        ? "Audit history unavailable. Return to the list and reopen before updating."
+        : history.length
+          ? history.map((h) => `${when(h.at)}: ${h.operator} · ${LABEL[h.from]} → ${LABEL[h.to]}`)
+          : "No recorded status changes.",
     );
     const actions = $("actions");
     actions.replaceChildren();
+    if (!historyAvailable) {
+      say(note || "");
+      return;
+    }
     const state = { request, pending: false };
     for (const to of NEXT[e.status] || [])
       actions.append(button(`Mark ${LABEL[to].toLowerCase()}`, e, to, state));

@@ -287,6 +287,25 @@ describe("operator API", () => {
       { at: NOW, operator: "owner@example.com", from: "new", to: "contacted" },
     ]);
   });
+  it("distinguishes empty audit history from unavailable history", async () => {
+    const path = `/api/operator/enquiries/${ID_A}`;
+    const empty = await call("GET", path);
+    expect(empty.status).toBe(200);
+    expect(await empty.json()).toMatchObject({ history: [] });
+    sql.exec("DROP TABLE operator_audit");
+    const unavailable = await call("GET", path);
+    expect(unavailable.status).toBe(200);
+    expect(await unavailable.json()).toMatchObject({
+      history: null,
+      enquiry: { id: ID_A, status: "new" },
+    });
+    expect(logs).toContainEqual({
+      event: "operator",
+      action: "history",
+      outcome: "unavailable",
+    });
+  });
+
   it("audits unsuccessful dispositions and keeps the trail after retention deletion", async () => {
     await call("POST", `/api/operator/enquiries/${ID_B}/status`, {
       from: "new",
