@@ -204,7 +204,8 @@ test("operator navigation ignores late details and status writes from abandoned 
   type Pending = { url: string; method: string; resolve: (response: Response) => void };
   const count = () =>
     page.evaluate(
-      () => (window as unknown as { operatorDetailPending: Pending[] }).operatorDetailPending.length,
+      () =>
+        (window as unknown as { operatorDetailPending: Pending[] }).operatorDetailPending.length,
     );
   const deliver = (index: number, body: unknown) =>
     page.evaluate(
