@@ -72,3 +72,11 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Verify populated editorial pages with disposable synthetic CI fixtures
         run: npm run test:editorial-fixtures
+      - name: Preserve editorial composition screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-compositions
+          path: test-results/**/*.png
+          retention-days: 7
+          if-no-files-found: ignore
