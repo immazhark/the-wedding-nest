@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { publishedServiceSlugs } from "../support/publication-records";
 import AxeBuilder from "@axe-core/playwright";
 
 const PAGES = ["/", "/plan-your-event/", "/privacy/", "/services/hyderabadi-wedding-catering/"];
@@ -62,7 +63,17 @@ test("occasion-specific service enquiries are discoverable without publishing un
   for (const label of ["Ceremony coordination", "Mehndi artist", "Sound, lighting & AV"]) {
     await expect(specialists.getByRole("link", { name: label })).toBeVisible();
   }
-  await specialists.getByRole("link", { name: "Mehndi artist" }).click();
+  const mehndi = specialists.getByRole("link", { name: "Mehndi artist" });
+  const approved = publishedServiceSlugs().includes("mehndi-artist-hyderabad");
+  await expect(mehndi).toHaveAttribute(
+    "href",
+    approved ? "/services/mehndi-artist-hyderabad/" : "/plan-your-event/?service=mehndi-artist",
+  );
+  await mehndi.click();
+  if (approved) {
+    await expect(page).toHaveURL(/\/services\/mehndi-artist-hyderabad\/$/);
+    await page.getByRole("link", { name: "Begin planning" }).click();
+  }
   await expect(page).toHaveURL(/\/plan-your-event\/\?service=mehndi-artist$/);
   await expect(page.getByRole("checkbox", { name: "Mehndi" })).not.toBeChecked();
   await page.getByRole("checkbox", { name: "Mehndi" }).check();

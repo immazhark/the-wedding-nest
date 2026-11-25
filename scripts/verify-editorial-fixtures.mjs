@@ -166,12 +166,16 @@ function run(command, args, env) {
 }
 
 try {
-  // Never overwrite approved originals. A real file at any test target is a
-  // hard collision rather than a reason to delete or change that file.
+  // Real service records already exercise the composition. Leave them byte-for-byte
+  // intact and let the normal build validate their approval. Synthetic story/media
+  // targets remain reserved and any collision is a hard error.
   for (const relative of paths) {
-    if (existsSync(resolve(root, relative))) {
-      throw new Error("Refusing to replace existing source with CI fixture: " + relative);
+    if (!existsSync(resolve(root, relative))) continue;
+    if (relative.startsWith("src/content/services/")) {
+      sources.delete(relative);
+      continue;
     }
+    throw new Error("Refusing to replace existing source with CI fixture: " + relative);
   }
   if (existsSync(output)) {
     throw new Error("Refusing to overwrite pre-existing editorial fixture output");
