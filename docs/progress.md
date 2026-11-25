@@ -251,3 +251,8 @@ Reproduced from the owner's laptop screenshots (about 1900x870 Chrome) and Playw
 
 - The four prepared service pages no longer share one recipe. Each service declares a `look` in `src/lib/services/photos.ts` (shared accessible gallery and lightbox, different composition): Décor opens full-bleed and uses an editorial grid of fixed row proportions; Mehndi sits on saffron paper in two large columns; Trousseau on ivory in three columns with the packing film; Hospitality opens split on the banquet photograph and uses justified rows of equal height (a horizontal rail was rejected: it fails the "every photograph stays inside the viewport" fixture check, which stays unchanged). Catering is unchanged. A light chapter breaks the dark-and-gold sameness the audit flagged.
 - Reviewed as rendered pages at 1440 and 390 using throwaway local drafts (deleted); the pages themselves remain unpublished pending approval of `docs/service-page-drafts.md`.
+
+### 25 November 2026: search, answer-engine and AI-discovery foundations
+
+- `docs/search-visibility-plan.md`: verified (25 Nov, official sources) what Google, OpenAI and Anthropic document about search, user-request and training crawlers; what stays gated; what is executable next.
+- robots.txt now has an owner-decision switch for model-training crawlers (`GPTBot`, `ClaudeBot`, `Google-Extended`, `CCBot`; build variable `PUBLIC_AI_TRAINING=disallow`). Default unchanged; the preview stays `Disallow: /` for everyone; search and user-request crawlers are never listed. **Owner decision:** recommended to opt out of training crawlers.
