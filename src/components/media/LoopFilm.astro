@@ -11,7 +11,7 @@ interface Props {
 const { film } = Astro.props;
 ---
 
-<div class="loop-frame" data-loop style={`aspect-ratio: ${film.width} / ${film.height}`}>
+<div class="loop-frame" data-loop>
   <img
     src={film.poster}
     alt=""
