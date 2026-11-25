@@ -103,7 +103,24 @@ export async function handleOperatorApi(
         payload_json: string;
       }>();
     if (!row) return json(404, { error: "not_found" });
+    // History is best-effort: a missing audit table must not hide the enquiry itself.
+    const history = await db
+      .prepare(
+        "SELECT at, operator, from_status, to_status FROM operator_audit WHERE enquiry_id = ?1 ORDER BY id DESC LIMIT 20",
+      )
+      .bind(row.id)
+      .all<{ at: string; operator: string; from_status: string; to_status: string }>()
+      .then((r) =>
+        r.results.map((h) => ({
+          at: h.at,
+          operator: h.operator,
+          from: h.from_status,
+          to: h.to_status,
+        })),
+      )
+      .catch(() => []);
     return json(200, {
+      history,
       enquiry: {
         id: row.id,
         createdAt: row.created_at,
@@ -143,6 +160,19 @@ export async function handleOperatorApi(
           : await advanceEnquiryStatus(db, id, from, to);
     } catch {
       return json(400, { error: "invalid_transition" });
+    }
+    if (applied) {
+      // shortcut: audit is a second statement, not atomic with the status change; a failure is
+      // logged (not hidden) and never undoes the change. Upgrade to a D1 batch if a hard guarantee is needed.
+      await db
+        .prepare(
+          "INSERT INTO operator_audit (at, operator, enquiry_id, from_status, to_status) VALUES (?1, ?2, ?3, ?4, ?5)",
+        )
+        .bind(ctx.now(), ctx.operator, id, String(from), String(to))
+        .run()
+        .catch(() =>
+          ctx.log({ event: "operator", action: "audit", outcome: "audit_failed", enquiry: id }),
+        );
     }
     ctx.log({
       event: "operator",

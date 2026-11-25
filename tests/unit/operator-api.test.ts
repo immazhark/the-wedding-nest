@@ -175,4 +175,51 @@ describe("operator API", () => {
     expect(text).toContain("contacted");
     expect(text).not.toMatch(/Person|98765|owner@/);
   });
+
+  it("records who changed what in an audit trail and shows it on the detail view", async () => {
+    await call("POST", `/api/operator/enquiries/${ID_A}/status`, { from: "new", to: "contacted" });
+    await call("POST", `/api/operator/enquiries/${ID_A}/status`, { from: "new", to: "booked" }); // stale
+    const rows = sql
+      .prepare("SELECT at, operator, enquiry_id, from_status, to_status FROM operator_audit")
+      .all();
+    expect(rows).toEqual([
+      {
+        at: NOW,
+        operator: "owner@example.com",
+        enquiry_id: ID_A,
+        from_status: "new",
+        to_status: "contacted",
+      },
+    ]);
+    const d = (await (await call("GET", `/api/operator/enquiries/${ID_A}`)).json()) as {
+      history: { at: string; operator: string; from: string; to: string }[];
+    };
+    expect(d.history).toEqual([
+      { at: NOW, operator: "owner@example.com", from: "new", to: "contacted" },
+    ]);
+  });
+  it("audits unsuccessful dispositions and keeps the trail after retention deletion", async () => {
+    await call("POST", `/api/operator/enquiries/${ID_B}/status`, {
+      from: "new",
+      to: "unsuccessful",
+    });
+    sql.exec("PRAGMA foreign_keys = ON");
+    sql.prepare("DELETE FROM enquiries WHERE id = ?").run(ID_B);
+    expect(
+      sql.prepare("SELECT to_status FROM operator_audit WHERE enquiry_id = ?").all(ID_B),
+    ).toEqual([{ to_status: "unsuccessful" }]);
+  });
+  it("still reports success and logs a failure when the audit write fails; detail tolerates a missing table", async () => {
+    sql.exec("DROP TABLE operator_audit");
+    const r = await call("POST", `/api/operator/enquiries/${ID_A}/status`, {
+      from: "new",
+      to: "contacted",
+    });
+    expect(r.status).toBe(200);
+    expect(JSON.stringify(logs)).toContain("audit_failed");
+    const d = (await (await call("GET", `/api/operator/enquiries/${ID_A}`)).json()) as {
+      history: unknown[];
+    };
+    expect(d.history).toEqual([]);
+  });
 });
