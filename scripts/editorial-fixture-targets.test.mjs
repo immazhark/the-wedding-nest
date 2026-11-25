@@ -27,9 +27,7 @@ test("multiple real service records coexist without synthetic replacements", () 
 
 for (const collision of [story, media, photo]) {
   test(`reserved collision still fails closed: ${collision}`, () => {
-    assert.throws(
-      () => missingFixtureTargets(paths, (path) => path === collision),
-      /Refusing to replace existing source/,
-    );
+    const action = () => missingFixtureTargets(paths, (path) => path === collision);
+    assert.throws(action, /Refusing to replace existing source/);
   });
 }
