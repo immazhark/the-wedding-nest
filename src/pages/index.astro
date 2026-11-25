@@ -7,6 +7,8 @@ import { OCCASIONS, SERVICES, STAGES } from "../lib/enquiry/schema";
 import { ENQUIRIES } from "../lib/site/config";
 import { publishedServicePages, servicePageHref } from "../lib/services/publication";
 import { publishedStories, featuredStoryPath } from "../lib/stories/publication";
+import { publishedTestimonials } from "../lib/testimonials/publication";
+import Testimonials from "../components/Testimonials.astro";
 
 // DRAFT COPY — editorial working draft pending owner approval (docs/creative-excellence-standards.md).
 // No claims about prices, clients, venues, awards or guarantees.
@@ -40,14 +42,70 @@ const doorTones: Record<string, string> = {
 };
 const doorPhotos: Record<string, string> = {
   catering: "../../assets/events/catering/menu-table-details/01-savoury-bowl.jpg",
-  decor: "../../assets/events/decor/hall-stage-decor/02-stage-seating.jpg",
+  decor: "../../assets/events/decor/marigold-jasmine-backdrop/01-marigold-jasmine-backdrop.jpg",
   hospitality: "../../assets/events/celebrations/banquet-table/01-long-banquet-table.jpg",
   "venue-coordination":
     "../../assets/events/decor/hall-ceiling-chandeliers/01-chandelier-ceiling.jpg",
   "photo-film": "../../assets/events/celebrations/film-stills/01-hands-bokeh.jpg",
   makeup: "../../assets/events/mehndi/mehndi-hands/01-mehndi-hands-gathering.jpg",
   transport: "../../assets/events/celebrations/decorated-car/01-garlanded-car.jpg",
-  gifting: "../../assets/events/details/gift-box-ribbon/01-gold-gift-box-ribbon.jpg",
+  gifting: "../../assets/events/details/trousseau-baskets/01-tulle-wrapped-basket.jpg",
+};
+// The gallery reel: seven more real moments, laid out as a mosaic (md+ columns / aspect are tuned so rows end level).
+const ev = "../../assets/events/";
+const reel = [
+  {
+    file: "decor/garden-night-seating/01-string-lights-seating.jpg",
+    cls: "reel-a",
+    aspect: "aspect-[3/2] md:aspect-[8/5]",
+    sizes: "(min-width: 768px) 62vw, 100vw",
+  },
+  {
+    file: "shaadi/groom-orange-door/01-groom-in-doorway.jpg",
+    cls: "reel-b",
+    aspect: "aspect-[4/5]",
+    sizes: "(min-width: 768px) 31vw, 100vw",
+    arch: true,
+  },
+  {
+    file: "celebrations/couple-garlands/01-couple-holding-hands.jpg",
+    cls: "reel-c",
+    aspect: "aspect-[3/2] md:aspect-square",
+    sizes: "(min-width: 768px) 31vw, 100vw",
+  },
+  {
+    file: "nikah/nikah-signing/01-signing-jasmine-bracelet.jpg",
+    cls: "reel-d",
+    aspect: "aspect-[3/2] md:aspect-square",
+    sizes: "(min-width: 768px) 31vw, 100vw",
+  },
+  {
+    file: "catering/table-setting-gold/01-gold-runner-place-settings.jpg",
+    cls: "reel-e",
+    aspect: "aspect-[3/2] md:aspect-square",
+    sizes: "(min-width: 768px) 31vw, 100vw",
+  },
+  {
+    file: "catering/saffron-biryani/01-saffron-biryani-plate.jpg",
+    cls: "reel-f",
+    aspect: "aspect-[3/2] md:aspect-[28/25]",
+    sizes: "(min-width: 768px) 55vw, 100vw",
+  },
+  {
+    file: "mehndi/mehndi-hands-vertical/01-henna-hands-portrait.jpg",
+    cls: "reel-g",
+    aspect: "aspect-[4/5]",
+    sizes: "(min-width: 768px) 38vw, 100vw",
+    arch: true,
+  },
+].map((r) => ({ ...r, photo: approvedEventPhotos[ev + r.file] }));
+// Short silent loops that wake on a pointer hover or keyboard focus (desktop only, never with reduced
+// motion or Save-Data): each belongs to the service it sits on. Nothing downloads until then.
+const doorFilms: Record<string, string> = {
+  catering: "/media/door-catering.mp4",
+  decor: "/media/door-decor.mp4",
+  "photo-film": "/media/door-film.mp4",
+  transport: "/media/door-transport.mp4",
 };
 const thresholdPhoto =
   approvedEventPhotos["../../assets/events/catering/menu-table-details/04-white-dessert-glass.jpg"];
@@ -123,8 +181,8 @@ const thresholdPhoto =
           <img
             src="/media/kitchen-loop-poster.jpg"
             alt=""
-            width="960"
-            height="540"
+            width="576"
+            height="720"
             loading="lazy"
             decoding="async"
             class="kitchen-poster"
@@ -136,7 +194,7 @@ const thresholdPhoto =
             playsinline
             preload="none"
             poster="/media/kitchen-loop-poster.jpg"
-            aria-label="A large pot of golden, saffron-streaked food being stirred"
+            aria-label="A cook in a Wedding Nest apron ladles a rich curry from a large pot and plates it with salad"
             data-kitchen-video
           >
             <source src="/media/kitchen-loop.mp4" type="video/mp4" />
@@ -220,6 +278,19 @@ const thresholdPhoto =
                 loading="lazy"
                 class="door-photo"
                 aria-hidden="true"
+              />
+            )}
+            {doorFilms[s.id] && (
+              <video
+                class="door-film"
+                muted
+                loop
+                playsinline
+                preload="none"
+                tabindex="-1"
+                aria-hidden="true"
+                data-door-film
+                data-src={doorFilms[s.id]}
               />
             )}
             <a href={servicePageHref(s.id, publishedServicePages)} class="door-link">
@@ -493,8 +564,21 @@ const thresholdPhoto =
           photographed it.
         </p>
       </div>
+      <div class="reel mt-24 md:mt-32">
+        {reel.map((r) => (
+          <Frame
+            photo={r.photo}
+            tone="dark"
+            aspectClass={r.aspect}
+            sizes={r.sizes}
+            class:list={["reel-item", r.cls, r.arch && "reel-arch"]}
+          />
+        ))}
+      </div>
     </div>
   </section>
+
+  <Testimonials items={publishedTestimonials} />
 </BaseLayout>
 
 <style>
@@ -653,6 +737,52 @@ const thresholdPhoto =
     padding-top: 1.25rem;
     border-top: 1px solid var(--color-saffron);
   }
+  /* The reel: a second, denser act of real work. Rows are tuned to end level on desktop. */
+  .reel {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .reel :global(.reel-item) {
+    outline: 1px solid color-mix(in srgb, var(--color-saffron) 45%, transparent);
+    outline-offset: 0.6rem;
+    box-shadow: 0 2.5rem 4rem -1.5rem rgb(0 0 0 / 0.6);
+    border-radius: 0.75rem;
+  }
+  .reel :global(.reel-item > :first-child) {
+    border-radius: 0.75rem;
+  }
+  .reel :global(.reel-arch),
+  .reel :global(.reel-arch > :first-child) {
+    border-radius: 999px 999px 0.75rem 0.75rem;
+  }
+  @media (min-width: 48rem) {
+    .reel {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 2rem;
+      align-items: start;
+    }
+    .reel :global(.reel-a) {
+      grid-column: 1 / span 8;
+    }
+    .reel :global(.reel-b) {
+      grid-column: 9 / span 4;
+    }
+    .reel :global(.reel-c) {
+      grid-column: 1 / span 4;
+    }
+    .reel :global(.reel-d) {
+      grid-column: 5 / span 4;
+    }
+    .reel :global(.reel-e) {
+      grid-column: 9 / span 4;
+    }
+    .reel :global(.reel-f) {
+      grid-column: 1 / span 7;
+    }
+    .reel :global(.reel-g) {
+      grid-column: 8 / span 5;
+    }
+  }
 </style>
 
 <script>
@@ -677,6 +807,31 @@ const thresholdPhoto =
     };
     button.addEventListener("click", start);
   });
+  // Service doors: a short silent film wakes only on a fine pointer hover or keyboard focus.
+  const doorCalm = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const canHover = window.matchMedia("(hover: hover) and (pointer: fine)");
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
+    ?.saveData;
+  if (!doorCalm.matches && canHover.matches && !saveData) {
+    document.querySelectorAll<HTMLElement>(".door:has([data-door-film])").forEach((door) => {
+      const film = door.querySelector<HTMLVideoElement>("[data-door-film]")!;
+      const wake = () => {
+        if (!film.src) film.src = film.dataset["src"] ?? "";
+        film
+          .play()
+          .then(() => door.setAttribute("data-film-on", ""))
+          .catch(() => door.removeAttribute("data-film-on"));
+      };
+      const rest = () => {
+        film.pause();
+        door.removeAttribute("data-film-on");
+      };
+      door.addEventListener("pointerenter", wake);
+      door.addEventListener("pointerleave", rest);
+      door.addEventListener("focusin", wake);
+      door.addEventListener("focusout", rest);
+    });
+  }
   // The kitchen loop plays only while visible, never with reduced motion, and has no audio track.
   const arch = document.querySelector<HTMLElement>("[data-kitchen]");
   const video = document.querySelector<HTMLVideoElement>("[data-kitchen-video]");

@@ -19,9 +19,13 @@ import {
 interface Props {
   title?: string;
   description?: string;
+  /** The footer's "Begin planning" band. Off where the page already ends with its own invitation. */
+  invite?: boolean;
+  /** Extra pre-serialised JSON-LD documents (already escaped by the site helpers). */
+  jsonLd?: string[];
 }
 
-const { title, description = SITE.description } = Astro.props;
+const { title, description = SITE.description, invite = true, jsonLd = [] } = Astro.props;
 const fullTitle = pageTitle(title);
 const canonical = canonicalUrl(Astro.url.pathname);
 ---
@@ -62,6 +66,9 @@ const canonical = canonicalUrl(Astro.url.pathname);
     <meta name="twitter:image" content={SOCIAL_IMAGE.url} />
     <meta name="twitter:image:alt" content={SOCIAL_IMAGE.alt} />
     <script type="application/ld+json" is:inline set:html={organizationJsonLd()}></script>
+    {jsonLd.map((doc) => (
+      <script type="application/ld+json" is:inline set:html={doc} />
+    ))}
   </head>
   <body class="min-h-dvh flex flex-col">
     <a
@@ -75,7 +82,7 @@ const canonical = canonicalUrl(Astro.url.pathname);
     <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
       <slot />
     </main>
-    <SiteFooter />
+    <SiteFooter invite={invite} />
     <script>
       import "../scripts/arrive";
     </script>

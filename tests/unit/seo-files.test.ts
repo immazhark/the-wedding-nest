@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { headersFile, robotsTxt, sitemapXml } from "../../src/lib/site/seo-files";
+import {
+  AI_TRAINING_CRAWLERS,
+  headersFile,
+  robotsTxt,
+  sitemapXml,
+} from "../../src/lib/site/seo-files";
 import { robotsContent, SITE } from "../../src/lib/site/config";
 
 describe("indexing switch keeps robots.txt, X-Robots-Tag and meta robots in step", () => {
@@ -45,5 +50,35 @@ describe("indexing switch keeps robots.txt, X-Robots-Tag and meta robots in step
       expect(h).toContain("X-Content-Type-Options: nosniff");
       expect(h).toContain("/_astro/*");
     }
+  });
+});
+
+describe("AI crawler policy (owner decision; default leaves behaviour unchanged)", () => {
+  it("defaults to allowing everything, exactly as before", () => {
+    expect(robotsTxt(true, SITE.url)).toBe(robotsTxt(true, SITE.url, "allow"));
+    for (const bot of AI_TRAINING_CRAWLERS) expect(robotsTxt(true, SITE.url)).not.toContain(bot);
+  });
+
+  it("can opt out of model-training crawlers only, never search or user-request fetchers", () => {
+    const txt = robotsTxt(true, SITE.url, "disallow");
+    for (const bot of AI_TRAINING_CRAWLERS) {
+      expect(txt).toContain(`User-agent: ${bot}\nDisallow: /\n`);
+    }
+    for (const bot of [
+      "OAI-SearchBot",
+      "ChatGPT-User",
+      "Claude-SearchBot",
+      "Claude-User",
+      "Googlebot",
+      "Bingbot",
+    ]) {
+      expect(txt, bot).not.toContain(bot);
+    }
+    expect(txt).toMatch(/User-agent: \*\nAllow: \//);
+    expect(txt).toContain(`Sitemap: ${SITE.url}/sitemap.xml`);
+  });
+
+  it("never loosens the preview: noindex stays Disallow for everyone", () => {
+    expect(robotsTxt(false, SITE.url, "disallow")).toBe(robotsTxt(false, SITE.url, "allow"));
   });
 });

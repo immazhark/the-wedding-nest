@@ -1,0 +1,62 @@
+---
+/**
+ * An explorable photograph mosaic for a service page. Each tile opens a lightbox (a native
+ * <dialog>: Escape closes, focus returns to the tile, arrow keys and the buttons move between
+ * photographs). Tiles keep each photograph's natural proportions, so nothing is cropped away.
+ * Without JavaScript (or native dialog support), each tile links to its approved photograph.
+ */
+import { Picture } from "astro:assets";
+import type { ApprovedPhoto } from "../../lib/media/catalog";
+
+interface Props {
+  photos: ApprovedPhoto[];
+  /** Accessible name for the group, e.g. "Floral decoration photographs". */
+  label: string;
+  /** Composition of the tiles; see ServiceLook. */
+  layout?: "mosaic" | "duo" | "editorial" | "rows";
+}
+const { photos, label, layout = "mosaic" } = Astro.props;
+---
+
+<div class:list={["gallery", `gallery-${layout}`]} role="group" aria-label={label} data-gallery>
+  {photos.map((photo, index) => (
+    <a
+      href={photo.image.src}
+      class="gallery-tile"
+      data-gallery-open={index}
+      aria-label={`View larger: ${photo.entry.alt}`}
+    >
+      <Picture
+        src={photo.image}
+        alt=""
+        formats={["avif", "webp"]}
+        widths={[480, 720, 1080, 1600]}
+        sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
+        loading="lazy"
+        decoding="async"
+        class="gallery-img"
+        data-full-alt={photo.entry.alt}
+      />
+    </a>
+  ))}
+</div>
+
+<dialog class="lightbox" data-lightbox aria-label={label}>
+  <div class="lightbox-stage" data-lightbox-stage></div>
+  <p class="lightbox-caption" data-lightbox-caption aria-live="polite" aria-atomic="true"></p>
+  <button type="button" class="lightbox-btn lightbox-close" data-lightbox-close>
+    Close<span class="sr-only"> the photograph</span>
+  </button>
+  <button type="button" class="lightbox-btn lightbox-prev" data-lightbox-prev>
+    <span aria-hidden="true">←</span>
+    <span class="sr-only">Previous photograph</span>
+  </button>
+  <button type="button" class="lightbox-btn lightbox-next" data-lightbox-next>
+    <span aria-hidden="true">→</span>
+    <span class="sr-only">Next photograph</span>
+  </button>
+</dialog>
+
+<script>
+  import "../../scripts/gallery";
+</script>

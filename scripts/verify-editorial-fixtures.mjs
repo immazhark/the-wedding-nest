@@ -14,6 +14,7 @@ import { existsSync } from "node:fs";
 import { mkdir, open, rm, rmdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { deflateSync } from "node:zlib";
+import { missingFixtureTargets } from "./editorial-fixture-targets.mjs";
 
 if (process.env.CI !== "true" && process.env.TWN_ALLOW_LOCAL_FIXTURES !== "1") {
   throw new Error("Fixture build requires CI=true or explicit TWN_ALLOW_LOCAL_FIXTURES=1");
@@ -27,6 +28,12 @@ const paths = [
   "src/assets/events/walima/ci-test-only-walima/01-geometry.png",
   "src/assets/events/walima/ci-test-only-walima/02-geometry.png",
 ];
+const additionalServices = [
+  "nikah-decoration-hyderabad",
+  "mehndi-artist-hyderabad",
+  "trousseau-packing-hyderabad",
+];
+paths.push(...additionalServices.map((slug) => `src/content/services/${slug}.json`));
 const output = resolve(root, "dist-editorial-fixtures");
 let ownsOutput = false;
 const created = [];
@@ -90,7 +97,7 @@ const photos = photoNames.map((name, index) => ({
   orientation: "landscape",
   focal: "center",
   permission: true, // schema-only CI declaration, NOT a human approval
-  releaseRef: `TWN-REL-2026-CITEST`,
+  releaseRef: `TWN-REL-2026-CITEST${index + 1}`,
   // No homepage slot: real approved photographs now occupy every homepage slot.
 }));
 
@@ -136,6 +143,15 @@ const sources = new Map([
   [paths[4], geometricPng(1)],
 ]);
 
+// Exercise each production composition without approving or publishing its draft copy.
+// Include every target in the collision check and the same finally-based cleanup.
+for (const slug of additionalServices) {
+  sources.set(
+    `src/content/services/${slug}.json`,
+    Buffer.from(JSON.stringify({ ...service, slug }, null, 2)),
+  );
+}
+
 function run(command, args, env) {
   return new Promise((resolvePromise, reject) => {
     const child = spawn(command, args, {
@@ -151,12 +167,14 @@ function run(command, args, env) {
 }
 
 try {
-  // Never overwrite approved originals. A real file at any test target is a
-  // hard collision rather than a reason to delete or change that file.
+  // Real service records already exercise the composition. Leave them byte-for-byte
+  // intact and let the normal build validate their approval. Synthetic story/media
+  // targets remain reserved and any collision is a hard error.
+  const missing = new Set(
+    missingFixtureTargets(paths, (relative) => existsSync(resolve(root, relative))),
+  );
   for (const relative of paths) {
-    if (existsSync(resolve(root, relative))) {
-      throw new Error("Refusing to replace existing source with CI fixture: " + relative);
-    }
+    if (!missing.has(relative)) sources.delete(relative);
   }
   if (existsSync(output)) {
     throw new Error("Refusing to overwrite pre-existing editorial fixture output");

@@ -17,3 +17,5 @@ test-results/
 .claude/handoff-nudge-state.json
 .claude/handoffs/
 dist-submit
+
+dist-editorial-fixtures/

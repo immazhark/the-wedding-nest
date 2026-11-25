@@ -83,6 +83,19 @@ export async function previewRetentionImpact(
 export const UNSUCCESSFUL_RETENTION_DAYS = 90;
 const MAX_RETENTION_BATCH = 100;
 
+// SQL identifiers below are internal literals, never caller input. The explicit
+// modifier normalizes SQLite's otherwise accepted 24:00 and overflow dates.
+function canonicalClock(column: "created_at" | "e.created_at" | "e.unsuccessful_at"): string {
+  return (
+    `length(${column}) = 24 AND ` +
+    `strftime('%Y-%m-%dT%H:%M:%fZ', ${column}, '+0 seconds') = ${column}`
+  );
+}
+
+const VALID_RETENTION_CLOCKS =
+  `${canonicalClock("e.created_at")} AND ${canonicalClock("e.unsuccessful_at")} ` +
+  "AND e.created_at <= e.unsuccessful_at";
+
 function retentionTime(iso: string): number {
   if (
     !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(iso) ||
@@ -100,23 +113,34 @@ function unsuccessfulCutoff(nowIso: string): string {
 
 /**
  * Dormant operator primitive, not a route or automatic status inference. Only known active
- * states may transition; booked/unknown states are protected. Repeating a call never resets
- * the clock. Caller authentication/authority is required before any future live use.
+ * states may transition; booked/unknown states are protected. The reviewed status must still
+ * match at write time, and repeating a call never resets the clock. Caller authentication and
+ * authority are required before any future live use.
  */
 export async function markEnquiryUnsuccessful(
   db: D1Like,
   enquiryId: string,
+  expectedStatus: unknown,
   atIso: string,
 ): Promise<boolean> {
-  if (!ENQUIRY_ID.test(enquiryId)) throw new Error("Invalid enquiry id");
+  if (typeof enquiryId !== "string" || !ENQUIRY_ID.test(enquiryId)) {
+    throw new Error("Invalid enquiry id");
+  }
+  if (
+    expectedStatus !== "new" &&
+    expectedStatus !== "contacted" &&
+    expectedStatus !== "in_progress"
+  ) {
+    throw new Error("Invalid expected enquiry status");
+  }
   retentionTime(atIso);
   const result = await db
     .prepare(
       "UPDATE enquiries SET status = 'unsuccessful', unsuccessful_at = ?1 " +
-        "WHERE id = ?2 AND status IN ('new', 'contacted', 'in_progress') " +
-        "AND unsuccessful_at IS NULL AND created_at <= ?1",
+        "WHERE id = ?2 AND status = ?3 AND status IN ('new', 'contacted', 'in_progress') " +
+        `AND unsuccessful_at IS NULL AND created_at <= ?1 AND ${canonicalClock("created_at")}`,
     )
-    .bind(atIso, enquiryId)
+    .bind(atIso, enquiryId, expectedStatus)
     .run();
   return result.meta.changes === 1;
 }
@@ -135,7 +159,7 @@ export async function previewUnsuccessfulRetention(
       `SELECT COUNT(CASE WHEN NOT ${PENDING_DELIVERY} THEN 1 END) AS eligible, ` +
         `COUNT(CASE WHEN ${PENDING_DELIVERY} THEN 1 END) AS pending ` +
         "FROM enquiries e WHERE e.status = 'unsuccessful' " +
-        "AND e.unsuccessful_at IS NOT NULL AND e.unsuccessful_at <= ?1",
+        `AND e.unsuccessful_at IS NOT NULL AND e.unsuccessful_at <= ?1 AND ${VALID_RETENTION_CLOCKS}`,
     )
     .bind(cutoff)
     .first<{ eligible: number; pending: number }>();
@@ -164,7 +188,7 @@ export async function deleteExpiredUnsuccessfulEnquiries(
     .prepare(
       "DELETE FROM enquiries WHERE id IN (SELECT e.id FROM enquiries e " +
         "WHERE e.status = 'unsuccessful' AND e.unsuccessful_at IS NOT NULL " +
-        `AND e.unsuccessful_at <= ?1 AND NOT ${PENDING_DELIVERY} ` +
+        `AND e.unsuccessful_at <= ?1 AND ${VALID_RETENTION_CLOCKS} AND NOT ${PENDING_DELIVERY} ` +
         "ORDER BY e.unsuccessful_at, e.id LIMIT ?2)",
     )
     .bind(cutoff, limit)

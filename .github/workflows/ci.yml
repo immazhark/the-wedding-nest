@@ -24,7 +24,13 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Format
+        id: format
         run: npm run format:check
+      - name: Show formatter corrections on failure
+        if: failure() && steps.format.outcome == 'failure'
+        run: |
+          npx prettier --write . > /dev/null
+          git diff --no-ext-diff
       - name: Type and Astro check
         run: npm run check
       - name: Unit tests
@@ -72,3 +78,41 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Verify populated editorial pages with disposable synthetic CI fixtures
         run: npm run test:editorial-fixtures
+      - name: Preserve editorial composition screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-compositions
+          path: test-results/**/*.png
+          retention-days: 7
+          if-no-files-found: ignore
+
+  cross-browser-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run build:submit
+      - name: Install Firefox and WebKit
+        run: npx playwright install --with-deps firefox webkit
+      - name: Check visual layout and catering in Firefox and WebKit
+        run: >-
+          npm run test:e2e:cross --
+          tests/e2e/visual-review.spec.ts
+          tests/e2e/hero-fit.spec.ts
+          tests/e2e/catering-art-direction.spec.ts
+          --grep-invert "the kitchen film plays when visible and can be paused"
+      - name: Retain cross-browser review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-browser-layout
+          path: playwright-report/
+          retention-days: 7
+          if-no-files-found: warn

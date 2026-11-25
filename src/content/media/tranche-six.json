@@ -1,0 +1,238 @@
+{
+  "images": [
+    {
+      "file": "../../assets/events/decor/stage-cream-florals/01-stage-wide-cream-florals.jpg",
+      "alt": "A wide hall stage in warm gold light, with cream and white floral arrangements, a dark carved throne chair and two sofas beneath a glittering ceiling.",
+      "category": "decor",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0033"
+    },
+    {
+      "file": "../../assets/events/decor/stage-cream-florals/02-stage-sofas-close.jpg",
+      "alt": "Closer view of the stage: two dark carved sofas and a central throne chair framed by cream flowers and warm lights.",
+      "category": "decor",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0034"
+    },
+    {
+      "file": "../../assets/events/decor/marigold-jasmine-backdrop/02-marigold-backdrop-front.jpg",
+      "alt": "A backdrop of yellow marigold garlands and white jasmine in a diamond lattice over saffron fabric, seen from the front.",
+      "category": "decor",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0035"
+    },
+    {
+      "file": "../../assets/events/decor/marigold-jasmine-backdrop/03-marigold-backdrop-angle.jpg",
+      "alt": "The marigold and jasmine lattice backdrop from an angle, showing its three-sided frame on a patterned floor.",
+      "category": "decor",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0036"
+    },
+    {
+      "file": "../../assets/events/decor/pink-gold-backdrop/01-pink-backdrop-sequin-drapes.jpg",
+      "alt": "A blush-pink fabric backdrop with gold sequin drapes, pink and purple flower garlands across the top and flower stands on either side.",
+      "category": "decor",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0037"
+    },
+    {
+      "file": "../../assets/events/decor/bridal-room-petals/01-bed-rose-petals.jpg",
+      "alt": "A bed covered in deep pink rose petals, with maroon and gold velvet cushions and a flower garland along the headboard.",
+      "category": "decor",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0038"
+    },
+    {
+      "file": "../../assets/events/decor/bridal-room-petals/02-bed-flowers-evening.jpg",
+      "alt": "A bedroom dressed with flowers and petals along the bed, a wall of hanging flowers behind the headboard and warm bedside lamps.",
+      "category": "decor",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0039"
+    },
+    {
+      "file": "../../assets/events/decor/doorway-garlands/01-flower-garland-doorway.jpg",
+      "alt": "A doorway framed with white and yellow flower garlands, opening into a pink-walled room.",
+      "category": "decor",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0040"
+    },
+    {
+      "file": "../../assets/events/mehndi/henna-detail/01-henna-forearms-hands.jpg",
+      "alt": "Both forearms and hands covered in dense, floral henna designs, resting on a cream cushion.",
+      "category": "mehndi",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0041"
+    },
+    {
+      "file": "../../assets/events/mehndi/henna-detail/02-henna-open-palms.jpg",
+      "alt": "Two open hands with fine black henna patterns on the fingers and palms, held over a yellow and teal woven mat.",
+      "category": "mehndi",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0042"
+    },
+    {
+      "file": "../../assets/events/mehndi/mehndi-seating/01-mehndi-seating-detail.jpg",
+      "alt": "Black-and-white close view of grey tufted sofas with two ornate round cushions set out on the floor in front.",
+      "category": "mehndi",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0043"
+    },
+    {
+      "file": "../../assets/events/details/trousseau-trays/00-trays-overview.jpg",
+      "alt": "A floor spread of wrapped trousseau trays and boxes in gold, pastel and jewel colours around an upright maroon outfit.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0044"
+    },
+    {
+      "file": "../../assets/events/details/trousseau-trays/01-gold-tray-red-rose.jpg",
+      "alt": "A gold-edged tray wrapped in cream tulle and finished with a single red rose, on a patterned rug.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0045"
+    },
+    {
+      "file": "../../assets/events/details/trousseau-trays/02-maroon-outfit-display.jpg",
+      "alt": "A maroon embroidered outfit displayed upright in a clear, ribbon-trimmed frame with strands of pearls, beside a blue outfit.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0046"
+    },
+    {
+      "file": "../../assets/events/details/trousseau-trays/03-compartment-boxes.jpg",
+      "alt": "A gold-framed box divided into compartments, each holding a folded outfit tied with cream tulle and a red rose.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0047"
+    },
+    {
+      "file": "../../assets/events/details/trousseau-trays/04-blue-outfit-and-shoes.jpg",
+      "alt": "A blue embroidered outfit and gold sandals in a clear frame trimmed with pearl strands and a flower spray.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0048"
+    },
+    {
+      "file": "../../assets/events/details/trousseau-trays/05-shoes-and-handbag-tray.jpg",
+      "alt": "A white lattice tray holding a pair of flat shoes on a brown monogram handbag with tan leather straps.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0049"
+    },
+    {
+      "file": "../../assets/events/details/trousseau-trays/06-beauty-gift-tray.jpg",
+      "alt": "A tray of beauty gifts: a boxed fragrance set and a make-up bag with brushes and palettes, finished with a red rose.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0050"
+    },
+    {
+      "file": "../../assets/events/details/gift-packaging/01-gift-bag-box-card.jpg",
+      "alt": "A cream and gold gift bag beside a gold window box tied with ribbon, a printed card and a strand of pearls.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0051"
+    },
+    {
+      "file": "../../assets/events/details/gift-packaging/02-outfit-stand-presentation.jpg",
+      "alt": "A dark mannequin torso draped in a cream veil with pearl strands, presented in a wooden slatted crate.",
+      "category": "details",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0052"
+    },
+    {
+      "file": "../../assets/events/celebrations/table-settings/01-long-table-shallow-focus.jpg",
+      "alt": "A long table set with a gold runner, patterned plates and bowls and paper napkins, in soft focus down the hall.",
+      "category": "celebrations",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0053"
+    },
+    {
+      "file": "../../assets/events/celebrations/table-settings/02-napkin-and-bowl-portrait.jpg",
+      "alt": "Close view of a place setting with a gold-patterned bowl and a folded paper napkin, rows of settings behind it.",
+      "category": "celebrations",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0054"
+    },
+    {
+      "file": "../../assets/events/celebrations/table-settings/03-vase-and-basket-portrait.jpg",
+      "alt": "A tall yellow vase with black circles beside a small flower basket, on a table set with rows of plates.",
+      "category": "celebrations",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0055"
+    },
+    {
+      "file": "../../assets/events/celebrations/table-settings/04-gold-rim-bowl.jpg",
+      "alt": "A gold-rimmed bowl on a matching patterned plate, with a hall of chandeliers behind.",
+      "category": "celebrations",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0056"
+    },
+    {
+      "file": "../../assets/events/celebrations/table-settings/05-hall-bowl-portrait.jpg",
+      "alt": "A white bowl on an ornate silver-patterned plate on a table in a gold and cream hall.",
+      "category": "celebrations",
+      "focal": "center",
+      "orientation": "portrait",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0057"
+    },
+    {
+      "file": "../../assets/events/celebrations/table-settings/06-round-table-layout.jpg",
+      "alt": "A round banquet table laid for a meal with plates, bowls, glasses, water bottles and a menu card.",
+      "category": "celebrations",
+      "focal": "center",
+      "orientation": "landscape",
+      "permission": true,
+      "releaseRef": "TWN-REL-2026-T0058"
+    }
+  ]
+}

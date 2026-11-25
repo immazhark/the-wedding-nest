@@ -310,7 +310,7 @@ test("homepage service links begin a specific-service enquiry without skipping o
 }) => {
   // Catering has an approved detail page, so the homepage links there; its planner link is the entry.
   await page.goto("/services/hyderabadi-wedding-catering/");
-  await page.getByRole("link", { name: "Explore in the planner" }).click();
+  await page.getByRole("link", { name: "Begin planning" }).click();
   await expect(page).toHaveURL(/\/plan-your-event\/\?service=catering$/);
   await expect(page.getByRole("checkbox", { name: "Nikah" })).not.toBeChecked();
   await page.getByRole("checkbox", { name: "Walima" }).check();

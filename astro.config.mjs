@@ -6,6 +6,9 @@ import { readFileSync } from "node:fs";
 import { parseConfigFileTextToJson } from "typescript";
 import { headersFile, robotsTxt, sitemapXml } from "./src/lib/site/seo-files.ts";
 import { assertIndexableRelease } from "./src/lib/site/release.ts";
+import { assertEditorialFixtureIsolation } from "./src/lib/site/editorial-fixtures.ts";
+
+assertEditorialFixtureIsolation(new URL("./src/content/", import.meta.url), process.env);
 
 // One switch for robots.txt, X-Robots-Tag and <meta name="robots"> (set as a real build
 // environment variable, e.g. in Workers Builds settings, only for the approved production build).
@@ -41,7 +44,14 @@ const seoFiles = {
   hooks: {
     "astro:build:done": async ({ dir, pages }) => {
       await writeFile(new URL("_headers", dir), headersFile(indexable));
-      await writeFile(new URL("robots.txt", dir), robotsTxt(indexable, siteUrl));
+      await writeFile(
+        new URL("robots.txt", dir),
+        robotsTxt(
+          indexable,
+          siteUrl,
+          process.env.PUBLIC_AI_TRAINING === "disallow" ? "disallow" : "allow",
+        ),
+      );
       const sitemap = new URL("sitemap.xml", dir);
       if (indexable) {
         await writeFile(

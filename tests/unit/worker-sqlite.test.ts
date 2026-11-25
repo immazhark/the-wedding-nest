@@ -265,8 +265,8 @@ describe("owner-approved unsuccessful-enquiry retention", () => {
   it("starts the clock only on an explicit unsuccessful disposition, without resetting it", async () => {
     const { d1, db, add } = setup();
     add(id);
-    expect(await markEnquiryUnsuccessful(d1, id, cutoff)).toBe(true);
-    expect(await markEnquiryUnsuccessful(d1, id, now)).toBe(false);
+    expect(await markEnquiryUnsuccessful(d1, id, "new", cutoff)).toBe(true);
+    expect(await markEnquiryUnsuccessful(d1, id, "new", now)).toBe(false);
     expect(db.prepare("SELECT status,unsuccessful_at FROM enquiries").get()).toEqual({
       status: "unsuccessful",
       unsuccessful_at: cutoff,
@@ -278,8 +278,44 @@ describe("owner-approved unsuccessful-enquiry retention", () => {
     async (status) => {
       const { d1, db, add } = setup();
       add(id, status);
-      expect(await markEnquiryUnsuccessful(d1, id, cutoff)).toBe(false);
+      expect(await markEnquiryUnsuccessful(d1, id, "new", cutoff)).toBe(false);
       expect(db.prepare("SELECT status FROM enquiries").get()).toEqual({ status });
+    },
+  );
+
+  it("rejects an unsuccessful disposition based on a stale reviewed status", async () => {
+    const { d1, db, add } = setup();
+    add(id, "contacted");
+    expect(await markEnquiryUnsuccessful(d1, id, "new", cutoff)).toBe(false);
+    expect(db.prepare("SELECT status,unsuccessful_at FROM enquiries").get()).toEqual({
+      status: "contacted",
+      unsuccessful_at: null,
+    });
+    expect(await markEnquiryUnsuccessful(d1, id, "contacted", cutoff)).toBe(true);
+  });
+
+  it("can close a reviewed in-progress enquiry", async () => {
+    const { d1, db, add } = setup();
+    add(id, "in_progress");
+    expect(await markEnquiryUnsuccessful(d1, id, "in_progress", cutoff)).toBe(true);
+    expect(db.prepare("SELECT status,unsuccessful_at FROM enquiries").get()).toEqual({
+      status: "unsuccessful",
+      unsuccessful_at: cutoff,
+    });
+  });
+
+  it.each(["booked", "unsuccessful", "unknown", null, {}])(
+    "rejects an invalid reviewed status %j",
+    async (status) => {
+      const { d1, db, add } = setup();
+      add(id);
+      await expect(markEnquiryUnsuccessful(d1, id, status, cutoff)).rejects.toThrow(
+        /Invalid expected enquiry status/,
+      );
+      expect(db.prepare("SELECT status,unsuccessful_at FROM enquiries").get()).toEqual({
+        status: "new",
+        unsuccessful_at: null,
+      });
     },
   );
 
@@ -306,6 +342,50 @@ describe("owner-approved unsuccessful-enquiry retention", () => {
     });
   });
 
+  it("holds reversed and malformed stored creation clocks out of preview and deletion", async () => {
+    const { d1, db, add } = setup();
+    add(id, "unsuccessful", cutoff);
+    add("reversed", "unsuccessful", cutoff);
+    add("bad-created", "unsuccessful", cutoff);
+    db.prepare("UPDATE enquiries SET created_at = ?1 WHERE id = 'reversed'").run(
+      "2026-09-01T00:00:00.000Z",
+    );
+    db.prepare("UPDATE enquiries SET created_at = '' WHERE id = 'bad-created'").run();
+    expect(await previewUnsuccessfulRetention(d1, now)).toEqual({
+      eligibleCount: 1,
+      pendingDeliveryCount: 0,
+    });
+    expect(await deleteExpiredUnsuccessfulEnquiries(d1, now)).toBe(1);
+    expect(db.prepare("SELECT id FROM enquiries ORDER BY id").all()).toEqual([
+      { id: "bad-created" },
+      { id: "reversed" },
+    ]);
+  });
+
+  it("holds noncanonical stored closure clocks even if a legacy constraint allowed them", async () => {
+    const { d1, db, add } = setup();
+    // Simulate a legacy or imported row without weakening any production schema.
+    db.exec("PRAGMA ignore_check_constraints = ON");
+    add(id, "unsuccessful", "2026-08-25T24:00:00.000Z");
+    db.exec("PRAGMA ignore_check_constraints = OFF");
+    expect(await previewUnsuccessfulRetention(d1, now)).toEqual({
+      eligibleCount: 0,
+      pendingDeliveryCount: 0,
+    });
+    expect(await deleteExpiredUnsuccessfulEnquiries(d1, now)).toBe(0);
+  });
+
+  it("does not close a record with an invalid stored creation clock", async () => {
+    const { d1, db, add } = setup();
+    add(id);
+    db.prepare("UPDATE enquiries SET created_at = '' WHERE id = ?1").run(id);
+    expect(await markEnquiryUnsuccessful(d1, id, "new", cutoff)).toBe(false);
+    expect(db.prepare("SELECT status,unsuccessful_at FROM enquiries").get()).toEqual({
+      status: "new",
+      unsuccessful_at: null,
+    });
+  });
+
   it("bounds a deletion batch and cascades delivered events without returning identifiers", async () => {
     const { d1, db, add } = setup();
     add(id, "unsuccessful", cutoff);
@@ -320,10 +400,12 @@ describe("owner-approved unsuccessful-enquiry retention", () => {
 
   it("rejects malformed times, IDs and unsafe batch limits before database access", async () => {
     const { d1 } = setup();
-    await expect(markEnquiryUnsuccessful(d1, "bad", now)).rejects.toThrow(/Invalid enquiry id/);
-    await expect(markEnquiryUnsuccessful(d1, id, "2026-02-30T00:00:00.000Z")).rejects.toThrow(
-      /Invalid retention time/,
+    await expect(markEnquiryUnsuccessful(d1, "bad", "new", now)).rejects.toThrow(
+      /Invalid enquiry id/,
     );
+    await expect(
+      markEnquiryUnsuccessful(d1, id, "new", "2026-02-30T00:00:00.000Z"),
+    ).rejects.toThrow(/Invalid retention time/);
     await expect(previewUnsuccessfulRetention(d1, "2026-11-24")).rejects.toThrow(
       /Invalid retention time/,
     );

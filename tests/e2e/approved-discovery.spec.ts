@@ -1,16 +1,23 @@
 import { expect, test } from "@playwright/test";
+import { publishedServiceSlugs, publishedStorySlugs } from "../support/publication-records";
 
-test("homepage links only to the approved catering page, never unapproved services or stories", async ({
-  page,
-}) => {
+test("homepage links only to reviewed service and story records", async ({ page }) => {
   await page.goto("/");
-  // Every service link on the homepage (the list and the catering menu rail) is the approved page.
+  // The expected set comes from reviewed source records, not a fixed launch snapshot.
   const serviceLinks = await page
     .locator('a[href^="/services/"]')
     .evaluateAll((links) => links.map((link) => link.getAttribute("href")));
   expect(serviceLinks.length).toBeGreaterThan(0);
-  expect(new Set(serviceLinks)).toEqual(new Set(["/services/hyderabadi-wedding-catering/"]));
-  await expect(page.locator('a[href^="/stories/"]')).toHaveCount(0);
+  const approved = publishedServiceSlugs();
+  expect(new Set(serviceLinks)).toEqual(new Set(approved.map((slug) => `/services/${slug}/`)));
+  const stories = publishedStorySlugs();
+  const storyLinks = page.locator('a[href^="/stories/"]');
+  if (stories.length > 0) {
+    await expect(storyLinks).toHaveCount(1);
+    await expect(storyLinks).toHaveAttribute("href", `/stories/${stories[0]}/`);
+  } else {
+    await expect(storyLinks).toHaveCount(0);
+  }
   await expect(page.getByRole("link", { name: "Catering & menus" })).toHaveAttribute(
     "href",
     "/services/hyderabadi-wedding-catering/",
@@ -18,7 +25,9 @@ test("homepage links only to the approved catering page, never unapproved servic
   // Services without an approved page still start in the planner.
   await expect(page.getByRole("link", { name: "Guest hospitality" })).toHaveAttribute(
     "href",
-    "/plan-your-event/?service=hospitality",
+    approved.includes("guest-hospitality-hyderabad")
+      ? "/services/guest-hospitality-hyderabad/"
+      : "/plan-your-event/?service=hospitality",
   );
 });
 

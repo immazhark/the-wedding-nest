@@ -107,6 +107,26 @@ export function organizationJsonLd(): string {
   return JSON.stringify(facts).replace(/</g, "\\u003c");
 }
 
+/**
+ * Service structured data for an owner-approved service page. Only facts already on the approved
+ * page are used (name, description, URL, provider, the Hyderabad area): no price, rating, review,
+ * availability or offer is ever generated.
+ */
+export function serviceJsonLd(page: { title: string; description: string }, path: string): string {
+  const url = canonicalUrl(path);
+  const facts = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${url}#service`,
+    name: page.title,
+    description: page.description,
+    url,
+    provider: { "@id": `${SITE.url}/#organization` },
+    areaServed: { "@type": "AdministrativeArea", name: SITE.region },
+  };
+  return JSON.stringify(facts).replace(/</g, "\\u003c");
+}
+
 export function canonicalUrl(path: string): string {
   const url = new URL(path, SITE.url);
   url.search = "";
