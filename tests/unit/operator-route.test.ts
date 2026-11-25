@@ -26,6 +26,7 @@ describe("routeOperator", () => {
       "/operator/",
       "/operator/operator.js",
       "/api/operator/enquiries",
+      "/api/operator/delivery-overview",
     ]) {
       const r = await routeOperator(get(p), env, deps(null));
       expect(r?.status, p).toBe(404);
@@ -39,6 +40,20 @@ describe("routeOperator", () => {
     expect(r?.headers.get("x-robots-tag")).toContain("noindex");
     expect(r?.headers.get("content-security-policy")).toContain("script-src 'self'");
     expect(r?.headers.get("content-security-policy")).not.toContain("unsafe-inline");
+  });
+  it("protects delivery overview and forbids writes even for operators", async () => {
+    const db = {
+      prepare: () => {
+        throw new Error("Database unavailable");
+      },
+    };
+    const configured = { ...env, DB: db };
+    const path = "/api/operator/delivery-overview";
+    const response = await routeOperator(get(path), configured, deps("owner@example.com"));
+    expect(response?.status).toBe(503);
+    expect(response?.headers.get("cache-control")).toBe("no-store");
+    const post = new Request(`https://twn.test${path}`, { method: "POST" });
+    expect((await routeOperator(post, configured, deps("owner@example.com")))?.status).toBe(405);
   });
   it("returns 503 for an authenticated API call when no database is bound", async () => {
     const r = await routeOperator(get("/api/operator/enquiries"), env, deps("owner@example.com"));
