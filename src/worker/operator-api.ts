@@ -6,6 +6,7 @@
 import { prepareAdvanceEnquiryStatus } from "./operator-status";
 import { prepareMarkEnquiryUnsuccessful } from "./privacy";
 import type { D1Like, D1PreparedLike } from "./types";
+import { BodyReadTimeout, readBody } from "./request-body";
 
 export interface OperatorStatement extends D1PreparedLike {
   bind(...values: unknown[]): OperatorStatement;
@@ -155,11 +156,18 @@ export async function handleOperatorApi(
     // CSRF: Access cookies are ambient, so require same-origin JSON.
     if (request.headers.get("origin") !== url.origin)
       return json(403, { error: "forbidden_origin" });
-    if (!(request.headers.get("content-type") ?? "").toLowerCase().startsWith("application/json")) {
-      return json(415, { error: "unsupported_media_type" });
+    const mediaType = request.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase();
+    if (mediaType !== "application/json") return json(415, { error: "unsupported_media_type" });
+    if (Number(request.headers.get("content-length") ?? "0") > MAX_BODY)
+      return json(413, { error: "too_large" });
+    let text: string | null;
+    try {
+      text = await readBody(request, MAX_BODY);
+    } catch (error) {
+      if (error instanceof BodyReadTimeout) return json(408, { error: "request_timeout" });
+      return json(400, { error: "invalid_body" });
     }
-    const text = await request.text();
-    if (text.length > MAX_BODY) return json(413, { error: "too_large" });
+    if (text === null) return json(413, { error: "too_large" });
     let body: unknown;
     try {
       body = JSON.parse(text);
