@@ -9,7 +9,7 @@
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash",
     // Only the API runs Worker code; every page is served straight from static assets.
-    "run_worker_first": ["/api/*"],
+    "run_worker_first": ["/api/*", "/operator", "/operator/*"],
   },
   // workers.dev + per-version preview URLs for review. No custom domain until owner approval.
   "workers_dev": true,

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Enquiries — The Wedding Nest operator</title>
+    <link rel="stylesheet" href="/operator/operator.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Enquiries</h1>
+      <label>
+        Show
+        <select id="filter">
+          <option value="">All</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="in_progress">In progress</option>
+          <option value="booked">Booked</option>
+          <option value="unsuccessful">Unsuccessful</option>
+        </select>
+      </label>
+    </header>
+    <main>
+      <p id="message" role="status" aria-live="polite"></p>
+      <ul id="list" aria-label="Enquiries"></ul>
+      <button id="more" type="button" hidden>Load older</button>
+      <section id="detail" aria-labelledby="detail-title" hidden>
+        <button id="back" type="button">← Back to list</button>
+        <h2 id="detail-title" tabindex="-1"></h2>
+        <dl id="fields"></dl>
+        <div id="actions" role="group" aria-label="Update status"></div>
+      </section>
+    </main>
+    <script src="/operator/operator.js" defer></script>
+  </body>
+</html>
