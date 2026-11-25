@@ -16,7 +16,7 @@ The plain-text notice must originate from the existing server validator/content 
 - Network/timeout failures, HTTP 429/5xx and malformed successful responses return a safe retry classification. The adapter never loops; the dormant consumer composes the existing outbox backoff/lease primitives.
 - Other HTTP failures, including idempotency conflicts, are held for review. No automatic key changes, recipient changes or fallback channel sends.
 - The immutable outbox UUID supplies the provider key. Events are blocked at 23 hours from original creation, including delayed first attempts, conservatively inside the provider's 24-hour key retention. This is bounded duplicate protection, not unlimited exactly-once delivery. Stale/unknown events require manual reconciliation; never reset their timestamp to bypass this guard.
-- Missing configuration, malformed events and disabled delivery cause no network access. The network target is fixed, redirects rejected and requests have a 10-second abort signal.
+- Missing configuration, malformed events and disabled delivery cause no network access. The network target is fixed, redirects rejected and one attempt has a 10-second total deadline across fetch and response parsing, with best-effort abort; a late response cannot acknowledge the event.
 
 Official references checked on 24 November 2026:
 - https://resend.com/docs/dashboard/emails/idempotency-keys

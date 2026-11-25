@@ -104,26 +104,48 @@ describe("dormant operator email adapter", () => {
             });
           }),
       );
-      // Node's native AbortSignal.timeout uses internal timers; inject only the
-      // timeout factory to drive the actual abort signal deterministically.
-      const controller = new AbortController();
-      const timeout = vi.spyOn(AbortSignal, "timeout").mockImplementation((ms) => {
-        setTimeout(() => controller.abort(), ms);
-        return controller.signal;
-      });
-      try {
-        const attempt = sendOperatorEmail(config, event, now, fetcher);
-        await vi.advanceTimersByTimeAsync(10_000);
-        expect(await attempt).toEqual({ status: "retry", reason: "network" });
-        expect(timeout).toHaveBeenCalledWith(10_000);
-        expect(controller.signal.aborted).toBe(true);
-      } finally {
-        timeout.mockRestore();
-      }
+      const attempt = sendOperatorEmail(config, event, now, fetcher);
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(await attempt).toEqual({ status: "retry", reason: "network" });
+      expect(fetcher.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);
     } finally {
       vi.useRealTimers();
     }
   });
+  it("settles the deadline even if the fetch transport ignores cancellation", async () => {
+    vi.useFakeTimers();
+    try {
+      let complete!: (response: Response) => void;
+      const fetcher = vi.fn(() => new Promise<Response>((resolve) => (complete = resolve)));
+      const attempt = sendOperatorEmail(config, event, now, fetcher);
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(await attempt).toEqual({ status: "retry", reason: "network" });
+      const response = accepted();
+      const json = vi.spyOn(response, "json");
+      complete(response);
+      await Promise.resolve();
+      expect(json).not.toHaveBeenCalled();
+      expect(fetcher).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("includes response parsing in the same total deadline", async () => {
+    vi.useFakeTimers();
+    try {
+      const response = accepted();
+      vi.spyOn(response, "json").mockImplementation(() => new Promise(() => {}));
+      const fetcher = vi.fn().mockResolvedValue(response);
+      const attempt = sendOperatorEmail(config, event, now, fetcher);
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(await attempt).toEqual({ status: "retry", reason: "network" });
+      expect(fetcher).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("does not acknowledge malformed success responses", async () => {
     for (const body of ["not json", "{}", '{"id":"invalid"}']) {
       expect(
