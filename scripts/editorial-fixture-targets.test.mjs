@@ -15,19 +15,14 @@ test("all missing fixtures are generated on a clean checkout", () => {
 
 test("existing service records are excluded from fixture creation and cleanup", () => {
   const existing = new Set([hospitality]);
-  assert.deepEqual(
-    missingFixtureTargets(paths, (path) => existing.has(path)),
-    [decor, story, media, photo],
-  );
+  const missing = missingFixtureTargets(paths, (path) => existing.has(path));
+  assert.deepEqual(missing, [decor, story, media, photo]);
 });
 
 test("multiple real service records coexist without synthetic replacements", () => {
   const existing = new Set([hospitality, decor]);
-  assert.deepEqual(missingFixtureTargets(paths, (path) => existing.has(path)), [
-    story,
-    media,
-    photo,
-  ]);
+  const missing = missingFixtureTargets(paths, (path) => existing.has(path));
+  assert.deepEqual(missing, [story, media, photo]);
 });
 
 for (const collision of [story, media, photo]) {
