@@ -43,11 +43,14 @@ test("fixture environment overrides all inherited publication switches", () => {
     PUBLIC_SITE_RELEASED: "true",
     TWN_ALLOW_LOCAL_FIXTURES: "1",
   };
-  assert.deepEqual({ ...inherited, ...editorialFixtureEnv() }, {
-    ASTRO_OUT_DIR: "./dist-editorial-fixtures",
-    PUBLIC_ALLOW_INDEXING: "false",
-    PUBLIC_ENQUIRIES_ENABLED: "false",
-    PUBLIC_SITE_RELEASED: "false",
-    TWN_ALLOW_LOCAL_FIXTURES: "1",
-  });
+  assert.deepEqual(
+    { ...inherited, ...editorialFixtureEnv() },
+    {
+      ASTRO_OUT_DIR: "./dist-editorial-fixtures",
+      PUBLIC_ALLOW_INDEXING: "false",
+      PUBLIC_ENQUIRIES_ENABLED: "false",
+      PUBLIC_SITE_RELEASED: "false",
+      TWN_ALLOW_LOCAL_FIXTURES: "1",
+    },
+  );
 });
