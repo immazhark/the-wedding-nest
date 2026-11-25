@@ -27,7 +27,7 @@ export function robotsTxt(
     aiTraining === "disallow"
       ? AI_TRAINING_CRAWLERS.map((bot) => `User-agent: ${bot}\nDisallow: /\n`).join("\n") + "\n"
       : "";
-  return `${training}User-agent: *\nAllow: /\nSitemap: ${new URL("/sitemap.xml", siteUrl).toString()}\n`;
+  return `${training}User-agent: *\nAllow: /\nDisallow: /operator/\nSitemap: ${new URL("/sitemap.xml", siteUrl).toString()}\n`;
 }
 
 /** Only generated into an explicitly indexable build. No unpublished routes or 404 pages. */

@@ -16,6 +16,7 @@ describe("indexing switch keeps robots.txt, X-Robots-Tag and meta robots in step
 
   it("approved production: everything allows indexing", () => {
     expect(robotsTxt(true, SITE.url)).toMatch(/Allow: \//);
+    expect(robotsTxt(true, SITE.url)).toContain("Disallow: /operator/");
     expect(robotsTxt(true, SITE.url)).not.toMatch(/Disallow: \/\s*$/m);
     expect(headersFile(true)).not.toContain("X-Robots-Tag");
     expect(robotsContent(true)).toBe("index, follow");

@@ -49,6 +49,17 @@ Not fully reviewed: images were judged on 300 px thumbnails (subject, compositio
 - M186 = M246 (Grooms/SIA02757.JPG)
 - M192 = M202 (IMG-20250821-WA0300.jpg.jpeg)
 
+## HEIC/HEIF resolution — 25 November 2026
+
+ffmpeg 9.1 (Gyan full build) decodes every HEIC/HEIF original in one command: `ffmpeg -i <file> -frames:v 1 -q:v 2 out.jpg` (the grid of tiles is stitched to the full 4284x5712 frame). All 11 distinct files, including `1000002088.heic` and `Floral/IMG_1540.HEIC`, were converted and previewed on a contact sheet; originals are untouched and the JPEGs are not yet in the repository or collection. Findings before any use:
+
+- `1000002088.heic` (M017): trousseau basket of six tulle-wrapped pouches; MK, DKNY and Calvin Klein branded goods are legible, so prefer a crop or the unbranded Packing frames until the owner decides about third-party brands.
+- `Floral/IMG_1540.HEIC` (M170): purple-and-yellow draped backdrop with white flower frame, but a wall air-conditioner, ceiling fan and a plain sofa dominate the frame. Needs a tight crop or exclusion; not hero quality.
+- Favours M132-M134: M133 duplicates M018. M134 shows cone labels with printed personal names/wording: do not publish without the client's permission or a blur.
+- Packing M224-M229: usable tulle-and-ribbon trousseau frames (baskets, footwear, suitcases); consistent with the Trousseau page selection.
+
+The "convert the 11 blocked HEIC files" item below is therefore a decode question solved; the remaining work is selection and privacy review.
+
 ## Blocked (HEIC/HEIF, Chrome/sharp cannot decode)
 
 - M017 1000002088.heic (3.6 MB)

@@ -1,0 +1,92 @@
+:root {
+  color-scheme: light dark;
+  font:
+    16px/1.5 system-ui,
+    sans-serif;
+}
+body {
+  margin: 0 auto;
+  max-width: 40rem;
+  padding: 1rem;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+h1 {
+  font-size: 1.4rem;
+  margin: 0;
+}
+ul {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+button,
+select {
+  font: inherit;
+  min-height: 44px;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.5rem;
+  border: 1px solid #8886;
+  background: Canvas;
+  color: CanvasText;
+}
+li button {
+  width: 100%;
+  text-align: left;
+  display: grid;
+  gap: 0.15rem;
+}
+.meta {
+  opacity: 0.75;
+  font-size: 0.9rem;
+}
+.badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+dl {
+  display: grid;
+  gap: 0.75rem;
+}
+dt {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+dd {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+#actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+#actions .danger {
+  border-color: #b3261e;
+  color: #b3261e;
+}
+:focus-visible {
+  outline: 3px solid #1a73e8;
+  outline-offset: 2px;
+}
+h2,
+li button > * {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+li button {
+  min-width: 0;
+}
