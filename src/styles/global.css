@@ -987,9 +987,13 @@ footer.on-dark {
   background: linear-gradient(
     to top,
     color-mix(in srgb, var(--door-bg) 92%, black) 0%,
-    color-mix(in srgb, var(--door-bg) 55%, transparent) 55%,
-    transparent 100%
+    color-mix(in srgb, var(--door-bg) 72%, transparent) 55%,
+    color-mix(in srgb, var(--door-bg) 18%, transparent) 100%
   );
+}
+/* Captions sit on bright photographs (tulle, florals): a soft shadow keeps them legible. */
+.door:has(.door-photo) .door-name {
+  text-shadow: 0 1px 14px rgb(0 0 0 / 0.55);
 }
 
 /* Inner pages: panels and photographs land as they enter view (progressive, motion-safe). */
