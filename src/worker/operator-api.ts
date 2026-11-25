@@ -3,8 +3,8 @@
  * operator-auth.ts; this module never authenticates. Reads customer data, so every response is
  * no-store and nothing personal is logged. Status writes reuse the compare-and-set primitives.
  */
-import { advanceEnquiryStatus } from "./operator-status";
-import { markEnquiryUnsuccessful } from "./privacy";
+import { prepareAdvanceEnquiryStatus } from "./operator-status";
+import { prepareMarkEnquiryUnsuccessful } from "./privacy";
 import type { D1Like, D1PreparedLike } from "./types";
 
 export interface OperatorStatement extends D1PreparedLike {
@@ -152,27 +152,35 @@ export async function handleOperatorApi(
     }
     const { from, to } = (body && typeof body === "object" ? body : {}) as Record<string, unknown>;
     const id = change[1]!.toLowerCase();
-    let applied: boolean;
+    const at = ctx.now();
+    let update: D1PreparedLike;
     try {
-      applied =
+      update =
         to === "unsuccessful"
-          ? await markEnquiryUnsuccessful(db, id, from, ctx.now())
-          : await advanceEnquiryStatus(db, id, from, to);
+          ? prepareMarkEnquiryUnsuccessful(db, id, from, at)
+          : prepareAdvanceEnquiryStatus(db, id, from, to);
     } catch {
       return json(400, { error: "invalid_transition" });
     }
-    if (applied) {
-      // shortcut: audit is a second statement, not atomic with the status change; a failure is
-      // logged (not hidden) and never undoes the change. Upgrade to a D1 batch if a hard guarantee is needed.
-      await db
+    let applied: boolean;
+    try {
+      // D1 batch executes sequentially in one transaction. SQLite changes()
+      // refers to the preceding UPDATE; stale actions insert no audit row.
+      const audit = db
         .prepare(
-          "INSERT INTO operator_audit (at, operator, enquiry_id, from_status, to_status) VALUES (?1, ?2, ?3, ?4, ?5)",
+          "INSERT INTO operator_audit (at, operator, enquiry_id, from_status, to_status) " +
+            "SELECT ?1, ?2, ?3, ?4, ?5 WHERE changes() = 1",
         )
-        .bind(ctx.now(), ctx.operator, id, String(from), String(to))
-        .run()
-        .catch(() =>
-          ctx.log({ event: "operator", action: "audit", outcome: "audit_failed", enquiry: id }),
-        );
+        .bind(at, ctx.operator, id, String(from), String(to));
+      const [updated, recorded] = await db.batch([update, audit]);
+      const changes = updated?.meta.changes;
+      if ((changes !== 0 && changes !== 1) || recorded?.meta.changes !== changes) {
+        throw new Error("Unexpected operator batch result");
+      }
+      applied = changes === 1;
+    } catch {
+      ctx.log({ event: "operator", action: "status", outcome: "transaction_failed" });
+      return json(503, { error: "status_update_unavailable" });
     }
     ctx.log({
       event: "operator",

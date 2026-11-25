@@ -32,8 +32,17 @@ function wrap(raw: DatabaseSync): OperatorD1 {
       };
       return s;
     },
-    async batch() {
-      throw new Error("unused");
+    async batch(statements: ReturnType<OperatorD1["prepare"]>[]) {
+      raw.exec("BEGIN");
+      try {
+        const results = [];
+        for (const statement of statements) results.push(await statement.run());
+        raw.exec("COMMIT");
+        return results;
+      } catch (error) {
+        raw.exec("ROLLBACK");
+        throw error;
+      }
     },
   } as unknown as OperatorD1;
 }
@@ -209,17 +218,34 @@ describe("operator API", () => {
       sql.prepare("SELECT to_status FROM operator_audit WHERE enquiry_id = ?").all(ID_B),
     ).toEqual([{ to_status: "unsuccessful" }]);
   });
-  it("still reports success and logs a failure when the audit write fails; detail tolerates a missing table", async () => {
+  it("rolls back status and closure clock if the audit table is missing", async () => {
     sql.exec("DROP TABLE operator_audit");
+    for (const to of ["contacted", "unsuccessful"]) {
+      const r = await call("POST", `/api/operator/enquiries/${ID_A}/status`, {
+        from: "new",
+        to,
+      });
+      expect(r.status).toBe(503);
+      expect(
+        sql.prepare("SELECT status, unsuccessful_at FROM enquiries WHERE id=?").get(ID_A),
+      ).toEqual({ status: "new", unsuccessful_at: null });
+    }
+    expect(JSON.stringify(logs)).toContain("transaction_failed");
+  });
+
+  it("rolls back the status if an existing audit table rejects the insert", async () => {
+    sql.exec(
+      "CREATE TRIGGER reject_audit BEFORE INSERT ON operator_audit " +
+        "BEGIN SELECT RAISE(ABORT, 'synthetic audit failure'); END",
+    );
     const r = await call("POST", `/api/operator/enquiries/${ID_A}/status`, {
       from: "new",
-      to: "contacted",
+      to: "booked",
     });
-    expect(r.status).toBe(200);
-    expect(JSON.stringify(logs)).toContain("audit_failed");
-    const d = (await (await call("GET", `/api/operator/enquiries/${ID_A}`)).json()) as {
-      history: unknown[];
-    };
-    expect(d.history).toEqual([]);
+    expect(r.status).toBe(503);
+    expect(sql.prepare("SELECT status FROM enquiries WHERE id=?").get(ID_A)).toEqual({
+      status: "new",
+    });
+    expect(sql.prepare("SELECT COUNT(*) AS c FROM operator_audit").get()).toEqual({ c: 0 });
   });
 });
