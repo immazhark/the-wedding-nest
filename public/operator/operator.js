@@ -36,8 +36,11 @@ async function load(reset) {
   try {
     const q = new URLSearchParams({ limit: String(PAGE) });
     if ($("filter").value) q.set("status", $("filter").value);
-    if (cursor) q.set("before", cursor);
-    const { enquiries } = await api(`/api/operator/enquiries?${q}`);
+    if (cursor) {
+      q.set("before", cursor.createdAt);
+      q.set("beforeId", cursor.id);
+    }
+    const { enquiries, nextCursor } = await api(`/api/operator/enquiries?${q}`);
     for (const e of enquiries) {
       const li = document.createElement("li");
       const b = document.createElement("button");
@@ -55,8 +58,8 @@ async function load(reset) {
       li.append(b);
       $("list").append(li);
     }
-    if (enquiries.length) cursor = enquiries[enquiries.length - 1].createdAt;
-    $("more").hidden = enquiries.length < PAGE;
+    cursor = nextCursor || null;
+    $("more").hidden = !cursor;
     say($("list").children.length ? "" : "No enquiries.");
   } catch (e) {
     say(`Could not load enquiries (${e.status || "network"}).`);

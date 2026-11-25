@@ -25,7 +25,62 @@ export interface OperatorApiContext {
 const STATUSES = ["new", "contacted", "in_progress", "booked", "unsuccessful"] as const;
 const ID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
 const DETAIL = new RegExp(`^/api/operator/enquiries/(${ID})$`, "i");
-const STATUS_PATH = new RegExp(`^/api/operator/enquiries/(${ID})/status$`, "i");
+const STATUS_PATH = new RegExp(`^/api/operator/enquiries/(${ID})/status/**
+ * Authenticated operator API. The caller (index.ts) must verify the operator first via
+ * operator-auth.ts; this module never authenticates. Reads customer data, so every response is
+ * no-store and nothing personal is logged. Status writes reuse the compare-and-set primitives.
+ */
+import { prepareAdvanceEnquiryStatus } from "./operator-status";
+import { prepareMarkEnquiryUnsuccessful } from "./privacy";
+import type { D1Like, D1PreparedLike } from "./types";
+
+export interface OperatorStatement extends D1PreparedLike {
+  bind(...values: unknown[]): OperatorStatement;
+  all<T = unknown>(): Promise<{ results: T[] }>;
+}
+export interface OperatorD1 extends D1Like {
+  prepare(sql: string): OperatorStatement;
+}
+
+export interface OperatorApiContext {
+  db: OperatorD1;
+  operator: string;
+  now: () => string;
+  log: (entry: Record<string, string | number | boolean>) => void;
+}
+
+const STATUSES = ["new", "contacted", "in_progress", "booked", "unsuccessful"] as const;
+const ID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+const DETAIL = new RegExp(`^/api/operator/enquiries/(${ID})$`, "i");
+, "i");
+const CURSOR_ID = new RegExp(`^${ID}/**
+ * Authenticated operator API. The caller (index.ts) must verify the operator first via
+ * operator-auth.ts; this module never authenticates. Reads customer data, so every response is
+ * no-store and nothing personal is logged. Status writes reuse the compare-and-set primitives.
+ */
+import { prepareAdvanceEnquiryStatus } from "./operator-status";
+import { prepareMarkEnquiryUnsuccessful } from "./privacy";
+import type { D1Like, D1PreparedLike } from "./types";
+
+export interface OperatorStatement extends D1PreparedLike {
+  bind(...values: unknown[]): OperatorStatement;
+  all<T = unknown>(): Promise<{ results: T[] }>;
+}
+export interface OperatorD1 extends D1Like {
+  prepare(sql: string): OperatorStatement;
+}
+
+export interface OperatorApiContext {
+  db: OperatorD1;
+  operator: string;
+  now: () => string;
+  log: (entry: Record<string, string | number | boolean>) => void;
+}
+
+const STATUSES = ["new", "contacted", "in_progress", "booked", "unsuccessful"] as const;
+const ID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+const DETAIL = new RegExp(`^/api/operator/enquiries/(${ID})$`, "i");
+);
 const MAX_BODY = 1024;
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 100;
@@ -62,17 +117,32 @@ export async function handleOperatorApi(
     const asked = Number(url.searchParams.get("limit") ?? DEFAULT_LIMIT);
     const limit = Number.isInteger(asked) && asked > 0 ? Math.min(asked, MAX_LIMIT) : DEFAULT_LIMIT;
     const before = url.searchParams.get("before");
-    // Uses idx_enquiries_created_at; keyset (not OFFSET) paging stays O(limit).
+    const beforeId = url.searchParams.get("beforeId");
+    if (
+      (before === null) !== (beforeId === null) ||
+      (before !== null &&
+        (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(before) ||
+          !Number.isFinite(Date.parse(before)) ||
+          new Date(before).toISOString() !== before)) ||
+      (beforeId !== null && !CURSOR_ID.test(beforeId))
+    ) {
+      return json(400, { error: "invalid_cursor" });
+    }
+    // Stable keyset paging: IDs break timestamp ties; one extra row determines whether more exist.
     const { results } = await db
       .prepare(
         "SELECT id, created_at, status, payload_json FROM enquiries " +
-          "WHERE (?1 IS NULL OR status = ?1) AND (?2 IS NULL OR created_at < ?2) " +
-          "ORDER BY created_at DESC LIMIT ?3",
+          "WHERE (?1 IS NULL OR status = ?1) AND (?2 IS NULL OR (created_at, id) < (?2, ?3)) " +
+          "ORDER BY created_at DESC, id DESC LIMIT ?4",
       )
-      .bind(status, before, limit)
+      .bind(status, before, beforeId, limit + 1)
       .all<{ id: string; created_at: string; status: string; payload_json: string }>();
+    const page = results.slice(0, limit);
+    const last = page.at(-1);
     return json(200, {
-      enquiries: results.map((r) => {
+      nextCursor:
+        results.length > limit && last ? { createdAt: last.created_at, id: last.id } : null,
+      enquiries: page.map((r) => {
         const p = parsePayload(r.payload_json);
         return {
           id: r.id,
