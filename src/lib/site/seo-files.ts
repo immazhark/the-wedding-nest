@@ -4,10 +4,30 @@
  * disagree. Default (unset) = preview = noindex everywhere.
  */
 
-export function robotsTxt(indexable: boolean, siteUrl: string): string {
-  return indexable
-    ? `User-agent: *\nAllow: /\nSitemap: ${new URL("/sitemap.xml", siteUrl).toString()}\n`
-    : "# Preview: indexing disabled until the owner approves production launch.\nUser-agent: *\nDisallow: /\n";
+/**
+ * Crawlers whose documented purpose is training generative models (not search, and not fetching a page
+ * because a person asked an assistant to). Search crawlers (Googlebot, Bingbot, OAI-SearchBot,
+ * Claude-SearchBot, PerplexityBot) and user-request fetchers (ChatGPT-User, Claude-User) are never
+ * listed here, so they follow the `*` group. Names verified against each operator's documentation on
+ * 25 Nov 2026; see docs/search-visibility-plan.md.
+ */
+export const AI_TRAINING_CRAWLERS = ["GPTBot", "ClaudeBot", "Google-Extended", "CCBot"] as const;
+
+export type AiTrainingPolicy = "allow" | "disallow";
+
+export function robotsTxt(
+  indexable: boolean,
+  siteUrl: string,
+  aiTraining: AiTrainingPolicy = "allow",
+): string {
+  if (!indexable) {
+    return "# Preview: indexing disabled until the owner approves production launch.\nUser-agent: *\nDisallow: /\n";
+  }
+  const training =
+    aiTraining === "disallow"
+      ? AI_TRAINING_CRAWLERS.map((bot) => `User-agent: ${bot}\nDisallow: /\n`).join("\n") + "\n"
+      : "";
+  return `${training}User-agent: *\nAllow: /\nSitemap: ${new URL("/sitemap.xml", siteUrl).toString()}\n`;
 }
 
 /** Only generated into an explicitly indexable build. No unpublished routes or 404 pages. */
