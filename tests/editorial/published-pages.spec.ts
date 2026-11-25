@@ -25,6 +25,16 @@ test("approved service template renders a useful, accessible and linked page", a
   );
 });
 
+test("service page (gallery included) loads with no console errors or CSP violations", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(SERVICE, { waitUntil: "networkidle" });
+  expect(errors).toEqual([]);
+});
+
 test("service gallery opens a keyboard-operable lightbox with described photographs", async ({
   page,
 }) => {

@@ -221,3 +221,8 @@ Reproduced from the owner's laptop screenshots (about 1900x870 Chrome) and Playw
 - The nine converted JPEGs (M365-M373, `Packing/`) are in: tulle-wrapped baskets, suitcases, satin pouches and henna cones. `tranche-seven.json` (T0059-T0065) feeds the trousseau and Mehndi galleries (pages still awaiting approval) and the home Gifting door photograph. Two HEIC originals (`1000002088.heic`, `Floral/IMG_1540.HEIC`) still have no JPEG.
 - Home service doors wake a short silent film on pointer hover or keyboard focus (desktop, fine pointer, no reduced motion, no Save-Data; nothing downloads before that): Catering, Décor, Photo & film, Cars. Four e2e tests (`living-doors.spec.ts`).
 - Cars loop uses M029 (decorated hood, no plate visible); plate blur is still required before any car footage with a visible plate (M362).
+
+### 25 November 2026: CSP inline-style defect and test gap (fixed)
+
+- A full viewport sweep (13 sizes x 5 pages, including 320 px, short laptops and landscape phones) found one real defect: the film frame and gallery tiles set `aspect-ratio` through an inline `style` attribute, which the site's Content-Security-Policy blocks. On the live site the gallery tiles would have collapsed once service pages publish. Both now use the image's own width/height (gallery) and a CSS ratio (film).
+- Why it was missed: the real catering page was not in the site-wide axe/console/overflow/metadata tests, and the editorial fixture test only clicked the lightbox. The catering page is now in `PAGES`, and the fixture service page has a no-console-or-CSP-error test.
