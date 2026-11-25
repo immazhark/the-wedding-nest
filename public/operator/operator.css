@@ -82,3 +82,11 @@ dd {
   outline: 3px solid #1a73e8;
   outline-offset: 2px;
 }
+h2,
+li button > * {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+li button {
+  min-width: 0;
+}
