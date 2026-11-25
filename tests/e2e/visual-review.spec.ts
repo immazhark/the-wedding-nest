@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 // Evidence for creative review, not approval of photography, claims, or visual direction.
 // Screenshots live in ephemeral CI artifacts, never in the deployed site or source tree.
 test.describe("responsive design review", () => {
-  test.skip(({ isMobile }) => isMobile, "Fixed viewport matrix uses desktop Chromium");
+  test.skip(({ isMobile }) => isMobile, "Fixed viewport matrix uses desktop browser projects");
   test.skip(
     process.env["E2E_TARGET"] === "workerd",
     "Visual captures run once against the local built preview",
@@ -12,6 +12,7 @@ test.describe("responsive design review", () => {
   for (const [route, label] of [
     ["/", "home"],
     ["/plan-your-event/", "planner"],
+    ["/services/hyderabadi-wedding-catering/", "catering"],
   ] as const) {
     for (const width of [360, 768, 1024, 1440]) {
       test(`${label} at ${width}px remains navigable and captures review evidence`, async ({
