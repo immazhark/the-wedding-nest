@@ -7,6 +7,7 @@ import LoopFilm from "../../components/media/LoopFilm.astro";
 import { SITE, serviceJsonLd } from "../../lib/site/config";
 import { servicePhotos } from "../../lib/services/photos";
 import { parseMenuBody } from "../../lib/services/menu";
+import { cateringAnswers } from "../../lib/services/catering-answers";
 import { publishedServicePages, type ApprovedServicePage } from "../../lib/services/publication";
 
 // Zero pages are generated until individual factual records are owner-approved.
@@ -22,6 +23,7 @@ interface Props {
 const { page } = Astro.props;
 const plannerHref = `/plan-your-event/?service=${page.plannerService}`;
 const photos = servicePhotos(page.slug);
+const answers = cateringAnswers(page);
 
 // Menu cards (sections that parse as menus) come first, in order; everything else follows them.
 const parsed = page.sections.map((section) => ({ section, menu: parseMenuBody(section.body) }));
@@ -176,6 +178,24 @@ const cta =
               ))}
             </ul>
           </nav>
+        )}
+        {answers.length > 0 && (
+          <section
+            class="mt-12 max-w-5xl border-t border-stone/20 pt-8"
+            aria-labelledby="catering-answers-heading"
+          >
+            <h3 id="catering-answers-heading" class="eyebrow text-saffron">
+              Before you choose
+            </h3>
+            <dl class="mt-6 grid gap-8 md:grid-cols-2 md:gap-12">
+              {answers.map(({ question, answer }) => (
+                <div>
+                  <dt class="font-medium text-ivory">{question}</dt>
+                  <dd class="mt-3 max-w-prose text-stone">{answer}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
         )}
         <div class="svc-panels mt-14 md:mt-20">
           {menus.map(({ section, menu }, i) => (
