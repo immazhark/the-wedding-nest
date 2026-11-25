@@ -1,12 +1,28 @@
-# Project progress — reconciled 21 November 2026
+# Project progress — reconciled 25 November 2026
 
-## Retention and privacy follow-up — 24 November 2026 (not yet merged)
+## Current verified state (25 Nov 2026): read this first
+
+**Repository.** `main` includes #137 (hero fits short windows), #138 (catering recovery: split hero, paired menu photographs, kitchen film, dessert arch, footer band/arch fixes), #139 (service gallery template, 26 photographs and a trousseau film prepared), #140 (living service doors, converted photographs, ffmpeg video review), #141 (lighter hero scrim, supersedes #114) and #122 (testimonials framework, renders nothing until quotes are approved). Open: #142 (CSP inline-style fix and the test gap that hid it), #130 (staging documentation reconciliation, draft) and #64 (staging rate limiting, draft, held for Cloudflare entitlement/cost). CI `verify`, `editorial-fixtures` and Workers Builds pass on each merged PR. #123, #126, #120 and #114 are closed as superseded.
+
+**Site state.** Main preview https://the-wedding-nest.mazharkhan-it.workers.dev/ is noindex with enquiry intake off and no custom domain. Only one service page is published (catering, owner-attested `TWN-PUB-2026-C0001`). Décor, Mehndi, Trousseau and Hospitality gallery pages are built and tested but **unpublished**: they need the owner's approval of the copy in `docs/service-page-drafts.md` and an approval reference for each. Home service doors play short silent category films on hover or focus (desktop only).
+
+**Verification state.** Technically verified: unit (236), Playwright desktop and mobile, axe, console/CSP, overflow, and a 13-size x 5-page viewport sweep (320 to 1920, short laptops, landscape phones). Visually verified by screenshot: home, catering and the five planner stages at 390 and 1440. Not verified: real-time video playback and audio (all published clips are silent), slow-network behaviour, browser zoom beyond the 320 px width, cross-browser visuals on Firefox/WebKit.
+
+**Media.** `docs/media-inventory.md` is the source of truth: 373 files (9 converted JPEGs M365-M373), 53 distinct videos probed with ffmpeg. Two HEIC originals still have no JPEG (`1000002088.heic`, `Floral/IMG_1540.HEIC`). Cars need a licence-plate blur before plated footage or photographs go live.
+
+**Owner decisions outstanding.** (1) Approve or edit the four service pages' copy and issue approval references; (2) booked-client data retention; (3) testimonial quotes and permissions; (4) the production gates: domain attachment, public release, indexing, real intake, notification activation. Cleared on 25 Nov: faces, client names on invitations, plate blur, `twn.events` overlays ignored, no raw-meat imagery.
+
+**Next executable priorities.** Publish approved service pages; cars (plate blur) and photography/film pages; Makeup (needs genuine photography); service-page SEO/structured data from verified facts only; operator enquiry workflow and email receipt test (owner-gated); cross-browser visual pass.
+
+Older entries below are historical. Sections marked "(not yet merged)" were written before their branches merged (#124, #125 and later).
+
+## Retention and privacy follow-up — 24 November 2026 (historical; merged as #125)
 
 Branch `feat/unsuccessful-enquiry-retention-20261124` follows the release-readiness candidate. Adds migration 0003 (not applied), explicit unsuccessful disposition/90-day clock, aggregate preview and bounded guarded deletion primitives. Active/booked/unknown-clock records are protected; pending deliveries are counted and held for review. No deletion job, API route, sender or migration execution is enabled. Adds an honest pre-launch privacy notice, linked from footer and planner; this is not a final operational/legal approval.
 
 Focused real-SQLite retention tests pass (14 tests in worker-sqlite suite). Full branch unit/component suite: 194 passed; Astro check: zero errors, warnings or hints; formatting passes. GitHub build/browser/runtime CI remains required. No customer database was read or modified.
 
-## Execution update — 24 November 2026 (not yet merged)
+## Execution update — 24 November 2026 (historical; merged as #124)
 
 Branch: `feat/prelaunch-release-readiness-20261124`, based on `e2f76d8a77a3fd8bdee31fced2bb00cbdce89fb5`. Scope: default-off public-display flag with test warning precedence, official-logo OG/Twitter sharing image, and a build-time indexing guard requiring explicit public release plus disabled default workers.dev/version previews. Current Wrangler flags and Cloudflare settings are unchanged. Main remains noindex with intake disabled.
 
@@ -142,7 +158,7 @@ Initial tooling restrictions and scaffold-only handover reports are historical. 
 - Hero checked in Firefox and WebKit at 390 and 1440: no horizontal overflow, copy clears the arch, layout matches Chromium.
 - Planner at 390: every field has a label; all planner buttons are 44px or taller. Remaining small targets are inline header and footer text links, which meet WCAG 2.5.8 through spacing.
 - Still awaiting owner: #114 scrim approval, catering hero and arch-loop imagery, makeup door photo, banner wording, repo visibility, and all production gates.
-- **#114 evidence (21 Nov):** compared the #114 preview with the main preview at 1440 and 390. Floral stage, sofas and stage floor are clearly visible on #114; headline, lede and CTA stay legible on both. Branch changes only `src/styles/global.css`, mergeable and clean against current `main`. Awaiting owner approval; not merged.
+- **#114 evidence (21 Nov):** compared the #114 preview with the main preview at 1440 and 390. Floral stage, sofas and stage floor are clearly visible on #114; headline, lede and CTA stay legible on both. Branch changes only `src/styles/global.css`, mergeable and clean against current `main`. Superseded and merged on 25 Nov (rebased replacement of #114).
 
 ### 22 November 2026
 
