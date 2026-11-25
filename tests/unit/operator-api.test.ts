@@ -220,7 +220,8 @@ describe("operator API", () => {
     });
     expect(sql.prepare("SELECT COUNT(*) AS c FROM operator_audit").get()).toEqual({ c: 0 });
     expect(
-      (await call("POST", path, body, { "content-type": "application/json; charset=UTF-8" })).status,
+      (await call("POST", path, body, { "content-type": "application/json; charset=UTF-8" }))
+        .status,
     ).toBe(200);
   });
 
