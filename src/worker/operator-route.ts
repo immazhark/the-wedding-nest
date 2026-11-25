@@ -1,6 +1,7 @@
 /** Routes /operator (UI) and /api/operator/* behind operator authentication. */
 import { handleOperatorApi, type OperatorD1 } from "./operator-api";
 import type { FetcherLike } from "./types";
+import { readDeliveryOverview } from "./operator-delivery";
 
 export interface OperatorRouteEnv {
   ASSETS: FetcherLike;
@@ -39,6 +40,21 @@ export async function routeOperator(
 
   if (isApi(pathname)) {
     if (!env.DB) return Response.json({ error: "not_configured" }, { status: 503, headers: BASE });
+    if (pathname === "/api/operator/delivery-overview") {
+      if (request.method !== "GET") {
+        return Response.json(
+          { error: "method_not_allowed" },
+          { status: 405, headers: { ...BASE, allow: "GET" } },
+        );
+      }
+      try {
+        const overview = await readDeliveryOverview(env.DB as OperatorD1, deps.now());
+        return Response.json(overview, { headers: BASE });
+      } catch {
+        deps.log({ event: "operator", action: "delivery_overview", outcome: "unavailable" });
+        return Response.json({ error: "storage_unavailable" }, { status: 503, headers: BASE });
+      }
+    }
     return handleOperatorApi(request, {
       db: env.DB as OperatorD1,
       operator,
