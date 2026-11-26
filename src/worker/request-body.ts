@@ -2,8 +2,11 @@
 export const BODY_READ_TIMEOUT_MS = 10_000;
 export class BodyReadTimeout extends Error {}
 
-/** Enforce a total time and byte limit while consuming untrusted request streams. */
-export async function readBody(request: Request, maxBytes: number): Promise<string | null> {
+/** Enforce a total time and byte limit while consuming untrusted body streams. */
+export async function readBody(
+  request: Request | Response,
+  maxBytes: number,
+): Promise<string | null> {
   if (!request.body) return "";
   const reader = request.body.getReader();
 
