@@ -197,3 +197,37 @@ $("back").addEventListener("click", () => {
 $("filter").addEventListener("change", () => load(true));
 $("more").addEventListener("click", () => load(false));
 load(true);
+
+const DELIVERY_KEYS = ["accepted", "held", "unconfirmed", "leased", "retry", "ready"];
+let deliveryLoading = false;
+
+async function loadDeliveryOverview() {
+  if (deliveryLoading) return;
+  deliveryLoading = true;
+  const refresh = $("delivery-refresh");
+  refresh.disabled = true;
+  $("delivery-message").textContent = "Loading delivery overview…";
+  for (const key of DELIVERY_KEYS) $(`delivery-${key}`).textContent = "—";
+  try {
+    const data = await api("/api/operator/delivery-overview");
+    const counts = DELIVERY_KEYS.map((key) => data[key]);
+    if (
+      ![data.total, ...counts].every((count) => Number.isSafeInteger(count) && count >= 0) ||
+      counts.reduce((sum, count) => sum + count, 0) !== data.total
+    ) {
+      throw new Error("Invalid delivery overview");
+    }
+    for (const key of DELIVERY_KEYS) $(`delivery-${key}`).textContent = String(data[key]);
+    $("delivery-message").textContent = `${data.total} events in the current overview.`;
+  } catch {
+    $("delivery-message").textContent = "Delivery overview unavailable. Refresh to try again.";
+  } finally {
+    deliveryLoading = false;
+    refresh.disabled = false;
+  }
+}
+
+$("delivery").addEventListener("toggle", () => {
+  if ($("delivery").open) loadDeliveryOverview();
+});
+$("delivery-refresh").addEventListener("click", loadDeliveryOverview);

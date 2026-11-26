@@ -21,6 +21,40 @@
           <option value="unsuccessful">Unsuccessful</option>
         </select>
       </label>
+      <details id="delivery">
+        <summary>Notification delivery</summary>
+        <p class="delivery-note">
+          Read-only queue overview. Provider acceptance does not confirm inbox receipt.
+        </p>
+        <dl id="delivery-counts">
+          <div>
+            <dt>Provider accepted</dt>
+            <dd id="delivery-accepted">—</dd>
+          </div>
+          <div>
+            <dt>Held for review</dt>
+            <dd id="delivery-held">—</dd>
+          </div>
+          <div>
+            <dt>Unconfirmed acceptance</dt>
+            <dd id="delivery-unconfirmed">—</dd>
+          </div>
+          <div>
+            <dt>Currently processing</dt>
+            <dd id="delivery-leased">—</dd>
+          </div>
+          <div>
+            <dt>Retry scheduled</dt>
+            <dd id="delivery-retry">—</dd>
+          </div>
+          <div>
+            <dt>Ready for processing</dt>
+            <dd id="delivery-ready">—</dd>
+          </div>
+        </dl>
+        <p id="delivery-message" aria-live="polite"></p>
+        <button id="delivery-refresh" type="button">Refresh delivery overview</button>
+      </details>
     </header>
     <main>
       <p id="message" role="status" aria-live="polite"></p>

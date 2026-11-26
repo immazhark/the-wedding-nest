@@ -278,3 +278,45 @@ test("operator distinguishes an unavailable audit trail from an empty one", asyn
   await expect(page.locator("#fields")).toContainText("No recorded status changes.");
   await expect(page.getByRole("button", { name: "Mark contacted" })).toBeEnabled();
 });
+
+test("delivery overview loads on demand and never presents failed reads as zeros", async ({
+  page,
+}) => {
+  test.skip(workerd, "static page is gated by the Worker");
+  let calls = 0;
+  let fail = false;
+  await page.route("**/api/operator/enquiries?**", (route) =>
+    route.fulfill({ json: { enquiries: [], nextCursor: null } }),
+  );
+  await page.route("**/api/operator/delivery-overview", (route) => {
+    calls++;
+    return fail
+      ? route.fulfill({ status: 503, json: { error: "storage_unavailable" } })
+      : route.fulfill({
+          json: {
+            total: 7,
+            accepted: 1,
+            unconfirmed: 1,
+            held: 2,
+            leased: 1,
+            retry: 1,
+            ready: 1,
+          },
+        });
+  });
+  await page.goto("/operator/");
+  await expect(page.getByRole("status")).toHaveText("No enquiries.");
+  expect(calls).toBe(0);
+  await page.getByText("Notification delivery", { exact: true }).click();
+  await expect(page.locator("#delivery-message")).toHaveText("7 events in the current overview.");
+  await expect(page.locator("#delivery-held")).toHaveText("2");
+  await expect(page.locator("#delivery-accepted")).toHaveText("1");
+  expect(calls).toBe(1);
+
+  fail = true;
+  await page.getByRole("button", { name: "Refresh delivery overview" }).click();
+  await expect(page.locator("#delivery-message")).toContainText("Delivery overview unavailable");
+  await expect(page.locator("#delivery-held")).toHaveText("—");
+  await expect(page.locator("#delivery-accepted")).toHaveText("—");
+  expect(calls).toBe(2);
+});

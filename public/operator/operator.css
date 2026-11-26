@@ -90,3 +90,36 @@ li button > * {
 li button {
   min-width: 0;
 }
+
+#delivery {
+  flex-basis: 100%;
+  min-width: 0;
+  border: 1px solid #8886;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+}
+#delivery summary {
+  display: list-item;
+  cursor: pointer;
+  min-height: 44px;
+  line-height: 44px;
+  font-weight: 650;
+}
+.delivery-note,
+#delivery-message {
+  font-size: 0.9rem;
+}
+#delivery-counts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+#delivery-counts > div {
+  border: 1px solid #8886;
+  border-radius: 0.5rem;
+  padding: 0.65rem;
+}
+#delivery-counts dd {
+  font-size: 1.5rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
