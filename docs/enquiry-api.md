@@ -25,7 +25,7 @@ Request: `POST /api/enquiry`, `Content-Type: application/json`, `Origin` on the 
 | 429    | `rate_limited` (+ `Retry-After`)                        | Only if a rate-limit binding is configured.                                   |
 | 503    | `enquiries_disabled` / `not_configured` / `*_unavailable` | Off, misconfigured, or Turnstile/D1 unreachable — safe to retry.              |
 
-Every response: `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`. Logs contain only event, outcome, status and enquiry id: never names, numbers, IPs or payloads.
+Every response: `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`. Enquiry application logs contain only event, outcome and status: never enquiry IDs, names, numbers, IPs or payloads. Provider request metadata is separate; see [operator-workflow.md](operator-workflow.md#audit-and-log-privacy-lifecycle) for the audit/log privacy boundary.
 
 ## Data
 
@@ -34,7 +34,7 @@ Every response: `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`. Lo
 ## Privacy deletion building block (not enabled)
 
 `src/worker/privacy.ts` contains a strictly parameterised,
-single-enquiry deletion helper. The migration's foreign-key cascade removes
+single-enquiry deletion helper (for a separately authorised privacy request, not the age-based retention policy). The migration's foreign-key cascade removes
 its associated outbox event as well, so a deleted lead cannot trigger a
 future notification. A real-SQLite regression verifies that other leads,
 their associated outbox events, and malformed IDs are protected.
@@ -48,9 +48,7 @@ UTC timestamp: total candidates, non-new status candidates, and candidates
 with pending outbox notifications. It does not select personal details or
 mutate any record, and a cutoff **must not** be interpreted as a business-approved
 deletion policy. It is intentionally internal with no route, cron, batch delete
-or public reporting surface. Its SQLite regression verifies no rows change. Before using it on real customer data, the
-business must approve a retention period, privacy contact, identity and
-authority verification, audit procedure, and authenticated operator access.
+or public reporting surface. Its SQLite regression verifies no rows change. The approved unsuccessful clock and privacy contact do not make this generic created-at preview a deletion policy. Before any real-data use, establish applicable authority, identity verification and approved audit/retention procedures; authenticated operator routes exist separately.
 No customer records are deleted merely by deploying this code.
 
 ## Staging (isolated, test data only)
@@ -100,7 +98,7 @@ Use Cloudflare's Turnstile **test** keys in staging. Never point staging at prod
 
 ## Before enabling in production (owner-gated)
 
-Privacy notice and retention period agreed; production D1 + Turnstile widget/secret created; lead inbox owner and notification channel chosen (outbox consumer, separate PR); planner wired to the API with Turnstile; end-to-end test on staging.
+The privacy contact, notification recipient/channel and unsuccessful eligibility clock are already recorded; the planner/API and dormant outbox consumer are implemented. Remaining gates include approved live privacy/operating procedures, booked-client and pending-delivery decisions, production D1 and real Turnstile configuration, authenticated staging transaction acceptance, separately authorised Worker delivery/receipt acceptance and explicit real-intake activation. Do not repeat account setup or infer activation from implemented code.
 
 ## Tests
 
@@ -108,7 +106,7 @@ Privacy notice and retention period agreed; production D1 + Turnstile widget/sec
 - `tests/unit/worker-sqlite.test.ts`: the real SQL against the real migration on SQLite.
 - `npm run test:runtime`: the full browser suite on the local Workers runtime, including "API is off in production config".
 
-## Unsuccessful-enquiry retention — dormant, not activated
+## Unsuccessful-enquiry retention — cleanup dormant, disposition routed
 
 Owner decision (24 Nov 2026): unsuccessful enquiries become retention candidates 90 days after they are explicitly marked unsuccessful, not 90 days after intake. The approved privacy contact is theweddingnest.events@gmail.com. Booked-client retention remains separate.
 
@@ -116,4 +114,4 @@ Owner decision (24 Nov 2026): unsuccessful enquiries become retention candidates
 
 Pending deliveries are reported separately and held instead of silently discarded. That hold can extend storage beyond the selected 90-day eligibility point; its resolution/escalation must be approved before promising a hard deletion deadline in a live notice. The pre-launch `/privacy/` page states this work is not operational.
 
-No route, cron, operator credentials, automatic migration application or live data operation is added. Before any live use: approve the authenticated operator/closure workflow, settle booked-client and pending-delivery handling, review the migration in isolated staging, verify rollback/backups and run fictional-data tests. Never infer unsuccessful status from age alone.
+The authenticated operator status route can explicitly mark an active enquiry unsuccessful and start its clock. Migration 0003 is recorded as already applied to isolated staging; it is not auto-applied by a request. **No cleanup route or cron is installed:** eligibility is not scheduled or guaranteed deletion. Before production use, settle booked-client and pending-delivery handling, verify the authenticated closure workflow, backups and fictional-data acceptance. Retention deletion cascades outbox snapshots but leaves independent `operator_audit` history; its separate privacy policy is documented in [privacy-retention.md](privacy-retention.md). Never infer unsuccessful status from age alone.

@@ -1,4 +1,5 @@
--- Operator action trail. Holds the operator's login email and enquiry id only: no customer data.
+-- Restricted operator action trail: login email and enquiry id are linkable personal identifiers.
+-- No customer payload is copied here. Retention policy: docs/privacy-retention.md.
 -- enquiry_id deliberately has no foreign key so the trail survives retention deletion.
 CREATE TABLE IF NOT EXISTS operator_audit (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,

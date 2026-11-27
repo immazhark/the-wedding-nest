@@ -4,10 +4,11 @@ import { editorialFixtureEnv, missingFixtureTargets } from "./editorial-fixture-
 
 const hospitality = "src/content/services/guest-hospitality-hyderabad.json";
 const decor = "src/content/services/nikah-decoration-hyderabad.json";
+const photography = "src/content/services/wedding-photography-videography.json";
 const story = "src/content/stories/ci-test-only-walima.json";
 const media = "src/content/media/ci-test-only-walima.json";
 const photo = "src/assets/events/walima/ci-test-only-walima/01-geometry.png";
-const paths = [hospitality, decor, story, media, photo];
+const paths = [hospitality, decor, photography, story, media, photo];
 
 test("all missing fixtures are generated on a clean checkout", () => {
   assert.deepEqual(
@@ -19,11 +20,11 @@ test("all missing fixtures are generated on a clean checkout", () => {
 test("existing service records are excluded from fixture creation and cleanup", () => {
   const existing = new Set([hospitality]);
   const missing = missingFixtureTargets(paths, (path) => existing.has(path));
-  assert.deepEqual(missing, [decor, story, media, photo]);
+  assert.deepEqual(missing, [decor, photography, story, media, photo]);
 });
 
 test("multiple real service records coexist without synthetic replacements", () => {
-  const existing = new Set([hospitality, decor]);
+  const existing = new Set([hospitality, decor, photography]);
   const missing = missingFixtureTargets(paths, (path) => existing.has(path));
   assert.deepEqual(missing, [story, media, photo]);
 });

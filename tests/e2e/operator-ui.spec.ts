@@ -49,11 +49,20 @@ test("operator page renders hostile text inertly, updates status and survives a 
           status,
           unsuccessfulAt: null,
           marketingConsent: false,
+          consentAt: "2026-12-01T09:00:00.000Z",
           payload: {
             name: HOSTILE,
             phone: "+91 98765 43210",
             notes: HOSTILE,
-            occasions: ["nikah"],
+            occasions: ["nikah", "legacy-occasion"],
+            scope: "specific-services",
+            services: ["decor", "photo-film"],
+            styles: ["heritage", "legacy_style", HOSTILE, "constructor"],
+            budget: "5-15l",
+            contactChannel: "whatsapp",
+            date: { kind: "undecided" },
+            guestCount: "350",
+            location: "Fictional venue",
           },
         },
       },
@@ -74,6 +83,35 @@ test("operator page renders hostile text inertly, updates status and survives a 
   await expect(page.getByRole("heading", { level: 2 })).toHaveText(HOSTILE);
   expect(await page.evaluate(() => (window as { __pwned?: number }).__pwned)).toBeUndefined();
   await expect(page.locator("#fields img")).toHaveCount(0);
+
+  const value = (label: string) =>
+    page
+      .locator("#fields dt")
+      .filter({ hasText: new RegExp(`^${label}$`) })
+      .locator("+ dd");
+  await expect(value("Scope")).toHaveText("Specific services");
+  await expect(value("Services")).toHaveText("Décor, florals & staging, Photography & film");
+  await expect(value("Styles")).toHaveText(
+    `Hyderabadi heritage, legacy style, ${HOSTILE}, constructor`,
+  );
+  await expect(value("Budget")).toHaveText("₹5–15 lakh");
+  await expect(value("Occasions")).toHaveText("Nikah, legacy occasion");
+  await expect(value("Preferred contact")).toHaveText("WhatsApp");
+  await expect(value("Date")).toHaveText("Undecided");
+  await expect(value("Consent recorded")).not.toHaveText("Not recorded");
+  await expect(page.locator("#fields img")).toHaveCount(0);
+  await expect(page.getByRole("heading", { level: 2 })).toBeFocused();
+
+  let confirmation = "";
+  page.once("dialog", async (dialog) => {
+    confirmation = dialog.message();
+    await dialog.dismiss();
+  });
+  await page.getByRole("button", { name: "Mark unsuccessful" }).click();
+  expect(confirmation).toBe(
+    "Mark unsuccessful? Details become eligible for deletion after 90 days. Pending deliveries hold deletion. Automatic cleanup is not active.",
+  );
+  expect(posts).toEqual([]);
 
   conflictNext = true;
   await page.getByRole("button", { name: "Mark in progress" }).click();

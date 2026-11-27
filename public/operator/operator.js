@@ -12,6 +12,20 @@ const LABEL = {
   booked: "Booked",
   unsuccessful: "Unsuccessful",
 };
+const labels = globalThis.TWN_ENQUIRY_LABELS || {};
+// Own-property lookup avoids inherited object keys masquerading as legacy labels.
+const answer = (key, value) => {
+  const values = Array.isArray(value) ? value : [value];
+  return values
+    .filter((v) => typeof v === "string" && v)
+    .map((v) =>
+      Object.hasOwn(labels[key] || {}, v)
+        ? labels[key][v]
+        : /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/i.test(v)
+          ? v.replace(/[-_]+/g, " ")
+          : v,
+    );
+};
 const PAGE = 25;
 let cursor = null;
 let listRequest = 0;
@@ -61,7 +75,7 @@ async function load(reset) {
       badge.textContent = LABEL[e.status] || e.status;
       const meta = document.createElement("span");
       meta.className = "meta";
-      meta.textContent = `${when(e.createdAt)} · ${e.occasions.join(", ")}`;
+      meta.textContent = `${when(e.createdAt)} · ${answer("occasions", e.occasions).join(", ")}`;
       b.append(name, badge, meta);
       b.addEventListener("click", () => show(e.id));
       li.append(b);
@@ -116,14 +130,23 @@ async function show(id, note) {
     field(dl, "Status", LABEL[e.status] || e.status);
     field(dl, "Received", when(e.createdAt));
     field(dl, "Phone", p.phone);
-    field(dl, "Preferred contact", p.contactChannel);
-    field(dl, "Occasions", p.occasions);
-    field(dl, "Services", p.services);
-    field(dl, "Date", p.date);
+    field(dl, "Preferred contact", answer("contactChannel", p.contactChannel));
+    field(dl, "Occasions", answer("occasions", p.occasions));
+    field(dl, "Scope", answer("scope", p.scope));
+    field(dl, "Services", answer("services", p.services));
+    field(dl, "Styles", answer("styles", p.styles));
+    field(dl, "Budget", answer("budget", p.budget));
+    field(dl, "Date", p.date?.kind === "undecided" ? "Undecided" : p.date?.value);
     field(dl, "Guests", p.guestCount);
     field(dl, "Location", p.location);
     field(dl, "Notes", p.notes);
-    field(dl, "Marketing consent", e.marketingConsent ? "Yes" : "No");
+    field(dl, "Consent recorded", e.consentAt ? when(e.consentAt) : "Not recorded");
+    field(
+      dl,
+      "Marketing consent",
+      e.marketingConsent === true ? "Yes" : e.marketingConsent === false ? "No" : "Not recorded",
+    );
+    if (e.unsuccessfulAt) field(dl, "Marked unsuccessful", when(e.unsuccessfulAt));
     const historyAvailable = Array.isArray(history);
     field(
       dl,
@@ -159,7 +182,9 @@ function button(text, e, to, state, danger) {
     if (state.pending || state.request !== detailRequest) return;
     if (
       to === "unsuccessful" &&
-      !confirm("Mark unsuccessful? Its details will be deleted 90 days from now.")
+      !confirm(
+        "Mark unsuccessful? Details become eligible for deletion after 90 days. Pending deliveries hold deletion. Automatic cleanup is not active.",
+      )
     )
       return;
     state.pending = true;

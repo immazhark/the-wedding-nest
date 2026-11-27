@@ -132,8 +132,11 @@ describe("operator API", () => {
   });
   it("returns full detail for one valid id and 404 for unknown/malformed", async () => {
     const r = await call("GET", `/api/operator/enquiries/${ID_A}`);
-    const d = (await r.json()) as { enquiry: { id: string; payload: { phone: string } } };
+    const d = (await r.json()) as {
+      enquiry: { id: string; consentAt: string; payload: { phone: string } };
+    };
     expect(d.enquiry.id).toBe(ID_A);
+    expect(d.enquiry.consentAt).toBe("2026-11-30T09:00:00.000Z");
     expect(d.enquiry.payload.phone).toBe("+91 98765 43210");
     expect(
       (await call("GET", "/api/operator/enquiries/cccccccc-cccc-4ccc-8ccc-cccccccccccc")).status,
@@ -258,11 +261,13 @@ describe("operator API", () => {
     expect(sql.prepare("SELECT COUNT(*) AS c FROM operator_audit").get()).toEqual({ c: 0 });
   });
 
-  it("logs actions without customer data", async () => {
+  it("logs status outcomes without linkable enquiry or operator identifiers", async () => {
     await call("POST", `/api/operator/enquiries/${ID_A}/status`, { from: "new", to: "contacted" });
     const text = JSON.stringify(logs);
     expect(text).toContain("contacted");
     expect(text).not.toMatch(/Person|98765|owner@/);
+    expect(text).not.toContain(ID_A);
+    expect(logs).toEqual([{ event: "operator", action: "status", to: "contacted", outcome: "ok" }]);
   });
 
   it("records who changed what in an audit trail and shows it on the detail view", async () => {

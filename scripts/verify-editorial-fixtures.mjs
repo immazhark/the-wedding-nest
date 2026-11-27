@@ -32,6 +32,7 @@ const additionalServices = [
   "nikah-decoration-hyderabad",
   "mehndi-artist-hyderabad",
   "trousseau-packing-hyderabad",
+  "wedding-photography-videography",
 ];
 paths.push(...additionalServices.map((slug) => `src/content/services/${slug}.json`));
 const output = resolve(root, "dist-editorial-fixtures");
