@@ -54,6 +54,16 @@
         </dl>
         <p id="delivery-message" aria-live="polite"></p>
         <button id="delivery-refresh" type="button">Refresh delivery overview</button>
+        <details id="held-events">
+          <summary>Held notifications</summary>
+          <p class="delivery-note">
+            Oldest first. Review metadata only. Holds cannot be released here; no message is sent.
+          </p>
+          <button id="held-refresh" type="button">Refresh held notifications</button>
+          <p id="held-message" aria-live="polite"></p>
+          <ol id="held-list" aria-label="Held notifications"></ol>
+          <button id="held-more" type="button" hidden>Load more held notifications</button>
+        </details>
       </details>
     </header>
     <main>

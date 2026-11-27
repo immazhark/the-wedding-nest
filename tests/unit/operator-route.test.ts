@@ -28,6 +28,7 @@ describe("routeOperator", () => {
       "/operator/labels.js",
       "/api/operator/enquiries",
       "/api/operator/delivery-overview",
+      "/api/operator/delivery-held",
     ]) {
       const r = await routeOperator(get(p), env, deps(null));
       expect(r?.status, p).toBe(404);
@@ -59,5 +60,88 @@ describe("routeOperator", () => {
   it("returns 503 for an authenticated API call when no database is bound", async () => {
     const r = await routeOperator(get("/api/operator/enquiries"), env, deps("owner@example.com"));
     expect(r?.status).toBe(503);
+  });
+});
+
+describe("held delivery route", () => {
+  const configured = {
+    ...env,
+    DB: {
+      prepare: () => {
+        throw new Error("private storage detail");
+      },
+    },
+  };
+  it("rejects writes without touching storage", async () => {
+    const response = await routeOperator(
+      new Request("https://twn.test/api/operator/delivery-held", { method: "POST" }),
+      configured,
+      deps("owner@example.com"),
+    );
+    expect(response?.status).toBe(405);
+    expect(response?.headers.get("allow")).toBe("GET");
+    expect(response?.headers.get("cache-control")).toBe("no-store");
+  });
+  it("returns safe invalid-query errors before storage access", async () => {
+    for (const [query, error] of [
+      ["after=2026-12-01T10:00:00.000Z", "invalid_cursor"],
+      ["limit=bad", "invalid_limit"],
+    ]) {
+      const response = await routeOperator(
+        get("/api/operator/delivery-held?" + query),
+        configured,
+        deps("owner@example.com"),
+      );
+      expect(response?.status).toBe(400);
+      expect(await response?.json()).toEqual({ error });
+    }
+  });
+  it("fails storage safely and logs no linked event identifier", async () => {
+    const logs: unknown[] = [];
+    const response = await routeOperator(get("/api/operator/delivery-held"), configured, {
+      ...deps("owner@example.com"),
+      log: (entry) => logs.push(entry),
+    });
+    expect(response?.status).toBe(503);
+    expect(await response?.json()).toEqual({ error: "storage_unavailable" });
+    expect(logs).toEqual([{ event: "operator", action: "delivery_held", outcome: "unavailable" }]);
+  });
+  it("returns metadata with no-store and noindex under authenticated GET", async () => {
+    const db = {
+      prepare: () => ({
+        bind: () => ({
+          all: async () => ({
+            results: [
+              {
+                id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                created_at: "2026-12-01T09:00:00.000Z",
+                attempts: 8,
+                held_reason: "provider",
+              },
+            ],
+          }),
+        }),
+      }),
+    };
+    const response = await routeOperator(
+      get("/api/operator/delivery-held"),
+      { ...env, DB: db },
+      deps("owner@example.com"),
+    );
+    expect(response?.status).toBe(200);
+    expect(response?.headers.get("cache-control")).toBe("no-store");
+    expect(response?.headers.get("x-robots-tag")).toContain("noindex");
+    expect(await response?.json()).toEqual({
+      events: [
+        {
+          id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+          createdAt: "2026-12-01T09:00:00.000Z",
+          attempts: 8,
+          reason: "provider",
+          window: "within_window",
+        },
+      ],
+      nextCursor: null,
+    });
   });
 });
