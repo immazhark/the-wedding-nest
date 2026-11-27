@@ -1,7 +1,12 @@
 /** Routes /operator (UI) and /api/operator/* behind operator authentication. */
 import { handleOperatorApi, type OperatorD1 } from "./operator-api";
 import type { FetcherLike } from "./types";
-import { readDeliveryOverview } from "./operator-delivery";
+import {
+  readDeliveryOverview,
+  readHeldDeliveries,
+  InvalidHeldDeliveryQuery,
+  type DeliveryD1,
+} from "./operator-delivery";
 
 export interface OperatorRouteEnv {
   ASSETS: FetcherLike;
@@ -52,6 +57,29 @@ export async function routeOperator(
         return Response.json(overview, { headers: BASE });
       } catch {
         deps.log({ event: "operator", action: "delivery_overview", outcome: "unavailable" });
+        return Response.json({ error: "storage_unavailable" }, { status: 503, headers: BASE });
+      }
+    }
+    if (pathname === "/api/operator/delivery-held") {
+      if (request.method !== "GET") {
+        return Response.json(
+          { error: "method_not_allowed" },
+          { status: 405, headers: { ...BASE, allow: "GET" } },
+        );
+      }
+      const query = new URL(request.url).searchParams;
+      try {
+        const held = await readHeldDeliveries(env.DB as DeliveryD1, deps.now(), {
+          limit: query.get("limit"),
+          after: query.get("after"),
+          afterId: query.get("afterId"),
+        });
+        return Response.json(held, { headers: BASE });
+      } catch (error) {
+        if (error instanceof InvalidHeldDeliveryQuery) {
+          return Response.json({ error: error.message }, { status: 400, headers: BASE });
+        }
+        deps.log({ event: "operator", action: "delivery_held", outcome: "unavailable" });
         return Response.json({ error: "storage_unavailable" }, { status: 503, headers: BASE });
       }
     }

@@ -256,3 +256,109 @@ $("delivery").addEventListener("toggle", () => {
   if ($("delivery").open) loadDeliveryOverview();
 });
 $("delivery-refresh").addEventListener("click", loadDeliveryOverview);
+
+const HELD_REASONS = {
+  invalid_event: "Event data requires review",
+  provider: "Provider blocked delivery",
+  attempts_exhausted: "Attempt limit reached",
+  unknown: "Reason requires review",
+};
+const HELD_WINDOWS = {
+  within_window: "Within the age window; hold still applies",
+  expired: "Outside the automatic send window",
+  invalid_clock: "Event clock requires review",
+};
+const uuid = (value) =>
+  typeof value === "string" &&
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+const instant = (value) =>
+  typeof value === "string" &&
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value) &&
+  Number.isFinite(Date.parse(value)) &&
+  new Date(value).toISOString() === value;
+let heldCursor = null;
+let heldRequest = 0;
+let heldLoading = false;
+
+async function loadHeld(reset) {
+  if (!reset && (heldLoading || !heldCursor)) return;
+  const request = ++heldRequest;
+  heldLoading = true;
+  $("held-refresh").disabled = true;
+  $("held-more").disabled = true;
+  if (reset) {
+    heldCursor = null;
+    $("held-list").replaceChildren();
+    $("held-more").hidden = true;
+  }
+  $("held-message").textContent = "Loading held notifications…";
+  try {
+    const q = new URLSearchParams({ limit: "25" });
+    if (heldCursor) {
+      q.set("after", heldCursor.createdAt);
+      q.set("afterId", heldCursor.id);
+    }
+    const data = await api(`/api/operator/delivery-held?${q}`);
+    if (request !== heldRequest) return;
+    if (
+      !Array.isArray(data.events) ||
+      data.events.length > 100 ||
+      !data.events.every(
+        (e) =>
+          e &&
+          uuid(e.id) &&
+          instant(e.createdAt) &&
+          Number.isSafeInteger(e.attempts) &&
+          e.attempts >= 0 &&
+          Object.hasOwn(HELD_REASONS, e.reason) &&
+          Object.hasOwn(HELD_WINDOWS, e.window),
+      ) ||
+      (data.nextCursor !== null &&
+        (!data.nextCursor ||
+          !uuid(data.nextCursor.id) ||
+          !instant(data.nextCursor.createdAt) ||
+          data.events.at(-1)?.id !== data.nextCursor.id ||
+          data.events.at(-1)?.createdAt !== data.nextCursor.createdAt))
+    ) {
+      throw new Error("Invalid held metadata");
+    }
+    for (const event of data.events) {
+      const li = document.createElement("li");
+      const ref = document.createElement("code");
+      ref.textContent = `Event ${event.id}`;
+      const dl = document.createElement("dl");
+      field(dl, "Created", when(event.createdAt));
+      field(dl, "Attempts", event.attempts);
+      field(dl, "Hold", HELD_REASONS[event.reason]);
+      field(dl, "Age check", HELD_WINDOWS[event.window]);
+      li.append(ref, dl);
+      $("held-list").append(li);
+    }
+    heldCursor = data.nextCursor;
+    $("held-more").hidden = !heldCursor;
+    const shown = $("held-list").children.length;
+    $("held-message").textContent = shown
+      ? `${shown} held notifications shown.`
+      : "No held notifications.";
+  } catch {
+    if (request === heldRequest)
+      $("held-message").textContent = "Could not load held notifications. Refresh to try again.";
+  } finally {
+    if (request === heldRequest) {
+      heldLoading = false;
+      $("held-refresh").disabled = false;
+      $("held-more").disabled = false;
+    }
+  }
+}
+$("held-events").addEventListener("toggle", () => {
+  if ($("held-events").open) loadHeld(true);
+  else {
+    heldRequest++;
+    heldLoading = false;
+    $("held-refresh").disabled = false;
+    $("held-more").disabled = false;
+  }
+});
+$("held-refresh").addEventListener("click", () => loadHeld(true));
+$("held-more").addEventListener("click", () => loadHeld(false));

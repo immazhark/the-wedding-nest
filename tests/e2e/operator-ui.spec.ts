@@ -387,3 +387,136 @@ test("delivery overview loads on demand and never presents failed reads as zeros
   await expect(page.locator("#delivery-accepted")).toHaveText("—");
   expect(calls).toBe(2);
 });
+
+test("held notifications load on demand with safe metadata, paging and failure visibility", async ({
+  page,
+}, testInfo) => {
+  test.skip(workerd, "static page is gated by the Worker");
+  const at = "2026-12-01T09:00:00.000Z";
+  const other = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+  let calls = 0;
+  let fail = false;
+  const entry = (id: string, reason: string, window: string) => ({
+    id,
+    createdAt: at,
+    attempts: 8,
+    reason,
+    window,
+    notice_json: HOSTILE,
+    enquiryId: "private-enquiry-id",
+    accepted_provider_id: "private-provider-id",
+  });
+  await page.route("**/api/operator/enquiries?**", (route) =>
+    route.fulfill({ json: { enquiries: [], nextCursor: null } }),
+  );
+  await page.route("**/api/operator/delivery-overview", (route) =>
+    route.fulfill({
+      json: { total: 2, accepted: 0, held: 2, unconfirmed: 0, leased: 0, retry: 0, ready: 0 },
+    }),
+  );
+  await page.route("**/api/operator/delivery-held?**", async (route) => {
+    calls++;
+    if (fail) return route.fulfill({ status: 503, json: { error: "storage_unavailable" } });
+    const url = new URL(route.request().url());
+    return route.fulfill({
+      json: url.searchParams.has("after")
+        ? { events: [entry(other, "unknown", "invalid_clock")], nextCursor: null }
+        : { events: [entry(ID, "provider", "expired")], nextCursor: { createdAt: at, id: ID } },
+    });
+  });
+  await page.goto("/operator/");
+  expect(calls).toBe(0);
+  await page.getByText("Notification delivery", { exact: true }).click();
+  expect(calls).toBe(0);
+  await page.getByText("Held notifications", { exact: true }).click();
+  await expect(page.locator("#held-list")).toContainText(ID);
+  await expect(page.locator("#held-list")).toContainText("Provider blocked delivery");
+  await expect(page.locator("#held-list")).toContainText("Outside the automatic send window");
+  await expect(page.locator("#held-list")).not.toContainText("private-");
+  await expect(page.locator("#held-list img")).toHaveCount(0);
+  await page.getByRole("button", { name: "Load more held notifications" }).click();
+  await expect(page.locator("#held-list li")).toHaveCount(2);
+  await expect(page.locator("#held-list")).toContainText("Reason requires review");
+  await expect(page.locator("#held-list")).toContainText("Event clock requires review");
+  await expect(page.getByRole("button", { name: "Load more held notifications" })).toBeHidden();
+  await mkdir("playwright-report", { recursive: true });
+  await page.screenshot({
+    path: `playwright-report/operator-held-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    ),
+  ).toBeLessThanOrEqual(0);
+  fail = true;
+  await page.getByRole("button", { name: "Refresh held notifications" }).click();
+  await expect(page.locator("#held-message")).toContainText("Could not load held notifications");
+  await expect(page.locator("#held-message")).not.toContainText("No held notifications");
+  await expect(page.locator("#held-list li")).toHaveCount(0);
+});
+
+test("held notifications reject late views and duplicate pagination requests", async ({ page }) => {
+  test.skip(workerd, "static page is gated by the Worker");
+  const at = "2026-12-01T09:00:00.000Z";
+  const other = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+  await page.route("**/api/operator/enquiries?**", (route) =>
+    route.fulfill({ json: { enquiries: [], nextCursor: null } }),
+  );
+  await page.route("**/api/operator/delivery-overview", (route) =>
+    route.fulfill({
+      json: { total: 0, accepted: 0, held: 0, unconfirmed: 0, leased: 0, retry: 0, ready: 0 },
+    }),
+  );
+  await page.addInitScript(() => {
+    const original = window.fetch.bind(window);
+    const pending: { url: string; resolve: (r: Response) => void }[] = [];
+    Object.assign(window, { heldTestPending: pending });
+    window.fetch = (input, init) =>
+      String(input).startsWith("/api/operator/delivery-held?")
+        ? new Promise<Response>((resolve) => pending.push({ url: String(input), resolve }))
+        : original(input, init);
+  });
+  type Pending = { url: string; resolve: (r: Response) => void };
+  const count = () =>
+    page.evaluate(
+      () => (window as unknown as { heldTestPending: Pending[] }).heldTestPending.length,
+    );
+  const deliver = (index: number, body: unknown) =>
+    page.evaluate(
+      ({ index, body }) => {
+        (window as unknown as { heldTestPending: Pending[] }).heldTestPending[index]!.resolve(
+          Response.json(body),
+        );
+      },
+      { index, body },
+    );
+  const entry = (id: string) => ({
+    id,
+    createdAt: at,
+    attempts: 8,
+    reason: "attempts_exhausted",
+    window: "within_window",
+  });
+  await page.goto("/operator/");
+  await page.getByText("Notification delivery", { exact: true }).click();
+  const toggle = page.getByText("Held notifications", { exact: true });
+  await toggle.click();
+  await expect.poll(count).toBe(1);
+  await toggle.click();
+  await toggle.click();
+  await expect.poll(count).toBe(2);
+  await deliver(1, { events: [entry(other)], nextCursor: { createdAt: at, id: other } });
+  await expect(page.locator("#held-list")).toContainText(other);
+  await deliver(0, { events: [entry(ID)], nextCursor: null });
+  await expect(page.locator("#held-list")).not.toContainText(ID);
+  const more = page.getByRole("button", { name: "Load more held notifications" });
+  await more.click();
+  await expect.poll(count).toBe(3);
+  await expect(more).toBeDisabled();
+  await more.evaluate((button) => button.dispatchEvent(new Event("click")));
+  expect(await count()).toBe(3);
+  await deliver(2, { events: [], nextCursor: null });
+  await expect(more).toBeHidden();
+  await expect(page.locator("#held-list li")).toHaveCount(1);
+});

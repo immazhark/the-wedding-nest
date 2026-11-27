@@ -3,6 +3,7 @@
  * One attempt only; a future consumer owns leases, durable snapshots and retries.
  * Acceptance is not proof of inbox delivery. Never log payloads/provider bodies.
  */
+import { MAX_EMAIL_EVENT_AGE_MS } from "./notification-window.ts";
 import type { OperatorNotice } from "./notification-content";
 
 export interface EmailConfiguration {
@@ -27,8 +28,6 @@ export type EmailAttemptResult =
   | { status: "blocked"; reason: "configuration" | "event" | "provider" };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-// Resend retains keys for 24h. Stop at 23h from creation, even if never sent.
-const MAX_EVENT_AGE_MS = 23 * 60 * 60_000;
 
 /** Version the fixed sender/recipient and notice contract; never replay old snapshots under a new contract. */
 export const EMAIL_NOTICE_VERSION = 1;
@@ -58,7 +57,7 @@ export async function sendOperatorEmail(
     !UUID.test(event.notice.enquiryId) ||
     !Number.isFinite(age) ||
     age < 0 ||
-    age >= MAX_EVENT_AGE_MS ||
+    age >= MAX_EMAIL_EVENT_AGE_MS ||
     new Date(createdAt).toISOString() !== event.createdAt ||
     !/^The Wedding Nest \| New enquiry [A-F0-9]{8}$/.test(event.notice.subject) ||
     event.notice.subject !==
