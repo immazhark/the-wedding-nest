@@ -10,7 +10,12 @@ const workerd = process.env["E2E_TARGET"] === "workerd";
 // Real Worker runtime, no Access configuration: every operator surface must fail closed (404).
 test("operator surfaces are invisible when Access is not configured", async ({ request }) => {
   test.skip(!workerd, "needs the Workers runtime");
-  for (const path of ["/operator/", "/operator/operator.js", "/api/operator/enquiries"]) {
+  for (const path of [
+    "/operator/",
+    "/operator/operator.js",
+    "/operator/labels.js",
+    "/api/operator/enquiries",
+  ]) {
     const response = await request.get(path);
     expect(response.status(), path).toBe(404);
     expect(response.headers()["cache-control"]).toBe("no-store");

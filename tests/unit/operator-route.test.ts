@@ -25,6 +25,7 @@ describe("routeOperator", () => {
       "/operator",
       "/operator/",
       "/operator/operator.js",
+      "/operator/labels.js",
       "/api/operator/enquiries",
       "/api/operator/delivery-overview",
     ]) {
