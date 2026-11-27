@@ -1,7 +1,8 @@
 /**
  * Authenticated operator API. The caller (index.ts) must verify the operator first via
  * operator-auth.ts; this module never authenticates. Reads customer data, so every response is
- * no-store and nothing personal is logged. Status writes reuse the compare-and-set primitives.
+ * no-store. Application logs omit operator/enquiry identifiers; the restricted audit table retains
+ * linkable identifiers (see docs/privacy-retention.md). Status writes reuse compare-and-set primitives.
  */
 import { prepareAdvanceEnquiryStatus } from "./operator-status";
 import { prepareMarkEnquiryUnsuccessful } from "./privacy";
@@ -108,7 +109,7 @@ export async function handleOperatorApi(
       return json(405, { error: "method_not_allowed" }, { allow: "GET" });
     const row = await db
       .prepare(
-        "SELECT id, created_at, status, unsuccessful_at, marketing_consent, payload_json FROM enquiries WHERE id = ?1",
+        "SELECT id, created_at, status, unsuccessful_at, marketing_consent, consent_at, payload_json FROM enquiries WHERE id = ?1",
       )
       .bind(detail[1]!.toLowerCase())
       .first<{
@@ -117,6 +118,7 @@ export async function handleOperatorApi(
         status: string;
         unsuccessful_at: string | null;
         marketing_consent: number;
+        consent_at: string;
         payload_json: string;
       }>();
     if (!row) return json(404, { error: "not_found" });
@@ -146,6 +148,7 @@ export async function handleOperatorApi(
         status: row.status,
         unsuccessfulAt: row.unsuccessful_at,
         marketingConsent: row.marketing_consent === 1,
+        consentAt: row.consent_at,
         payload: parsePayload(row.payload_json),
       },
     });
@@ -213,7 +216,6 @@ export async function handleOperatorApi(
       action: "status",
       to: String(to),
       outcome: applied ? "ok" : "conflict",
-      enquiry: id,
     });
     return applied ? json(200, { ok: true }) : json(409, { error: "stale_or_missing" });
   }

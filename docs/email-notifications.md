@@ -1,6 +1,6 @@
 # Email notification preparation
 
-24 November 2026. This is a dormant transport, not an active delivery pipeline.
+Current source boundary (27 November 2026): the transport and durable consumer are implemented but remain dormant. Historical provider configuration evidence below must be rechecked before activation; it does not establish sends, receipt or deployed Worker delivery.
 
 ## Implemented boundary
 
@@ -27,9 +27,9 @@ Official references checked on 24 November 2026:
 The owner approved the four prepared email-authentication DNS records on 24 November. They were added DNS-only with Auto TTL, and Cloudflare read-back matched their content. All four records and the sending domain were subsequently provider-verified. Recheck provider status before any activation; DNS configuration alone does not enable this adapter.
 
 Before live delivery:
-1. Complete provider verification and approve the exact sender identity and operating handler/backup.
+1. Reverify the already-recorded domain/DNS verification; confirm the exact sender identity and operating handler/backup. Do not repeat completed DNS/account setup.
 2. Provision a domain-scoped sending-only key directly into the Worker secret store through a secure owner-controlled flow. No key has been created/exported here; do not paste credentials into chat or repository files.
-3. Reverify the already-applied isolated staging migrations (0002–0004) and review the dormant consumer's immutable snapshots, bounded retries and acknowledgement semantics. Add authenticated operator handling before activation. This adapter alone does not read or change outbox rows.
+3. Reverify the already-applied isolated staging migrations (0002–0004) and review the dormant consumer's immutable snapshots, bounded retries and acknowledgement semantics. The authenticated aggregate delivery overview is implemented; held-event resolution and operating authority remain prerequisites before activation. This adapter alone does not read or change outbox rows.
 4. Separately approve a fictional staging receipt test; confirm inbox receipt and failure handling before approving real delivery.
 5. Resolve pending-delivery retention holds and booked-client retention before live intake/cleanup. Preserve public launch, indexing and real-enquiry approval gates.
 
@@ -41,7 +41,7 @@ Configuration is checked before any claim or private-data read. The consumer ren
 
 Permanent failures, invalid/old snapshots and exhausted attempts are held by exhausting claim eligibility and recording a bounded reason. Provider acceptance and lease acknowledgement are recorded in one conditional database update. A failed ACK leaves the event unacknowledged: a later eligible retry reuses the identical provider key and payload within the age window. A transport-contract version change blocks old snapshots for review rather than silently sending a changed payload.
 
-There is still no Worker import, scheduler, HTTP trigger, secret or live consumer. The additive staging schema is applied, but no real send was performed. Staging delivery still needs secure credentials and receipt-test approval. Before live operation, provide an authenticated operator workflow for held/exhausted/expired events and distinguish provider acceptance from inbox receipt. Deleting a lead cannot recall an email already accepted or in flight; provider-side retention/access and this race need inclusion in the operating/privacy procedure. No inbox webhook or automated resend/replay endpoint is introduced here.
+There is still no deployed Worker consumer import, scheduler, HTTP send trigger or implemented Worker email credential binding. The additive staging schema is applied, but no real send was performed. Staging delivery still needs secure credentials and receipt-test approval. The authenticated delivery overview provides read-only aggregate visibility, not held-event resolution. Before live operation, complete an approved resolution workflow for held/exhausted/expired events and distinguish provider acceptance from inbox receipt. Deleting a lead cannot recall an email already accepted or in flight; provider-side retention/access and this race need inclusion in the operating/privacy procedure. No inbox webhook or automated resend/replay endpoint is introduced here.
 
 ## Manual fictional provider receipt workflow
 
@@ -73,4 +73,4 @@ This checks the email provider path only, not the deployed Worker or database.
 Please confirm inbox receipt to the project owner using the test reference.
 ```
 
-This workflow is prepared and mock-tested only. No real workflow send, secret provisioning, inbox confirmation or public activation has occurred. Hosted staging migrations 0002–0004 have been applied separately; this receipt probe itself has no database access. A later Worker integration test still needs its own isolated staging setup and explicit receipt authorisation.
+The repository records this workflow as prepared and mock-tested only. This documentation change does not inspect current environment-secret presence or establish a real send, inbox confirmation or public activation. Reconcile current protected workflow runs and owner receipt evidence before repeating any probe. Hosted staging migrations 0002–0004 have been applied separately; this receipt probe itself has no database access. A later Worker integration test still needs its own isolated staging setup and explicit receipt authorisation.

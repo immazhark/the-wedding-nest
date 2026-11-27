@@ -1,6 +1,6 @@
 # Deployment — Cloudflare Workers Static Assets
 
-**Status (16 Nov 2026):** Cloudflare MCP is connected. Main and branch previews work with intake disabled; the separate staging Worker accepts fictional test submissions only. Main includes #10–#12 (latest baseline `79f9e42`), with successful Cloudflare deployment and real desktop/mobile staging checks. Production domain, indexing and live enquiry gates remain unchanged.
+**Current deployment contract (27 Nov 2026):** Astro/TypeScript static assets and Worker enquiry/operator routes are implemented. Main and branch previews retain intake-off/noindex configuration; isolated staging has its own D1 and fictional intake. Prior provider read-backs record migrations 0002–0005 and staging Access bindings as installed. These records are historical evidence, not a fresh deployment verification; consult [progress.md](progress.md) and current build/version provenance before claiming a particular commit is deployed. Production domain attachment, public display, indexing, real intake and notification activation remain separate gates.
 
 ### Verifying the live preview
 
@@ -16,7 +16,9 @@ In a Claude Code Cloud session this needs that exact host allowed in the environ
 
 Cloudflare builds directly from GitHub, so no Cloudflare API token is stored in GitHub or shared with agents. Each pull request branch gets its own preview URL, posted on the PR.
 
-### One-time owner action (Cloudflare dashboard, about 5 minutes)
+### Historical setup reference — already established
+
+Workers Builds and the staging trigger already exist. Reverify their current settings rather than recreate them. The following procedure is for a genuinely new environment only.
 
 1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Import a repository**.
 2. Connect GitHub and grant access to **only** `immazhark/the-wedding-nest`.
@@ -55,3 +57,9 @@ After a staging deployment, run the synthetic HTTP script or the manually runnab
 - `astro.config.mjs` → `security.csp: true` generates a hash-based CSP `<meta>` for scripts and styles on each page. No inline `style=""` attributes are used (the CSP would block them).
 - `_headers` is generated at build time by `src/lib/site/seo-files.ts` (via the integration in `astro.config.mjs`): `frame-ancestors 'none'`, `nosniff`, referrer and permissions policies, COOP, immutable caching for hashed `/_astro/*` assets, plus `X-Robots-Tag` while not indexable.
 - HSTS stays off (see the decisions log) until the live site and redirects are verified.
+
+## Configuration boundaries
+
+Build-time public flags are documented in [../.env.example](../.env.example); they are embedded in generated assets and cannot carry secrets. Runtime intake/origin values and the staging `DB` resource binding live in `wrangler.jsonc`. `TURNSTILE_SECRET` belongs in the environment-specific Cloudflare Worker secret store. Staging `OPERATOR_ACCESS_TEAM_DOMAIN`, `OPERATOR_ACCESS_AUD` and `OPERATOR_EMAILS` were installed as encrypted Worker bindings and must stay out of source, especially the email allow-list. Default/preview configuration must not inherit staging credentials or D1.
+
+The manual provider probe uses the protected GitHub environment `twn-email-receipt` and secret `TWN_RESEND_STAGING_API_KEY`; that secret is not a Worker credential. The deployed Worker has no email-consumer import, send route or scheduler, and no Worker email binding name is implemented. See [email-notifications.md](email-notifications.md) before preparing any integration.

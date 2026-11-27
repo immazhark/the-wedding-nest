@@ -5,13 +5,13 @@ Premium wedding and event experiences in Hyderabad, India.
 **Status:** Astro 7 + TypeScript + Tailwind 4 editorial site and five-step planner on a Cloudflare Workers design preview. Public enquiries are **disabled** and search indexing is off. An isolated staging Worker accepts fictional test submissions with Turnstile and a separate D1 database. No custom production domain is attached. Current state: [docs/progress.md](docs/progress.md), [docs/deployment.md](docs/deployment.md).
 
 - Domain: https://theweddingnest.in (registered; production site not yet deployed)
-- Product owner workflow: Claude Code Cloud for implementation, GitHub for source control, ChatGPT/Codex for independent review.
-- Proposed stack (to validate during initial scaffold): Astro, TypeScript, Tailwind CSS, GSAP selectively, Cloudflare Workers Static Assets, D1 for enquiry leads.
+- Product owner workflow: authorised cloud implementation with GitHub as source of truth; see `docs/progress.md` for the current writer and verified state.
+- Implemented stack: Astro, TypeScript, Tailwind CSS, GSAP selectively, Cloudflare Workers Static Assets, D1 for enquiry leads.
 - Business facts, contact details, testimonials, event photos, service coverage and legal claims require approval before publication.
 
 ## For coding agents
 
-Read [CLAUDE.md](CLAUDE.md), [AGENTS.md](AGENTS.md), and [docs/engineering-tooling.md](docs/engineering-tooling.md) after the tooling PR lands. Avoid installing unreviewed tools, runtime hooks or services. Follow the minimal, cloud-first workflow.
+Read [CLAUDE.md](CLAUDE.md), [AGENTS.md](AGENTS.md), and [docs/engineering-tooling.md](docs/engineering-tooling.md) before changing source. Avoid installing unreviewed tools, runtime hooks or services. Follow the minimal, cloud-first workflow.
 
 ## Project commands (run by agents/CI — the owner never needs to)
 
@@ -41,8 +41,8 @@ In Claude Code Cloud, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chrom
 - `wrangler.jsonc` — Workers Static Assets + `/api/*` Worker; isolated `staging` env with its own D1
 - `src/worker/` — `POST /api/enquiry` (off in production; see docs/enquiry-api.md); `migrations/` — D1 schema
 - `src/lib/site/seo-files.ts` — generates `_headers` (security + noindex) and `robots.txt` at build time from `PUBLIC_ALLOW_INDEXING`
-- `src/lib/services/publication.ts` and `src/lib/stories/publication.ts` — fail-closed factual approval, consent-paired media and conditional homepage discovery; zero pages until individually approved
+- `src/lib/services/publication.ts` and `src/lib/stories/publication.ts` — fail-closed factual approval, consent-paired media and conditional homepage discovery; only individually approved records create public pages (catering is currently approved)
 
 ## Next milestone
 
-Review the current responsive preview, then add only original owner-approved event photographs, approved testimonials, verified contact/service coverage and a legally reviewed privacy contact. Lead notifications, retention policy and production Turnstile require explicit business decisions before enabling real enquiries. Production domain attachment and indexing remain separate owner approval gates.
+Complete remaining operator, service/media and staging acceptance work from [docs/progress.md](docs/progress.md), reusing existing owner decisions. The privacy contact, notification destination and 90-day unsuccessful eligibility clock are already recorded. Booked-client/pending-delivery procedures, email send/receipt acceptance and production Turnstile remain live-operation prerequisites. Public display, production domain attachment, indexing and real intake remain separate owner gates.

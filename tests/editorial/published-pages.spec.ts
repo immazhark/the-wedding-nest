@@ -159,6 +159,7 @@ const SERVICE_LOOKS = [
   { slug: "mehndi-artist-hyderabad", layout: "duo", hero: "split" },
   { slug: "trousseau-packing-hyderabad", layout: "mosaic", hero: "split" },
   { slug: "guest-hospitality-hyderabad", layout: "rows", hero: "split" },
+  { slug: "wedding-photography-videography", layout: "duo", hero: "split" },
 ] as const;
 
 for (const { slug, layout, hero } of SERVICE_LOOKS) {

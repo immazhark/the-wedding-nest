@@ -66,7 +66,8 @@ jobs:
 
   editorial-fixtures:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Cold image generation measured 9m10s; leave time for the 96 browser checks.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -107,6 +108,7 @@ jobs:
           tests/e2e/visual-review.spec.ts
           tests/e2e/hero-fit.spec.ts
           tests/e2e/catering-art-direction.spec.ts
+          tests/e2e/operator-ui.spec.ts
           --grep-invert "the kitchen film plays when visible and can be paused"
       - name: Retain cross-browser review evidence
         if: always()

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { mkdir } from "node:fs/promises";
 
 // The page is static; its API is mocked here. Server-side auth/CSRF/CAS are covered by unit tests.
 const ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
@@ -9,7 +10,12 @@ const workerd = process.env["E2E_TARGET"] === "workerd";
 // Real Worker runtime, no Access configuration: every operator surface must fail closed (404).
 test("operator surfaces are invisible when Access is not configured", async ({ request }) => {
   test.skip(!workerd, "needs the Workers runtime");
-  for (const path of ["/operator/", "/operator/operator.js", "/api/operator/enquiries"]) {
+  for (const path of [
+    "/operator/",
+    "/operator/operator.js",
+    "/operator/labels.js",
+    "/api/operator/enquiries",
+  ]) {
     const response = await request.get(path);
     expect(response.status(), path).toBe(404);
     expect(response.headers()["cache-control"]).toBe("no-store");
@@ -18,7 +24,7 @@ test("operator surfaces are invisible when Access is not configured", async ({ r
 
 test("operator page renders hostile text inertly, updates status and survives a stale conflict", async ({
   page,
-}) => {
+}, testInfo) => {
   test.skip(workerd, "static page is gated by the Worker; covered by the fail-closed test");
   let status = "new";
   let conflictNext = false;
@@ -49,11 +55,20 @@ test("operator page renders hostile text inertly, updates status and survives a 
           status,
           unsuccessfulAt: null,
           marketingConsent: false,
+          consentAt: "2026-12-01T09:00:00.000Z",
           payload: {
             name: HOSTILE,
             phone: "+91 98765 43210",
             notes: HOSTILE,
-            occasions: ["nikah"],
+            occasions: ["nikah", "legacy-occasion"],
+            scope: "specific-services",
+            services: ["decor", "photo-film"],
+            styles: ["heritage", "legacy_style", HOSTILE, "constructor"],
+            budget: "5-15l",
+            contactChannel: "whatsapp",
+            date: { kind: "undecided" },
+            guestCount: "350",
+            location: "Fictional venue",
           },
         },
       },
@@ -74,6 +89,47 @@ test("operator page renders hostile text inertly, updates status and survives a 
   await expect(page.getByRole("heading", { level: 2 })).toHaveText(HOSTILE);
   expect(await page.evaluate(() => (window as { __pwned?: number }).__pwned)).toBeUndefined();
   await expect(page.locator("#fields img")).toHaveCount(0);
+
+  const value = (label: string) =>
+    page
+      .locator("#fields dt")
+      .filter({ hasText: new RegExp(`^${label}$`) })
+      .locator("+ dd");
+  await expect(value("Scope")).toHaveText("Specific services");
+  await expect(value("Services")).toHaveText("Décor, florals & staging, Photography & film");
+  await expect(value("Styles")).toHaveText(
+    `Hyderabadi heritage, legacy style, ${HOSTILE}, constructor`,
+  );
+  await expect(value("Budget")).toHaveText("₹5–15 lakh");
+  await expect(value("Occasions")).toHaveText("Nikah, legacy occasion");
+  await expect(value("Preferred contact")).toHaveText("WhatsApp");
+  await expect(value("Date")).toHaveText("Undecided");
+  const consentDate = await page.evaluate(() =>
+    new Date("2026-12-01T09:00:00.000Z").toLocaleString("en-IN", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }),
+  );
+  await expect(value("Consent recorded")).toHaveText(consentDate);
+  await expect(page.locator("#fields img")).toHaveCount(0);
+  await expect(page.getByRole("heading", { level: 2 })).toBeFocused();
+
+  await mkdir("playwright-report", { recursive: true });
+  await page.screenshot({
+    path: `playwright-report/operator-details-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
+
+  let confirmation = "";
+  page.once("dialog", async (dialog) => {
+    confirmation = dialog.message();
+    await dialog.dismiss();
+  });
+  await page.getByRole("button", { name: "Mark unsuccessful" }).click();
+  expect(confirmation).toBe(
+    "Mark unsuccessful? Details become eligible for deletion after 90 days. Pending deliveries hold deletion. Automatic cleanup is not active.",
+  );
+  expect(posts).toEqual([]);
 
   conflictNext = true;
   await page.getByRole("button", { name: "Mark in progress" }).click();
@@ -270,6 +326,17 @@ test("operator distinguishes an unavailable audit trail from an empty one", asyn
   );
   await page.goto("/operator/");
   await page.getByRole("button", { name: /Audit fixture/ }).click();
+  await expect(
+    page
+      .locator("#fields dt")
+      .filter({ hasText: /^Consent recorded$/ })
+      .locator("+ dd"),
+  ).toHaveText("Not recorded");
+  for (const optional of ["Scope", "Services", "Styles", "Budget"]) {
+    await expect(
+      page.locator("#fields dt").filter({ hasText: new RegExp(`^${optional}$`) }),
+    ).toHaveCount(0);
+  }
   await expect(page.locator("#fields")).toContainText("Audit history unavailable");
   await expect(page.getByRole("button", { name: "Mark contacted" })).toHaveCount(0);
   await page.getByRole("button", { name: /Back to list/ }).click();

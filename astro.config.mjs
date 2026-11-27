@@ -5,6 +5,14 @@ import { rm, writeFile } from "node:fs/promises";
 import { readFileSync } from "node:fs";
 import { parseConfigFileTextToJson } from "typescript";
 import { headersFile, robotsTxt, sitemapXml } from "./src/lib/site/seo-files.ts";
+import {
+  OCCASIONS,
+  SCOPES,
+  SERVICES,
+  STYLES,
+  BUDGETS,
+  CONTACT_CHANNELS,
+} from "./src/lib/enquiry/schema.ts";
 import { assertIndexableRelease } from "./src/lib/site/release.ts";
 import { assertEditorialFixtureIsolation } from "./src/lib/site/editorial-fixtures.ts";
 
@@ -43,6 +51,24 @@ const seoFiles = {
   name: "twn-seo-files",
   hooks: {
     "astro:build:done": async ({ dir, pages }) => {
+      // Static operator assets share the planner's labels without importing source at runtime.
+      const labels = Object.fromEntries(
+        Object.entries({
+          occasions: OCCASIONS,
+          scope: SCOPES,
+          services: SERVICES,
+          styles: STYLES,
+          budget: BUDGETS,
+          contactChannel: CONTACT_CHANNELS,
+        }).map(([key, options]) => [
+          key,
+          Object.fromEntries(options.map(({ id, label }) => [id, label])),
+        ]),
+      );
+      await writeFile(
+        new URL("operator/labels.js", dir),
+        `globalThis.TWN_ENQUIRY_LABELS = ${JSON.stringify(labels)};\n`,
+      );
       await writeFile(new URL("_headers", dir), headersFile(indexable));
       await writeFile(
         new URL("robots.txt", dir),

@@ -37,6 +37,17 @@ describe("editorial fixture isolation", () => {
     });
   });
 
+  it("rejects a leftover photography fixture even in a noindex preview", () => {
+    withRecords(
+      [["services/wedding-photography-videography.json", { approvalRef: "TWN-PUB-2026-CITEST" }]],
+      (root) => {
+        expect(() =>
+          assertEditorialFixtureIsolation(root, { PUBLIC_ALLOW_INDEXING: "false" }),
+        ).toThrow(/Synthetic editorial/);
+      },
+    );
+  });
+
   it("allows the explicitly isolated CI build", () => {
     withRecords(synthetic, (root) => {
       expect(() => assertEditorialFixtureIsolation(root, allowed)).not.toThrow();
