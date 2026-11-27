@@ -3,7 +3,7 @@
  * One attempt only; a future consumer owns leases, durable snapshots and retries.
  * Acceptance is not proof of inbox delivery. Never log payloads/provider bodies.
  */
-import { MAX_EMAIL_EVENT_AGE_MS } from "./notification-window";
+import { MAX_EMAIL_EVENT_AGE_MS } from "./notification-window.ts";
 import type { OperatorNotice } from "./notification-content";
 
 export interface EmailConfiguration {
