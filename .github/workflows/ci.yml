@@ -75,6 +75,15 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      # npm ci clears node_modules; restore only image transforms afterwards.
+      # Never cache Vite code, dependencies, dist, credentials or database state.
+      - name: Cache editorial image transforms
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.astro/assets
+          key: ${{ runner.os }}-${{ runner.arch }}-astro-images-v1-editorial-${{ hashFiles('package-lock.json', '.nvmrc', 'astro.config.mjs') }}-${{ hashFiles('src/**', 'scripts/verify-editorial-fixtures.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-astro-images-v1-editorial-${{ hashFiles('package-lock.json', '.nvmrc', 'astro.config.mjs') }}-
       - name: Install Playwright Chromium for editorial templates
         run: npx playwright install --with-deps chromium
       - name: Verify populated editorial pages with disposable synthetic CI fixtures
