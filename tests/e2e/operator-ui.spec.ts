@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { mkdir } from "node:fs/promises";
 
 // The page is static; its API is mocked here. Server-side auth/CSRF/CAS are covered by unit tests.
 const ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
@@ -18,7 +19,7 @@ test("operator surfaces are invisible when Access is not configured", async ({ r
 
 test("operator page renders hostile text inertly, updates status and survives a stale conflict", async ({
   page,
-}) => {
+}, testInfo) => {
   test.skip(workerd, "static page is gated by the Worker; covered by the fail-closed test");
   let status = "new";
   let conflictNext = false;
@@ -98,9 +99,21 @@ test("operator page renders hostile text inertly, updates status and survives a 
   await expect(value("Occasions")).toHaveText("Nikah, legacy occasion");
   await expect(value("Preferred contact")).toHaveText("WhatsApp");
   await expect(value("Date")).toHaveText("Undecided");
-  await expect(value("Consent recorded")).not.toHaveText("Not recorded");
+  const consentDate = await page.evaluate(() =>
+    new Date("2026-12-01T09:00:00.000Z").toLocaleString("en-IN", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }),
+  );
+  await expect(value("Consent recorded")).toHaveText(consentDate);
   await expect(page.locator("#fields img")).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 2 })).toBeFocused();
+
+  await mkdir("playwright-report", { recursive: true });
+  await page.screenshot({
+    path: `playwright-report/operator-details-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
 
   let confirmation = "";
   page.once("dialog", async (dialog) => {
@@ -308,6 +321,17 @@ test("operator distinguishes an unavailable audit trail from an empty one", asyn
   );
   await page.goto("/operator/");
   await page.getByRole("button", { name: /Audit fixture/ }).click();
+  await expect(
+    page
+      .locator("#fields dt")
+      .filter({ hasText: /^Consent recorded$/ })
+      .locator("+ dd"),
+  ).toHaveText("Not recorded");
+  for (const optional of ["Scope", "Services", "Styles", "Budget"]) {
+    await expect(
+      page.locator("#fields dt").filter({ hasText: new RegExp(`^${optional}$`) }),
+    ).toHaveCount(0);
+  }
   await expect(page.locator("#fields")).toContainText("Audit history unavailable");
   await expect(page.getByRole("button", { name: "Mark contacted" })).toHaveCount(0);
   await page.getByRole("button", { name: /Back to list/ }).click();
