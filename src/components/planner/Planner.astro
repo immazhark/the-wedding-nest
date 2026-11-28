@@ -498,10 +498,15 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
     color: var(--color-brass-deep);
   }
   .progress-bar {
-    width: 20%;
+    width: 100%;
     height: 2px;
+    transform: scaleX(0.2);
+    transform-origin: left center;
     background: linear-gradient(90deg, var(--color-garnet), var(--color-saffron));
-    transition: width 0.7s var(--ease-editorial);
+    transition: transform 0.22s var(--ease-editorial);
+  }
+  .progress-bar:dir(rtl) {
+    transform-origin: right center;
   }
   .planner :global(.progress-item[aria-current="step"] .progress-title) {
     transform: translateX(0.4rem);

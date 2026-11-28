@@ -4,6 +4,8 @@
 
 Application measurements are deliberately deferred by the owner. This document does not mark them waived or substitute source presence for runtime evidence.
 
+**Progress animation phase:** `perf/planner-progress-transform` replaces layout-width animation with a full-width `scaleX` indicator,220ms transition and explicit RTL origin. Progress ARIA and reduced motion stay unchanged. Browser navigation/layout regression added but locally UNVERIFIED; unit/type checks pass. No measured performance saving or D2 compliance claim. Hosted pointer/consent regressions and home kitchen controls have passed on predecessor trees; latest full GREEN awaits the corrected phone-help fixture (WhatsApp radio blur rather than Skip navigation), without removing assertions.
+
 **Hosted UI failure and repair:** initial #181 head `c061b5a` failed4 guest-focus browser cases (263 passed/37 skipped). Root cause: blur-induced error layout shifted Continue during a pointer press and cancelled its click. Repair queues pointer blur until click completion, skips action-button blur in favor of authoritative handlers, and cancels pending feedback on submit/navigation. Held-pointer Continue/consent regressions added. No assertions weakened. Current UI unit366/type checks pass; browser repair verification is PENDING, not a claimed pass. Propagate this fix into descendant motion PR #182 before integration.
 
 **Motion/resource phase checkpoint:** `fix/home-loop-lifecycle` reuses the shared controller for the home kitchen and adds a native Pause/Play control. Shared loops stop for hidden documents and Save-Data where supported; reduced-motion/live preference and stale-play guards remain. Two regression failures reproduced before implementation;10 focused loop tests and full369-unit suite now pass with clean type check. Browser/rendered playback, byte/CWV savings and device acceptance remain UNVERIFIED. No measured performance benefit or final programme completion is claimed.
@@ -80,7 +82,7 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | 09.7 | Evaluate shortcuts/palette/undo/sheets/advanced menu interactions | Technique register | P2 | Verified | Applicability decisions recorded, not implementation claims |
 | 10.1 | Motion explains state/hierarchy/causality/story | Motion inventory | P2 | Partial | Existing choreography; fresh critique pending |
 | 10.2 | Shared durations/easings; interruptible/reversible motion | Global tokens/controllers | P1 | Partial | Home kitchen consolidated onto shared generation guards; hidden/Save-Data regressions pass; no universal or rendered guarantee |
-| 10.3 | Opacity/transform; avoid thrash/loops/excess layers | global.css/motion handlers | P1 | Partial | Progress width animation and home loops need targeted work |
+| 10.3 | Opacity/transform; avoid thrash/loops/excess layers | global.css/motion handlers | P1 | Partial | Home loops use resource guards; progress now animates transform with stable layout box. Browser fraction/layout regression and actual performance effects remain pending |
 | 10.4 | CSS/native transitions with support/static fallback | Global/motion/gallery | P1 | Partial | Existing progressive transitions; current browser acceptance UNVERIFIED |
 | 10.5 | GSAP only justified; no redundant animation stack | motion.ts; dependency policy | P1 | Partial | Existing GSAP use; current byte and interaction budget unmeasured |
 | 10.6 | Evaluate Motion for React only when architecture warrants | Dependency decision | P2 | N/A | No new React island need established |
