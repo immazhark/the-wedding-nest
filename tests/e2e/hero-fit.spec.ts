@@ -32,3 +32,16 @@ test.describe("opening hero fits short viewports", () => {
     });
   }
 });
+
+test("desktop hero releases reserved space on live reduced-motion changes", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 600 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const hero = page.locator(".grand");
+  await expect(hero).toHaveCSS("padding-bottom", "420px");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(hero).toHaveCSS("padding-bottom", "0px");
+  await expect(hero.getByRole("heading", { level: 1 })).toBeVisible();
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await expect(hero).toHaveCSS("padding-bottom", "420px");
+});
