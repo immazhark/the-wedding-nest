@@ -4,6 +4,10 @@
 
 Application measurements are deliberately deferred by the owner. This document does not mark them waived or substitute source presence for runtime evidence.
 
+**Hosted UI failure and repair:** initial #181 head `c061b5a` failed4 guest-focus browser cases (263 passed/37 skipped). Root cause: blur-induced error layout shifted Continue during a pointer press and cancelled its click. Repair queues pointer blur until click completion, skips action-button blur in favor of authoritative handlers, and cancels pending feedback on submit/navigation. Held-pointer Continue/consent regressions added. No assertions weakened. Current UI unit366/type checks pass; browser repair verification is PENDING, not a claimed pass. Propagate this fix into descendant motion PR #182 before integration.
+
+**Accessibility/enquiry phase checkpoint:** branch `fix/planner-inline-validation` follows security PR #180; persistence #179 is merged (`3fe1df6`, four hosted checks green). Field-local errors, independent after-blur validation/correction, preserved help IDs, guarded first-error focus and44px consent-label sizing are implemented. Three new unit cases failed before helper implementation; full366-unit suite and clean Astro/type check now pass. Five browser regressions were added but not executed locally because Chromium binary is absent. Inline rendered visibility/focus announcements/touch geometry remain Implemented—UNVERIFIED until those tests/manual checks run. No new overall design/a11y/performance score is assigned.
+
 **Latest authorization/checkpoint:** owner's subsequent “Continue autonomous execution” instruction authorizes source implementation passes; earlier pending plan-approval entries describe the persistence checkpoint. Phase1 `fix/enquiry-verification-response` adds a Siteverify HTTP-success guard. Four new regressions reproduced201 instead of503 on upstream400/429/500/503; full unit suite now363/363 passes, type check clean, format and standard build pass. This is unit/build evidence only; real provider/runtime/measurement acceptance remains UNVERIFIED. No change to held limiter #64 or production gates. Update affected row09.4/13.4 evidence by this checkpoint without asserting all security requirements are verified.
 
 Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md), [reconciliation](../directives/EXECUTION.md), [DESIGN](../../DESIGN.md), [audit](AUDIT-0.md) and [phase plan](IMPLEMENTATION-PLAN-1.md). This is the shared implementation register, not another audit.
@@ -51,7 +55,7 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | 06.5 | Concentric radii, balanced headlines, mixed-size/numeric alignment | Typography/component tokens | P2 | Partial | Headline balancing exists; rest evaluated in technique register |
 | 06.6 | Every decoration has a defensible purpose | DESIGN; critique | P2 | Pending | One-signature/three-delight policy; inventory actual effects before edits |
 | 07.1 | Real mobile journey at 320/360/375/390/414/430/768/1024/1440 plus existing1280/1920 | e2e/manual device QA | P1 | Pending | Historical tests exist; fresh run UNVERIFIED |
-| 07.2 | 44–48px targets, 8px spacing, thumb reach | Planner/nav/CTAs | P1 | Partial | Consent label minimum source concern; actual geometry UNVERIFIED |
+| 07.2 | 44–48px targets, 8px spacing, thumb reach | Planner/nav/CTAs | P1 | Partial | Consent label44px minimum and padding added; new browser geometry regression unrun locally; other target geometry UNVERIFIED |
 | 07.3 | Safe area/dynamic viewport handling | Global/sticky controls | P1 | Missing | No safe-area rules in reviewed global styles; actual device acceptance UNVERIFIED |
 | 07.4 | Correct type/inputmode/autocomplete/enterkeyhint and keyboard-friendly forms | Planner.astro | P1 | Partial | Native controls and some hints exist; field inventory pending |
 | 07.5 | Sticky controls never obscure content/focus/browser keyboard | Header/planner/mobile actions | P0 | Pending | Full viewport/keyboard acceptance UNVERIFIED |
@@ -66,7 +70,7 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | 08.4 | Font subsets/formats/loading/fallback metrics | BaseLayout/global.css | P1 | Partial | Self-host/preloads; actual file count/bytes and metric fallbacks pending |
 | 08.5 | No invented reviews/facts/prices/availability/owner content | All content/schema | P0 | Partial | Publication gates exist; per-content provenance remains required |
 | 09.1 | All applicable interactive states | Planner/nav/gallery/operator | P1 | Partial | State inventory pending; no artificial states for noninteractive elements |
-| 09.2 | Fast truthful feedback/skeletons/stable placeholders/error recovery/retries | Planner/media/operator | P1 | Partial | Copy status and submission failure handling exist; fresh checks pending |
+| 09.2 | Fast truthful feedback/skeletons/stable placeholders/error recovery/retries | Planner/media/operator | P1 | Partial | Field-local after-blur errors and independent correction added; unit logic verified; browser/SR acceptance pending. Existing copy/submission states retained |
 | 09.3 | Optimistic changes only reversible/low-risk with reconciliation/rollback | Local planner state | P1 | Conditional | No optimistic enquiry/booking/payment/delivery confirmation; see technique register |
 | 09.4 | Prevent duplicates; idempotency/server validation | enquiry.ts; submit.ts | P0 | Implemented—UNVERIFIED | Existing safeguards; current isolated runtime tests deferred |
 | 09.5 | Persist only safe non-sensitive progress | draft.ts; share.ts | P0 | Implemented—UNVERIFIED | Allowlist/expiry source; full current storage/expiry test execution deferred |

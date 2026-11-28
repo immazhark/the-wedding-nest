@@ -11,7 +11,14 @@ import {
   type ServiceId,
   type StageId,
 } from "../lib/enquiry/schema";
-import { firstIncompleteStage, nextStage, previousStage, stageError } from "../lib/enquiry/flow";
+import {
+  fieldError,
+  firstIncompleteStage,
+  nextStage,
+  previousStage,
+  stageError,
+  type PlannerField,
+} from "../lib/enquiry/flow";
 import { DRAFT_STORAGE_KEY, restoreDraft, toDraft } from "../lib/enquiry/draft";
 import { applyPlannerIntent, readPlannerIntent } from "../lib/enquiry/intent";
 import { summarise } from "../lib/enquiry/summary";
@@ -108,6 +115,13 @@ export function initPlanner(form: HTMLFormElement) {
   const root = form.closest<HTMLElement>("[data-planner]") ?? document.body;
   const panels = [...form.querySelectorAll<HTMLElement>("[data-stage]")];
   const errorEl = form.querySelector<HTMLElement>("[data-error]")!;
+  const errorHome = errorEl.parentElement!;
+  const errorAnchor = errorEl.nextSibling;
+  const feedbackFields = new Set<string>(["date", "guestCount", "name", "phone", "consent"]);
+  let invalidField: string | null = null;
+  let focusingValidation = false;
+  let pointerActive = false;
+  let pendingBlur: HTMLInputElement | null = null;
   const backBtn = form.querySelector<HTMLButtonElement>("[data-back]")!;
   const nextBtn = form.querySelector<HTMLButtonElement>("[data-next]")!;
   const nextLabel = form.querySelector<HTMLElement>("[data-next-label]")!;
@@ -305,6 +319,7 @@ export function initPlanner(form: HTMLFormElement) {
   const order: Panel[] = [...STAGES.map((s) => s.id), "review"];
 
   function show(panel: Panel, focus = true) {
+    pendingBlur = null;
     // A previous copy acknowledgement must not describe an edited plan.
     if (panel !== current) {
       copyAttempt++; // Invalidate pending clipboard results after navigation.
@@ -352,11 +367,9 @@ export function initPlanner(form: HTMLFormElement) {
     resetBtn.closest<HTMLElement>(".planner-nav")!.hidden = panel === "sent";
     nextLabel.textContent = panel === "contact" ? "Review" : "Continue";
     errorEl.textContent = "";
+    errorHome.insertBefore(errorEl, errorAnchor);
     serverError = null;
-    form.querySelectorAll("[aria-invalid]").forEach((el) => {
-      el.removeAttribute("aria-invalid");
-      el.removeAttribute("aria-describedby");
-    });
+    clearInvalidFields();
     if (panel === "review") {
       renderSummary();
       sending?.enterReview();
@@ -371,15 +384,46 @@ export function initPlanner(form: HTMLFormElement) {
     }
   }
 
-  function focusInvalid(el: HTMLElement | undefined | null) {
-    if (!el) return;
+  function clearInvalidFields() {
+    invalidField = null;
     form.querySelectorAll<HTMLElement>("[aria-invalid]").forEach((input) => {
       input.removeAttribute("aria-invalid");
-      input.removeAttribute("aria-describedby");
+      const descriptions = (input.getAttribute("aria-describedby") ?? "")
+        .split(/\s+/)
+        .filter((id) => id && id !== "planner-error-msg");
+      if (descriptions.length) input.setAttribute("aria-describedby", descriptions.join(" "));
+      else input.removeAttribute("aria-describedby");
     });
+  }
+
+  function focusInvalid(el: HTMLElement | undefined | null, focus = true) {
+    if (!el) return;
+    clearInvalidFields();
+    invalidField = el.getAttribute("name");
     el.setAttribute("aria-invalid", "true");
-    el.setAttribute("aria-describedby", "planner-error-msg");
-    el.focus();
+    const descriptions = el.getAttribute("aria-describedby");
+    el.setAttribute(
+      "aria-describedby",
+      [descriptions, "planner-error-msg"].filter(Boolean).join(" "),
+    );
+    // Keep corrections with text inputs rather than below the entire stage.
+    // Group/consent feedback stays outside the input's label and its hit area.
+    const field = el.closest<HTMLElement>(".field");
+    const container = field ?? el.closest<HTMLElement>(".consent");
+    if (container) container.append(errorEl);
+    else errorHome.insertBefore(errorEl, errorAnchor);
+    if (focus) {
+      // Focusing the first error can synchronously blur a different invalid input.
+      // That blur must not replace the message/association we are focusing here.
+      focusingValidation = true;
+      try {
+        el.focus();
+      } finally {
+        focusingValidation = false;
+      }
+      // A phone keyboard or short viewport must not hide the correction below focus.
+      field?.scrollIntoView({ block: "nearest", behavior: "instant" });
+    }
   }
 
   function markInvalid(stage: StageId, s: EnquiryState) {
@@ -418,6 +462,7 @@ export function initPlanner(form: HTMLFormElement) {
 
   form.addEventListener("submit", (e) => {
     e.preventDefault(); // stages advance in place; sending (if enabled) has its own button
+    pendingBlur = null;
     if (current === "review" || current === "sent") return;
     const s = readState(form);
     const error = stageError(current, s);
@@ -503,15 +548,61 @@ export function initPlanner(form: HTMLFormElement) {
       const validation = validateEnquiry(state);
       if (!validation.ok && validation.errors[serverError.field]) return;
     }
-    if (!stageError(current, state)) {
+    const error =
+      invalidField && feedbackFields.has(invalidField)
+        ? fieldError(invalidField as PlannerField, state)
+        : stageError(current, state);
+    if (!error) {
       errorEl.textContent = "";
       serverError = null;
-      form.querySelectorAll<HTMLElement>("[aria-invalid]").forEach((field) => {
-        field.removeAttribute("aria-invalid");
-        field.removeAttribute("aria-describedby");
-      });
+      clearInvalidFields();
     }
   }
+
+  function validateBlur(input: HTMLInputElement) {
+    if (
+      focusingValidation ||
+      !feedbackFields.has(input.name) ||
+      input.closest<HTMLElement>("[data-stage]")?.dataset["stage"] !== current ||
+      serverError
+    )
+      return;
+    const error = fieldError(input.name as PlannerField, readState(form));
+    if (!error) return;
+    errorEl.textContent = error;
+    // Blur validation must never pull focus back from the visitor's next control.
+    focusInvalid(input, false);
+  }
+
+  // A correction can increase a field's height. Never move a clicked control
+  // between pointerdown and pointerup, or its click/checkbox activation can be lost.
+  form.addEventListener("pointerdown", () => {
+    pointerActive = true;
+    pendingBlur = null;
+  });
+  document.addEventListener("pointerup", () => (pointerActive = false));
+  document.addEventListener("pointercancel", () => {
+    pointerActive = false;
+    pendingBlur = null;
+  });
+  document.addEventListener("click", () => {
+    if (!pendingBlur) return;
+    setTimeout(() => {
+      if (pointerActive) return;
+      const input = pendingBlur;
+      pendingBlur = null;
+      if (input) validateBlur(input);
+    }, 0);
+  });
+  form.addEventListener("focusout", (event) => {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || focusingValidation) return;
+    // These actions validate, navigate or reset themselves. Their result takes
+    // precedence over feedback for the field being left.
+    if (event.relatedTarget instanceof HTMLElement && event.relatedTarget.closest("button")) return;
+    if (pointerActive) pendingBlur = input;
+    else validateBlur(input);
+  });
 
   form.addEventListener("change", (event) => {
     const target = event.target;

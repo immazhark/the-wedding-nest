@@ -460,6 +460,128 @@ test("correcting guest count clears validation feedback before the field loses f
   await expect(guests).not.toHaveAttribute("aria-describedby");
 });
 
+test("guest feedback appears beside the field after blur without stealing focus", async ({
+  page,
+}) => {
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await next(page);
+  await next(page);
+  const guests = page.getByLabel(/Approximate guests/);
+  const venue = page.getByLabel(/Venue or area/);
+  await guests.fill("3.5");
+  await expect(page.getByRole("alert")).toBeEmpty();
+  await venue.focus();
+  await expect(venue).toBeFocused();
+  await expect(guests).toHaveAttribute("aria-describedby", "planner-error-msg");
+  await expect(page.locator(".field").filter({ has: guests })).toContainText("whole number");
+  await guests.fill("150");
+  await expect(page.getByRole("alert")).toBeEmpty();
+  await next(page);
+  await expect(heading(page)).toHaveText("How should we reach you?");
+  await expect(page.getByRole("alert")).toBeEmpty();
+});
+
+test("blocked guest correction and focused input fit in the viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await next(page);
+  await next(page);
+  const guests = page.getByLabel(/Approximate guests/);
+  await guests.fill("3.5");
+  await next(page);
+  await expect(guests).toBeFocused();
+  await expect(page.getByRole("alert")).toContainText("whole number");
+  const field = page.locator(".field").filter({ has: guests });
+  const box = await field.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box!.y).toBeGreaterThanOrEqual(0);
+  expect(box!.y + box!.height).toBeLessThanOrEqual(640);
+});
+
+test("holding Continue through blur does not move its click target", async ({ page }) => {
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await next(page);
+  await next(page);
+  const guests = page.getByLabel(/Approximate guests/);
+  await guests.fill("3.5");
+  const button = page.getByRole("button", { name: /^Continue/ });
+  await button.scrollIntoViewIfNeeded();
+  const before = await button.boundingBox();
+  expect(before).not.toBeNull();
+  await page.mouse.move(before!.x + before!.width / 2, before!.y + before!.height / 2);
+  await page.mouse.down();
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+  expect(await button.boundingBox()).toEqual(before);
+  await page.mouse.up();
+  await expect(guests).toBeFocused();
+  await expect(page.getByRole("alert")).toContainText("whole number");
+});
+
+test("blur feedback does not cancel a consent checkbox click", async ({ page }) => {
+  await completeToContact(page);
+  const phone = page.getByLabel("Phone or WhatsApp number");
+  await phone.fill("12");
+  const consent = page.getByRole("checkbox", { name: /I agree/ });
+  await consent.scrollIntoViewIfNeeded();
+  const before = await consent.boundingBox();
+  expect(before).not.toBeNull();
+  await page.mouse.move(before!.x + before!.width / 2, before!.y + before!.height / 2);
+  await page.mouse.down();
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+  expect(await consent.boundingBox()).toEqual(before);
+  await page.mouse.up();
+  await expect(consent).toBeChecked();
+  await expect(phone).toHaveAttribute("aria-invalid", "true");
+  await expect(page.getByRole("alert")).toContainText("phone or WhatsApp");
+});
+
+test("correcting phone feedback preserves help and ignores an untouched missing name", async ({
+  page,
+}) => {
+  await completeToContact(page);
+  const phone = page.getByLabel("Phone or WhatsApp number");
+  await phone.evaluate((input) => {
+    const hint = document.createElement("p");
+    hint.id = "phone-help-fixture";
+    hint.textContent = "Include the country code when needed.";
+    input.parentElement!.append(hint);
+    input.setAttribute("aria-describedby", hint.id);
+  });
+  await phone.fill("12");
+  // Leave for another answer, not a navigation action whose handler owns validation.
+  await page.getByRole("radio", { name: "WhatsApp", exact: true }).focus();
+  await expect(phone).toHaveAttribute("aria-describedby", "phone-help-fixture planner-error-msg");
+  await phone.fill("9876543210");
+  await expect(phone).toBeFocused();
+  await expect(phone).not.toHaveAttribute("aria-invalid");
+  await expect(phone).toHaveAttribute("aria-describedby", "phone-help-fixture");
+  await expect(page.getByRole("alert")).toBeEmpty();
+  await next(page);
+  await expect(page.getByLabel("Your name")).toBeFocused();
+  await expect(page.getByRole("alert")).toHaveText("Please enter your name.");
+});
+
+test("Enter focuses and describes the first contact error without blur replacing it", async ({
+  page,
+}) => {
+  await completeToContact(page);
+  const name = page.getByLabel("Your name");
+  const phone = page.getByLabel("Phone or WhatsApp number");
+  await phone.fill("12");
+  await phone.press("Enter");
+  await expect(name).toBeFocused();
+  await expect(name).toHaveAttribute("aria-invalid", "true");
+  await expect(name).toHaveAttribute("aria-describedby", "planner-error-msg");
+  await expect(phone).not.toHaveAttribute("aria-invalid");
+  await expect(page.getByRole("alert")).toHaveText("Please enter your name.");
+});
+
 test("requires explicit consent and a valid phone number", async ({ page }) => {
   await completeToContact(page);
   await page.getByLabel("Your name").fill("Test Visitor");
@@ -478,6 +600,18 @@ test("requires explicit consent and a valid phone number", async ({ page }) => {
   await expect(consent).not.toHaveAttribute("aria-invalid");
   await expect(page.getByRole("alert")).toBeEmpty();
   await expect(page.getByRole("checkbox", { name: /future offers/ })).not.toBeChecked();
+});
+
+test("both contact consent labels expose at least 44px touch targets", async ({ page }) => {
+  await completeToContact(page);
+  const labels = page.locator('[data-stage="contact"] label.check');
+  await expect(labels).toHaveCount(2);
+  for (const label of await labels.all()) {
+    const box = await label.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+  }
 });
 
 test("keeps choices after reload but never stores contact details", async ({ page }) => {

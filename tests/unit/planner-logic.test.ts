@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { emptyEnquiry, type EnquiryState } from "../../src/lib/enquiry/schema";
-import { stageError } from "../../src/lib/enquiry/flow";
+import { fieldError, stageError } from "../../src/lib/enquiry/flow";
 import { summarise } from "../../src/lib/enquiry/summary";
 
 const filled = (): EnquiryState => ({
@@ -16,6 +16,31 @@ const filled = (): EnquiryState => ({
   name: "A Person",
   phone: "9876543210",
   consent: true,
+});
+
+describe("fieldError (feedback for the field just left)", () => {
+  it("validates a phone independently of another missing contact answer", () => {
+    const state = { ...filled(), name: "", phone: "12" };
+    expect(fieldError("phone", state)).toMatch(/phone or WhatsApp/i);
+    expect(fieldError("phone", { ...state, phone: "9876543210" })).toBeNull();
+    expect(fieldError("name", state)).toMatch(/enter your name/i);
+  });
+
+  it("keeps optional guests blank but rejects fractional counts independently of date", () => {
+    const state: EnquiryState = { ...filled(), date: { kind: "date", value: "" } };
+    expect(fieldError("guestCount", { ...state, guestCount: "" })).toBeNull();
+    expect(fieldError("guestCount", { ...state, guestCount: "3.5" })).toMatch(/whole number/i);
+    expect(fieldError("date", state)).toMatch(/valid date/i);
+    expect(fieldError("date", { ...state, date: { kind: "undecided" } })).toBeNull();
+  });
+
+  it("uses the same correction as stage navigation and never requires marketing consent", () => {
+    const state = { ...filled(), consent: false, marketingConsent: false };
+    expect(fieldError("consent", state)).toBe(stageError("contact", state));
+    expect(fieldError("consent", { ...state, consent: true })).toBeNull();
+    expect(fieldError("name", filled())).toBeNull();
+    expect(fieldError("phone", filled())).toBeNull();
+  });
 });
 
 describe("stageError (plain-language messages)", () => {
