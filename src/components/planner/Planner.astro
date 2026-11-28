@@ -20,22 +20,20 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
 ---
 
 <div class="planner" data-planner>
-  <noscript>
-    <p class="planner-panel text-charcoal">
-      The planner needs JavaScript. You can reach The Wedding Nest on{" "}
-      <a href={SITE.instagram} class="underline decoration-brass underline-offset-4">
-        Instagram
-      </a>{" "}
-      or call{" "}
-      <a
-        href={`tel:${SITE.phone}`}
-        class="underline decoration-brass underline-offset-4 whitespace-nowrap"
-      >
-        {SITE.phoneDisplay}
-      </a>{" "}
-      in the meantime.
-    </p>
-  </noscript>
+  <p class="planner-panel text-charcoal" data-planner-fallback>
+    If the planner doesn’t load, you can reach The Wedding Nest on{" "}
+    <a href={SITE.instagram} class="underline decoration-brass underline-offset-4">
+      Instagram
+    </a>{" "}
+    or call{" "}
+    <a
+      href={`tel:${SITE.phone}`}
+      class="underline decoration-brass underline-offset-4 whitespace-nowrap"
+    >
+      {SITE.phoneDisplay}
+    </a>{" "}
+    in the meantime.
+  </p>
 
   {!sending && (
     <div id="planner-disclosure" class="disclosure" role="note" aria-labelledby="disclosure-title">
@@ -64,7 +62,7 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
     </div>
   )}
 
-  <div class="js-only mt-7 sm:mt-12 grid gap-10 lg:grid-cols-12">
+  <div class="planner-interactive mt-7 sm:mt-12 grid gap-10 lg:grid-cols-12" data-planner-interactive hidden inert>
     <!-- Progress -->
     <nav class="lg:col-span-4" aria-label="Planner progress">
       <p class="eyebrow text-brass-deep" data-step-count>
@@ -485,7 +483,7 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
   .planner {
     overflow-x: clip;
   }
-  :global(html:not(.js)) .js-only {
+  .planner-interactive[hidden] {
     display: none;
   }
   .planner :global(.progress-item) {
@@ -881,5 +879,13 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
 <script>
   import { initPlanner } from "../../scripts/planner";
   const form = document.querySelector<HTMLFormElement>("[data-planner-form]");
-  if (form) initPlanner(form);
+  const root = form?.closest<HTMLElement>("[data-planner]");
+  const interactive = root?.querySelector<HTMLElement>("[data-planner-interactive]");
+  const fallback = root?.querySelector<HTMLElement>("[data-planner-fallback]");
+  if (form && interactive && fallback) {
+    initPlanner(form);
+    interactive.hidden = false;
+    interactive.inert = false;
+    fallback.hidden = true;
+  }
 </script>
