@@ -793,6 +793,7 @@ const thresholdPhoto =
 <script>
   import "../scripts/motion";
   import "../scripts/loop";
+  import "../scripts/door-film";
   // Films: nothing downloads until play. The native controls stay for no-JS and keyboard users;
   // with JS a single large play button leads, then hands over to the native controls.
   const players = document.querySelectorAll<HTMLElement>("[data-film]");
@@ -813,29 +814,4 @@ const thresholdPhoto =
     };
     button.addEventListener("click", start);
   });
-  // Service doors: a short silent film wakes only on a fine pointer hover or keyboard focus.
-  const doorCalm = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const canHover = window.matchMedia("(hover: hover) and (pointer: fine)");
-  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
-    ?.saveData;
-  if (!doorCalm.matches && canHover.matches && !saveData) {
-    document.querySelectorAll<HTMLElement>(".door:has([data-door-film])").forEach((door) => {
-      const film = door.querySelector<HTMLVideoElement>("[data-door-film]")!;
-      const wake = () => {
-        if (!film.src) film.src = film.dataset["src"] ?? "";
-        film
-          .play()
-          .then(() => door.setAttribute("data-film-on", ""))
-          .catch(() => door.removeAttribute("data-film-on"));
-      };
-      const rest = () => {
-        film.pause();
-        door.removeAttribute("data-film-on");
-      };
-      door.addEventListener("pointerenter", wake);
-      door.addEventListener("pointerleave", rest);
-      door.addEventListener("focusin", wake);
-      door.addEventListener("focusout", rest);
-    });
-  }
 </script>

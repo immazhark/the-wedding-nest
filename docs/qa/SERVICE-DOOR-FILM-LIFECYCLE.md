@@ -1,0 +1,5 @@
+# Service-door film lifecycle — 28 November 2026
+
+Independent source phase based on main `b41b42a`; no changes to the open navigation/planner/motion stack. The service-door hover/focus film previously used unguarded play promises and evaluated reduced motion/Save-Data only at initialization. Move its lifecycle into a small native module, track pointer and focus independently, ignore stale promise completion, stop on hidden documents or live preference changes and retain the poster when playback is not allowed. Existing fine-pointer restriction, artwork, source URLs and styles remain intact.
+
+Isolated Chromium reproduction with manually transcribed original handlers and deterministic media promises: original 3/6, candidate 6/6. Strict standalone TypeScript passed for the candidate lifecycle before the final optional listener guard. Full-page Playwright regression committed; real video playback, full application render, hosted checks and physical-device acceptance remain unverified. No new dependency, publication or production gate change. Review and reconcile the integration stack before merging this independent candidate.
