@@ -1,5 +1,9 @@
 # Design and engineering — living implementation matrix
 
+## Reduced-motion hero spacing checkpoint — 28 November 2026
+
+#184 merged as `6e73d93` after all four exact-head checks passed; #185 retargeted to main without changing its tested source tree. Hosted formatter fixes applied to #186 and #187; #187 test probe typing corrected in `695892d`. New phase `fix/live-reduced-motion-spacing` restricts the existing 70vh desktop hero pin reserve to no-preference media, so toggling reduced motion no longer leaves an empty region after GSAP releases its pin. Real Chromium isolated CSS fixture (1280×600): original 4/5, candidate 5/5; 420px redundant spacing removed on preference change. Motion-on, resumed, mobile and failed-enhancement states retained. Before/after fixture screenshots inspected; not a built Astro page. Added full-page Playwright regression. Actual site render, hosted checks and performance measurements remain unverified. No new dependency or production/creative gate change.
+
 28 November 2026 · source baseline `f7848a8` · current phase: directive persistence.
 
 Application measurements are deliberately deferred by the owner. This document does not mark them waived or substitute source presence for runtime evidence.
