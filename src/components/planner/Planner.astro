@@ -62,7 +62,12 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
     </div>
   )}
 
-  <div class="planner-interactive mt-7 sm:mt-12 grid gap-10 lg:grid-cols-12" data-planner-interactive hidden inert>
+  <div
+    class="planner-interactive mt-7 sm:mt-12 grid gap-10 lg:grid-cols-12"
+    data-planner-interactive
+    hidden
+    inert
+  >
     <!-- Progress -->
     <nav class="lg:col-span-4" aria-label="Planner progress">
       <p class="eyebrow text-brass-deep" data-step-count>
