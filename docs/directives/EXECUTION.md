@@ -2,6 +2,8 @@
 
 Owner-authorized persistence phase · 28 November 2026
 
+**Latest owner authorization, 28 November:** following persistence PR #179, the owner instructed “Continue autonomous execution” and “Execute, integrate, optimize, critique and deliver” under the established directive. This authorizes the previously proposed implementation passes, one isolated phase/PR at a time, without another plan-approval question. Earlier pending-plan wording below records the persistence checkpoint and is superseded for source implementation by this explicit instruction. Required checks/review, substantial creative-direction approval and separate production/notification/data/publication gates remain binding. The directive text itself is unchanged.
+
 ## Authority and reconciliation
 
 1. Preserve the complete [new master directive](MASTER-DESIGN-ENGINEERING-DIRECTIVE.md), including the owner's added sections 18–19. Preserve the earlier [site rulebook](ELITE-SITE-DIRECTIVE-WEDDING-NEST.md); it is not replaced with a generic design brief. New requirements supplement stricter existing rules. A material amendment must name the affected rule, reason and owner authorization.
@@ -41,4 +43,4 @@ Primary documentation inspected selectively for technique evaluation: [MDN corne
 
 ## Immediate next application work
 
-After the existing plan-approval gate is satisfied, reconcile Phase 1 against held #64 rather than duplicating it. If cost/entitlement remains blocked, log it and prepare the next independently authorized accessibility/enquiry fix on a separate phase branch. Candidate first UI defect is field-adjacent guest validation/focus, not a new hero or a full planner rewrite. Its real rendered validation and later measurement results must be recorded, not inferred from this document.
+Under the latest owner authorization above, reconcile Phase 1 against held #64 rather than duplicating it. If cost/entitlement remains blocked, log it and execute another unblocked safety fix, then the next accessibility/enquiry phase on its own branch/PR. Candidate first UI defect is field-adjacent guest validation/focus, not a new hero or a full planner rewrite. Its real rendered validation and later measurement results must be recorded, not inferred from this document. Do not repeat the already answered plan-approval question.

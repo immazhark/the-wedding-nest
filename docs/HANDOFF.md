@@ -1,5 +1,13 @@
 # Current handoff — 28 November 2026
 
+## Latest implementation checkpoint — supersedes persistence-only scope below
+
+Owner's subsequent autonomous execution instruction authorizes the proposed source implementation passes; do not ask for the same plan approval again. Preserve separate creative/publication/production gates and one-phase/one-PR isolation. Phase 1 branch: `fix/enquiry-verification-response`, stacked on PR #179's remote head `6a33167`; local persistence-only commit `5b968bd` has the same tree but is not that remote commit. Main remains `f7848a8` at this reconciliation.
+
+Security fix: reject unsuccessful Siteverify HTTP responses before reading success JSON. Four regressions for HTTP400/429/500/503 reproduced incorrect201 responses, then passed with the guard. A legacy deadline test used a response-shaped object without HTTP status; it now uses a real200 Response with a stalled JSON reader, retaining timeout/abort/late-write assertions. Full `npm test`:363/363 passed; `npm run check`:0 errors/warnings/hints; format check and standard five-page build passed. Submission-test build result and hosted acceptance remain to be reconciled before merge. Independent source review found no blocking issue.
+
+Held limiter PR #64 remains blocked on entitlement/cost evidence, not duplicated or activated. No provider configuration, production intake/indexing/domain, customer data, sends or new dependencies changed. Fresh Lighthouse/axe/runtime/device measurements remain deferred/UNVERIFIED. Next separately scoped accessibility/enquiry phase: field-adjacent validation feedback and accessible focus/recovery, preserving all privacy and submit semantics.
+
 ## Read first
 
 Every session: AGENTS.md/CLAUDE.md → complete `docs/directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md` (1–19) and preserved site rulebook → `docs/directives/EXECUTION.md` → DESIGN.md → living `docs/qa/DESIGN-IMPLEMENTATION.md` → current progress. Preserve both directives and the actual approved Grand Entrance. No silent material amendment.

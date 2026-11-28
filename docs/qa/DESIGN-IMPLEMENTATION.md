@@ -4,6 +4,8 @@
 
 Application measurements are deliberately deferred by the owner. This document does not mark them waived or substitute source presence for runtime evidence.
 
+**Latest authorization/checkpoint:** owner's subsequent “Continue autonomous execution” instruction authorizes source implementation passes; earlier pending plan-approval entries describe the persistence checkpoint. Phase1 `fix/enquiry-verification-response` adds a Siteverify HTTP-success guard. Four new regressions reproduced201 instead of503 on upstream400/429/500/503; full unit suite now363/363 passes, type check clean, format and standard build pass. This is unit/build evidence only; real provider/runtime/measurement acceptance remains UNVERIFIED. No change to held limiter #64 or production gates. Update affected row09.4/13.4 evidence by this checkpoint without asserting all security requirements are verified.
+
 Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md), [reconciliation](../directives/EXECUTION.md), [DESIGN](../../DESIGN.md), [audit](AUDIT-0.md) and [phase plan](IMPLEMENTATION-PLAN-1.md). This is the shared implementation register, not another audit.
 
 **Status vocabulary:** Verified = named evidence actually inspected/executed for the stated scope; Implemented—UNVERIFIED = source/document exists without required acceptance; Partial = some requirements implemented; Missing = source gap identified; Pending = not executed; Blocked = named prerequisite; Conditional = apply only if justified; N/A = explicit exclusion. Document checks never certify app behavior. Prior CI is historical evidence, not a fresh run.

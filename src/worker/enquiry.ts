@@ -56,6 +56,9 @@ async function verifyTurnstile(
     });
     // A transport that ignores cancellation must not start consuming a late response.
     if (controller.signal.aborted) throw new Error("verification_timeout");
+    // A success-shaped error response is not proof of verification. Keep provider
+    // failures retryable and never store an enquiry on an unsuccessful HTTP result.
+    if (!response.ok) throw new Error("verification_http_error");
     return (await response.json()) as { success?: boolean };
   })();
   try {
