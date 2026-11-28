@@ -1,5 +1,9 @@
 # Current handoff — 28 November 2026
 
+## Forced-colors planner selection checkpoint — 28 November 2026
+
+New phase `fix/planner-forced-colors`: restore visible native checkboxes/radios in forced-colors mode only, hide decorative marks there, and use the system Highlight focus outline. Normal editorial tiles and semantics remain unchanged. MDN forced-colors reference confirms the browser removes shadows and forces colors. Actual isolated Chromium fixture at 360×440: original 2/6, candidate 6/6 (visible native checkbox/radio, decorative marks hidden, keyboard toggle/exclusive selection); normal-color assertions passed for both. Inspected fixture screenshots: original selected/unselected marks visually identical, revised check/dot distinguishable. This is an isolated markup/CSS reproduction, not an Astro render or Windows device certification. Full-page Playwright regression added; hosted checks and actual site acceptance pending. No dependency, creative approval, submission or production gate change.
+
 ## Mobile overlay geometry checkpoint — 28 November 2026
 
 #189 initial verify stopped at Prettier; applied exact formatter correction in `576b4f4`. #187 and #188 passed all four required checks at their current heads; integration depends on #186. New phase `fix/mobile-menu-geometry`: refresh fixed-menu top on resize and scroll only while open, preserving native close/focus handlers, styling and CSP-compatible CSSOM writes. Isolated real Chromium fixture at 700×650 then 320×650 reproduced an 18px header overlap (header bottom 142px, menu top 124px); candidate aligned both at 142px. Original 3/4, candidate 4/4 geometry/close checks. Full-page Playwright regression covers preview-notice reflow, restored width and Escape/unlock. Fixture is not a built Astro page; full hosted checks and physical-device/visual acceptance remain pending. No new dependencies, production or creative gate changes.
