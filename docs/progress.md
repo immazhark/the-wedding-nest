@@ -1,5 +1,11 @@
 # Project progress — reconciled 27 November 2026
 
+## Latest checkpoint — 28 November 2026, public intent prefetch
+
+#182 squash-merged as `781560d` after all four exact-head checks passed and no unresolved reviews. #183 retargeted to main and ancestry repaired by a non-force merge preserving its previously tested tree; refreshed checks remain required. #184 had four green checks at `406c00d`, but integration awaits its predecessor. #64 remains held.
+
+Isolated candidate `perf/public-intent-prefetch`: restrict navigation prefetch to the root, planner, privacy and public service/story document route families; omit query/fragment data and exclude non-self targets, downloads, private/API/access paths, hidden documents, offline, Data Saver and 2g/slow-2g at each intent. Existing native navigation remains unchanged. MDN NetworkInformation and rel=prefetch references reviewed; no dependency, creative direction, content or production flag change. Local strict TypeScript compilation of the exact standalone script passed. Node VM harness against the original script reproduced four failures (three passes); the revised script passed all seven. New Playwright regressions are prepared but not executed locally against the site because repository DNS/checkout and dependencies are unavailable. Full hosted verification, real page rendering and performance measurements remain unverified for this candidate; no speed claim or gate bypass.
+
 ## Latest checkpoint — 28 November 2026
 
 **Latest source phase:** `feat/planner-share-drafts` adds explicit WhatsApp/email draft links from allow-listed planning choices, preserving generic business contacts and copy fallback. Enquiry routing uses approved8686773095/email; registered9966973113 unchanged. New unit test red→green; full370-unit/type checks pass, browser/no-network/edit-link assertions added but unrun locally. No automatic send/receipt or production activation. Main includes #181 (`5d05fc7`) after all four checks green; #182's identical tested media tree now has main as merge parent (`bf2a101`) and awaits refreshed checks. #183 remains a separate progress-animation phase. Read current PRs and matrix before integration.
