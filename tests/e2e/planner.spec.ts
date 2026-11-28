@@ -94,6 +94,37 @@ test("walks through all five stages to a review, without sending anything", asyn
   expect(requests).toEqual([]);
 });
 
+test("progress keeps a stable layout box while its visual fraction follows navigation", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  const bar = page.locator("[data-progress-bar]");
+  const track = page.locator("[data-progress-track]");
+  await expect(bar).toBeVisible();
+  const layoutWidth = await bar.evaluate((element) => (element as HTMLElement).offsetWidth);
+  expect(layoutWidth).toBeGreaterThan(0);
+  const check = async (step: number) => {
+    await expect(track).toHaveAttribute("aria-valuenow", String(step));
+    const size = await bar.evaluate((element) => ({
+      layout: (element as HTMLElement).offsetWidth,
+      visual: element.getBoundingClientRect().width,
+    }));
+    expect(size.layout).toBe(layoutWidth);
+    expect(Math.abs(size.visual - (layoutWidth * step) / 5)).toBeLessThanOrEqual(1);
+  };
+  await check(1);
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await check(2);
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await next(page);
+  await check(3);
+  await page.getByRole("button", { name: "← Back" }).click();
+  await check(2);
+  await page.getByRole("button", { name: "Start again" }).click();
+  await check(1);
+});
+
 test("preview reviews a plan without contact details", async ({ page }) => {
   const posts: string[] = [];
   page.on("request", (request) => {

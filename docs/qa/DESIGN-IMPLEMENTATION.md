@@ -4,6 +4,8 @@
 
 Application measurements are deliberately deferred by the owner. This document does not mark them waived or substitute source presence for runtime evidence.
 
+**Progress animation phase:** `perf/planner-progress-transform` replaces layout-width animation with a full-width `scaleX` indicator,220ms transition and explicit RTL origin. Progress ARIA and reduced motion stay unchanged. Browser navigation/layout regression added but locally UNVERIFIED; unit/type checks pass. No measured performance saving or D2 compliance claim. Hosted pointer/consent regressions and home kitchen controls have passed on predecessor trees; latest full GREEN awaits the corrected phone-help fixture (WhatsApp radio blur rather than Skip navigation), without removing assertions.
+
 **Hosted UI failure and repair:** initial #181 head `c061b5a` failed4 guest-focus browser cases (263 passed/37 skipped). Root cause: blur-induced error layout shifted Continue during a pointer press and cancelled its click. Repair queues pointer blur until click completion, skips action-button blur in favor of authoritative handlers, and cancels pending feedback on submit/navigation. Held-pointer Continue/consent regressions added. No assertions weakened. Current UI unit366/type checks pass; browser repair verification is PENDING, not a claimed pass. Propagate this fix into descendant motion PR #182 before integration.
 
 **Motion/resource phase checkpoint:** `fix/home-loop-lifecycle` reuses the shared controller for the home kitchen and adds a native Pause/Play control. Shared loops stop for hidden documents and Save-Data where supported; reduced-motion/live preference and stale-play guards remain. Two regression failures reproduced before implementation;10 focused loop tests and full369-unit suite now pass with clean type check. Browser/rendered playback, byte/CWV savings and device acceptance remain UNVERIFIED. No measured performance benefit or final programme completion is claimed.
@@ -23,8 +25,8 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | ID | Actionable requirement | Applicability / location | Priority | Status | Evidence / next verification |
 |---|---|---|---|---|---|
 | 01.1 | Brownfield preservation: functionality, business rules, security, accessibility, maintainability | All | P0 | Partial | Existing Astro/Worker architecture; per-change regression proof required |
-| 01.2 | Execute reconciled authorized work rather than repeat planning | Current persistence phase | P1 | Implemented—UNVERIFIED | Directive/entrypoint changes prepared; commit and remote PR pending |
-| 02.1 | Inspect branch/main/tree/commits/open PRs and synchronize safely | Git/GitHub | P0 | Verified | main f7848a8; ff-only pull up to date; only held draft #64 returned; prior untracked docs preserved |
+| 01.2 | Execute reconciled authorized work rather than repeat planning | Source implementation passes | P1 | Partial | Persistence/security #179/#180 merged; enquiry/media #181/#182 and progress #183 implemented on isolated branches, required current checks pending |
+| 02.1 | Inspect branch/main/tree/commits/open PRs and synchronize safely | Git/GitHub | P0 | Verified | Latest reconciliation main df0b0ea; #181/#182/#183 open, #64 held; local/remote content trees checked and all concurrent work preserved |
 | 02.2 | Read agent, README, product/design, tooling, QA and handoff context | Agent files; docs/directives/EXECUTION.md | P0 | Verified | Attachment1–17, owner18–19, prior rulebook/audit/plan, entrypoints, README, decisions, product/tooling, current progress, creative/Grand Entrance/launch docs inspected |
 | 02.3 | Classify requirements and preserve stricter instructions | This matrix; EXECUTION.md | P0 | Partial | Initial matrix established; application acceptance remains pending |
 | 02.4 | Preserve completed work, approved facts and concurrent changes | All diffs | P0 | Partial | No application changes in this phase; no resets/overwrites |
@@ -80,7 +82,7 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | 09.7 | Evaluate shortcuts/palette/undo/sheets/advanced menu interactions | Technique register | P2 | Verified | Applicability decisions recorded, not implementation claims |
 | 10.1 | Motion explains state/hierarchy/causality/story | Motion inventory | P2 | Partial | Existing choreography; fresh critique pending |
 | 10.2 | Shared durations/easings; interruptible/reversible motion | Global tokens/controllers | P1 | Partial | Home kitchen consolidated onto shared generation guards; hidden/Save-Data regressions pass; no universal or rendered guarantee |
-| 10.3 | Opacity/transform; avoid thrash/loops/excess layers | global.css/motion handlers | P1 | Partial | Progress width animation and home loops need targeted work |
+| 10.3 | Opacity/transform; avoid thrash/loops/excess layers | global.css/motion handlers | P1 | Partial | Home loops use resource guards; progress now animates transform with stable layout box. Browser fraction/layout regression and actual performance effects remain pending |
 | 10.4 | CSS/native transitions with support/static fallback | Global/motion/gallery | P1 | Partial | Existing progressive transitions; current browser acceptance UNVERIFIED |
 | 10.5 | GSAP only justified; no redundant animation stack | motion.ts; dependency policy | P1 | Partial | Existing GSAP use; current byte and interaction budget unmeasured |
 | 10.6 | Evaluate Motion for React only when architecture warrants | Dependency decision | P2 | N/A | No new React island need established |
@@ -110,7 +112,7 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | 14.4 | Evidence and release under authorization | Release gates | P0 | Blocked | Fresh acceptance and separate owner release approvals outstanding |
 | 15.1 | Actual rendered before/after mobile/desktop captures | Browser QA | P1 | Pending | Prior audit desktop before captures only; no new visual change to capture here |
 | 15.2 | Primary/edge/duplicate/network/keyboard/motion/recovery tests | Unit/e2e/manual | P0 | Pending | Fresh application runtime execution deferred |
-| 15.3 | Build/lint/types/unit/integration/Playwright/axe/audit/Lighthouse | Existing checks/QA | P1 | Pending | Run applicable commands per phase; no inferred pass |
+| 15.3 | Build/lint/types/unit/integration/Playwright/axe/audit/Lighthouse | Existing checks/QA | P1 | Partial | Local369-unit/type/format/two-build checks pass; hosted browser findings/passes recorded per head; latest full acceptance pending. Fresh Lighthouse/audit/device metrics remain unrun/deferred |
 | 15.4 | Nine-category weighted95 target and originalB3≥9/category | QA critique | P2 | Pending | No unsupported score; stricter thresholds preserved |
 | 15.5 | Security/functional/a11y blockers trump visual score | Release gate | P0 | Implemented—UNVERIFIED | Explicit permanent rule; execution enforcement remains procedural |
 | 15.6 | Critique/refine first render | Each visual phase | P1 | Pending | No public visual implementation this phase |
@@ -124,11 +126,11 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | 18.4 | Research→design→implement→render→critique→refine→optimize→verify | Each visual phase | P1 | Pending | Mandatory workflow; not all steps performed for application yet |
 | 18.5 | Creative director/UX/architect/mobile critique | QA evidence | P1 | Pending | Specialist matrix review only; not rendered creative approval |
 | 18.6 | Preserve approved rules/work; no bypass/fake completion | Entire programme | P0 | Partial | Precedence and evidence boundaries explicit |
-| 19.1 | Persist complete directive1–19 | docs/directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md | P0 | Partial | Local exact source preservation and ordered1–19 assertions passed; remote integration pending |
+| 19.1 | Persist complete directive1–19 | docs/directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md | P0 | Verified | Exact source/ordered1–19 assertions passed; #179 merged as3fe1df6 after four hosted checks passed |
 | 19.2 | Both agent entrypoints mandate full session-start read | AGENTS.md; CLAUDE.md | P0 | Verified | Both entrypoint reference/link assertions passed; future agent adherence remains procedural |
-| 19.3 | Integrate design/engineering/architecture/QA without duplication | DESIGN; tooling; decisions; matrix | P1 | Implemented—UNVERIFIED | Additive pointers and scoped decision; no app architecture replaced |
+| 19.3 | Integrate design/engineering/architecture/QA without duplication | DESIGN; tooling; decisions; matrix | P1 | Verified | Additive pointers/decision/design index/matrix integrated in #179; document link/source checks passed; no claim of full application compliance |
 | 19.4 | Session sync/progress/verified milestone/standards/no regressions | Entry files; HANDOFF | P0 | Partial | Current session reconciled; future session compliance procedural |
-| 19.5 | All agents share canonical truth | Directive; matrix; progress | P0 | Implemented—UNVERIFIED | Shared paths; remote persistence pending |
+| 19.5 | All agents share canonical truth | Directive; matrix; progress | P0 | Verified | Shared source paths and mandatory entrypoints on main through #179; future agent adherence is procedural, not mechanically guaranteed |
 | 19.6 | Protect directive; authorize/log material amendments; controlled nonweakening improvements | EXECUTION; decisions | P0 | Implemented—UNVERIFIED | Amendment policy explicit; owner-controlled process |
 | 19.7 | Living statuses and institutional knowledge without repeated owner pasting | Matrix; HANDOFF; progress | P1 | Partial | Initial checkpoint; future meaningful updates required |
 

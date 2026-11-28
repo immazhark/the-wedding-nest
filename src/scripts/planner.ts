@@ -352,8 +352,8 @@ export function initPlanner(form: HTMLFormElement) {
     progressTrack?.setAttribute("aria-valuetext", stepCount?.textContent ?? "");
     // CSSOM writes are allowed by the CSP (inline style attributes in markup are not).
     progressBar?.style.setProperty(
-      "width",
-      `${(Math.min(index + 1, STAGES.length) / STAGES.length) * 100}%`,
+      "transform",
+      `scaleX(${Math.min(index + 1, STAGES.length) / STAGES.length})`,
     );
     root.querySelectorAll<HTMLElement>("[data-progress-item]").forEach((item, i) => {
       item.toggleAttribute("data-done", i < index);

@@ -1,5 +1,13 @@
 # Current handoff — 28 November 2026
 
+## Latest source phase — progress animation
+
+Review refinement: the progress browser regression now explicitly uses360x800, asserts visibility and positive layout width, so a hidden desktop bar cannot satisfy zero-size geometry assertions. Independent source review found no important transform/ARIA/reduced-motion/RTL blocker. Required hosted acceptance remains pending; no passing browser result is inferred from source review.
+
+`perf/planner-progress-transform` is a separate small phase based on media #182's corrected-fixture head `4a63028`; #181 correction head is `8bc3f50`. Main remains #179/#180. Latest hosted runs had only the phone-help fixture fail (269 UI/272 combined browser tests passed); held-pointer tests pass on desktop/mobile and home-film poster/pause tests pass in hosted Chromium. The fixture now focuses the WhatsApp radio rather than Skip navigation, retaining every error/help/correction assertion and matching the intended action-button policy. Fresh full hosted GREEN is still pending.
+
+Progress bar now has a stable full-width layout box and uses `scaleX` with a220ms transform transition, rather than animating width over700ms. Existing progress ARIA values and reduced-motion override remain; RTL transform origin is explicit. New browser regression checks visual fractions/stable layout through Continue/Back/reset; it is UNVERIFIED locally (Chromium absent). No actual CWV/paint saving is claimed. Existing full369-unit/type checks pass after this source change; format/build results and remote PR status must be read from the phase's PR before integration. No dependency, data, service publication or production gate changed.
+
 Latest integration: PR #181's pointer-safe blur repair (remote `284c144`) is propagated into descendant motion PR #182 on `fix/home-loop-lifecycle`. Both remain unmerged pending required checks. Main contains #179/#180. Documentation insertion conflicts were resolved by preserving both checkpoints; no application conflict or assertion was discarded. Reconcile the newest GitHub heads/checks before merge.
 
 ## Hosted regression repair — accessibility PR #181

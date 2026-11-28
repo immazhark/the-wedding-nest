@@ -2,6 +2,8 @@
 
 ## Latest checkpoint — 28 November 2026
 
+**Current source phase:** `perf/planner-progress-transform` replaces planner width animation with220ms scaleX, preserves progress ARIA/reduced motion, and adds forward/back/reset stable-layout checks. Full369-unit/type checks pass; browser regression/performance effects remain UNVERIFIED. Predecessors #181/#182 now carry the corrected phone-help fixture (WhatsApp radio blur, all assertions retained). Hosted held-pointer and kitchen-control scenarios pass; full refreshed checks remain required. No production gate changed.
+
 **Hosted UI regression, not merged:** #181 initial head `c061b5a` failed4 browser focus assertions (263 passed/37 skipped). Inline blur feedback shifted Continue during pointerdown and prevented click completion. A pointer-safe deferred-blur repair plus held-pointer Continue/consent regressions is prepared; local366-unit/type checks pass, hosted GREEN remains pending. Preserve failing assertions. Security #180 is now merged as `df0b0ea` after all four hosted checks passed; persistence #179 remains merged. Descendant #182 must receive the repair before integration.
 
 **Latest source phase:** `fix/home-loop-lifecycle` follows #181/#180, consolidating home kitchen playback onto the shared guarded controller and adding a Pause button. Shared loops now stop for hidden documents and honor supported Save-Data changes without undoing user pause. Two reproduced regressions fixed;10 focused loop tests/full369-unit suite pass; type check clean. Home-film browser tests added, unexecuted locally (Chromium absent); performance/visual claims remain UNVERIFIED. Persistence #179 is on main (`3fe1df6`); security/UI merge gates remain separate. No production activation or new creative direction.
