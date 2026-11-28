@@ -120,6 +120,18 @@ beforeEach(() => {
 });
 
 describe("POST /api/enquiry", () => {
+  it.each([400, 429, 500, 503])(
+    "does not accept an enquiry when verification returns HTTP %i with a success-shaped body",
+    async (status) => {
+      turnstile.mockResolvedValueOnce(Response.json({ success: true }, { status }));
+      const response = await call(request(ok()));
+      expect(response.status).toBe(503);
+      expect(await response.json()).toEqual({ error: "verification_unavailable" });
+      expect(db.enquiries.size).toBe(0);
+      expect(db.outbox).toHaveLength(0);
+    },
+  );
+
   it("rejects a missing Origin even when the allow-list has empty entries", async () => {
     env.ALLOWED_ORIGINS = `${ORIGIN}, `;
     const req = request(ok());
@@ -500,9 +512,11 @@ describe("POST /api/enquiry", () => {
       let signal: AbortSignal | undefined;
       turnstile.mockImplementationOnce((_url, init: RequestInit) => {
         signal = init.signal ?? undefined;
-        return Promise.resolve({
-          json: () => new Promise((resolve) => (finishBody = resolve)),
-        });
+        const response = new Response(null, { status: 200 });
+        vi.spyOn(response, "json").mockImplementation(
+          () => new Promise((resolve) => (finishBody = resolve)),
+        );
+        return Promise.resolve(response);
       });
       let response: Response | undefined;
       const pending = call(request(ok())).then((res) => (response = res));
