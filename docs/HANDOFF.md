@@ -1,5 +1,11 @@
 # Current handoff — 28 November 2026
 
+## Latest checkpoint — 28 November 2026, public intent prefetch
+
+#182 squash-merged as `781560d` after all four exact-head checks passed and no unresolved reviews. #183 retargeted to main and ancestry repaired by a non-force merge preserving its previously tested tree; refreshed checks remain required. #184 had four green checks at `406c00d`, but integration awaits its predecessor. #64 remains held.
+
+Isolated candidate `perf/public-intent-prefetch`: restrict navigation prefetch to the root, planner, privacy and public service/story document route families; omit query/fragment data and exclude non-self targets, downloads, private/API/access paths, hidden documents, offline, Data Saver and 2g/slow-2g at each intent. Existing native navigation remains unchanged. MDN NetworkInformation and rel=prefetch references reviewed; no dependency, creative direction, content or production flag change. Local strict TypeScript compilation of the exact standalone script passed. Node VM harness against the original script reproduced four failures (three passes); the revised script passed all seven. New Playwright regressions are prepared but not executed locally against the site because repository DNS/checkout and dependencies are unavailable. Full hosted verification, real page rendering and performance measurements remain unverified for this candidate; no speed claim or gate bypass.
+
 ## Latest enquiry hand-off phase
 
 `feat/planner-share-drafts` prepares WhatsApp/email draft links from the existing allow-listed `previewPlanText`, refreshed on each review render. Name, customer phone, venue, notes, channel and consent remain excluded. Destinations derive from trusted owner-approved config: enquiry WhatsApp8686773095 and configured email; registered business line9966973113/footer/schema remain unchanged. Existing generic contacts and manual clipboard fallback remain. Links only open a draft on explicit action; no automatic message, POST, accepted receipt or Sent state. Disclosure names the exclusions and requires the visitor to review/send in their app.
