@@ -1,9 +1,25 @@
 import { expect, test } from "@playwright/test";
 
-test("mobile navigation remains usable when external JavaScript fails", async ({ page }) => {
+test("mobile navigation remains usable when page modules fail", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 500 });
-  await page.route(/\.js(?:\?.*)?$/, (route) => route.abort());
+  let removedModules = 0;
+  await page.route("**/*", async (route) => {
+    if (route.request().resourceType() !== "document") {
+      await route.continue();
+      return;
+    }
+    const response = await route.fetch();
+    const html = await response.text();
+    // Astro can inline small modules at build time. Disable both forms of module execution,
+    // without disabling the separate inline layout marker or the rest of the document.
+    const body = html.replace(/<script\b[^>]*\btype=["']module["'][^>]*>[\s\S]*?<\/script>/gi, () => {
+      removedModules++;
+      return "";
+    });
+    await route.fulfill({ response, body });
+  });
   await page.goto("/");
+  expect(removedModules).toBeGreaterThan(0);
 
   // The inline layout marker still executes, but the header module never initializes.
   await expect(page.locator("html")).toHaveClass(/\bjs\b/);
