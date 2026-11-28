@@ -1,5 +1,7 @@
 # Architecture decision log
 
+- 2026-11-28: Owner explicitly requested permanent master design/engineering directive persistence (complete attachment sections 1–17 plus message sections 18–19), cross-agent entrypoint references and a living requirements matrix. Added a reconciliation/execution prompt and design index on a dedicated documentation branch. Existing Astro/static-first architecture, approved Grand Entrance, stricter site budgets, factual publication rules and phase/release gates remain. This is an additive documentation decision, not approval of a replacement creative direction, new dependency, rate-limit entitlement, data deletion or production activation.
+
 - 2026-11-15: Project source: private GitHub repository immazhark/the-wedding-nest.
 - 2026-11-15: Development workflow: browser/Claude Code Cloud first, with ChatGPT Work and Codex as complementary review/implementation tools. Local Windows development is optional, not required.
 - 2026-11-15: Domain theweddingnest.in; registration at Spaceship, Cloudflare DNS, active DNSSEC, managed SSL/TLS certificate. Website not yet deployed.

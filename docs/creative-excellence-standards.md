@@ -2,6 +2,8 @@
 
 The working standard for every design, motion and copy decision. Owner directive of 15 Nov 2026, condensed. Read before any visual or copy work.
 
+**28 November reconciliation:** read [DESIGN.md](../DESIGN.md), [the permanent master directive](directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md) and [execution reconciliation](directives/EXECUTION.md) first. Preserve later approved Grand Entrance decisions and stricter site-rulebook budgets; older proposal labels, motif limits and generic targets below are historical where superseded by recorded owner approvals. Do not silently replace the approved direction or claim fresh measurements from these targets.
+
 ## The bar
 
 An original, ultra-premium editorial experience for a Hyderabad wedding and events business, welcoming to every budget. It must never read as AI-generated or templated. Clean or green CI is not the same as approved: judge the rendered result.

@@ -2,6 +2,8 @@
 
 **Scope:** TWN cloud-first project. This file is a truthful inventory and install plan, not proof of runtime activation.
 
+Permanent cross-agent requirements: [master directive](directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md), [reconciliation/execution prompt](directives/EXECUTION.md), [DESIGN.md](../DESIGN.md) and [living QA matrix](qa/DESIGN-IMPLEMENTATION.md). Evaluate native/existing solutions before tools; listed tools do not imply installation. Require evidence for dependency/security/performance claims and preserve existing stage gates. Maintain bounded single-writer integration with independent specialist questions where justified.
+
 ## Enabled declarations in this repository
 - Superpowers `superpowers@claude-plugins-official`: enabled in `.claude/settings.json` from Anthropic's official marketplace; [upstream](https://github.com/obra/superpowers), MIT.
 - Impeccable `impeccable@impeccable`: enabled in `.claude/settings.json`; marketplace source `pbakaus/impeccable`, auto-update off pending review; [upstream](https://github.com/pbakaus/impeccable), Apache-2.0. Its published marketplace manifest identifies the plugin and marketplace as `impeccable`.

@@ -2,6 +2,12 @@
 
 Project: The Wedding Nest, Hyderabad. Cloud-first development; product owner reviews outcomes rather than coding locally.
 
+## Permanent instructions — every session, every agent
+
+Before any development, read and follow [the complete Master Design & Engineering Directive](docs/directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md) (sections 1–19), [the binding site rulebook](docs/directives/ELITE-SITE-DIRECTIVE-WEDDING-NEST.md), and [the reconciliation and execution prompt](docs/directives/EXECUTION.md). These apply to ChatGPT Work, Codex, Claude Code and future agents. Preserve both directives; material amendments require documented owner authorization.
+
+Then read [DESIGN.md](DESIGN.md), [the living requirement matrix](docs/qa/DESIGN-IMPLEMENTATION.md), `docs/progress.md` and `docs/HANDOFF.md`. Synchronize safely with authorized main, preserve local/concurrent work, use one branch/PR per phase, and resume the last evidenced milestone. Unavailable measurements never become a PASS or permission to bypass a gate. Follow the narrower current owner scope and existing release/creative approval gates.
+
 Read README.md, CLAUDE.md, docs/decisions.md, docs/product-direction.md, docs/engineering-tooling.md, and docs/progress.md before changes.
 
 - GitHub is source of truth. Use short feature branches and reviewable PRs; squash merge when approved.
