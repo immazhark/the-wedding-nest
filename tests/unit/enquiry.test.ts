@@ -14,7 +14,8 @@ import {
 } from "../../src/lib/enquiry/flow";
 import { validateEnquiry, LIMITS } from "../../src/lib/enquiry/validate";
 import { DRAFT_TTL_MS, restoreDraft, toDraft } from "../../src/lib/enquiry/draft";
-import { previewPlanText } from "../../src/lib/enquiry/share";
+import { previewPlanLinks, previewPlanText } from "../../src/lib/enquiry/share";
+import { SITE } from "../../src/lib/site/config";
 
 const complete = (): EnquiryState => ({
   ...emptyEnquiry(),
@@ -34,6 +35,32 @@ const complete = (): EnquiryState => ({
 });
 
 describe("preview planning-choice sharing", () => {
+  it("prepares explicit WhatsApp/email drafts containing only allow-listed choices", () => {
+    const state = {
+      ...complete(),
+      name: "PRIVATE PERSON",
+      phone: "PRIVATE PHONE",
+      location: "PRIVATE ADDRESS",
+      notes: "PRIVATE NOTES & subject=injected",
+    };
+    const links = previewPlanLinks(state);
+    const whatsapp = new URL(links.whatsapp);
+    expect(whatsapp.origin).toBe("https://wa.me");
+    expect(whatsapp.pathname).toBe("/918686773095");
+    expect(SITE.whatsapp).toBe("https://wa.me/919966973113");
+    expect(SITE.phone).toBe("+919966973113");
+    expect(whatsapp.searchParams.get("text")).toBe(previewPlanText(state));
+    const email = new URL(links.email);
+    expect(email.protocol).toBe("mailto:");
+    expect(email.pathname).toBe("theweddingnest.events@gmail.com");
+    expect(email.searchParams.get("subject")).toBe("The Wedding Nest — Planning enquiry");
+    expect(email.searchParams.get("body")).toBe(previewPlanText(state));
+    for (const link of [links.whatsapp, links.email]) {
+      expect(decodeURIComponent(link)).not.toContain("PRIVATE");
+      expect(decodeURIComponent(link)).not.toContain("injected");
+    }
+  });
+
   it("copies only approved planning choices, excluding private fields and hidden services", () => {
     const state = {
       ...complete(),

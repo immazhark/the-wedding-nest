@@ -6,6 +6,7 @@
 import { toDraft } from "./draft";
 import { emptyEnquiry, type EnquiryState } from "./schema";
 import { summarise } from "./summary";
+import { ENQUIRY_CONTACT } from "../site/config";
 
 export function previewPlanText(state: EnquiryState): string {
   const selections = toDraft(state, 0).data;
@@ -16,4 +17,15 @@ export function previewPlanText(state: EnquiryState): string {
     "The Wedding Nest — Planning choices",
     ...rows.map((row) => `${row.label}: ${row.value}`),
   ].join("\n");
+}
+
+/** Prepare a draft only. Opening these links never confirms sending or enquiry receipt. */
+export function previewPlanLinks(state: EnquiryState): { whatsapp: string; email: string } {
+  const text = encodeURIComponent(previewPlanText(state));
+  return {
+    whatsapp: `${ENQUIRY_CONTACT.whatsapp}?text=${text}`,
+    email:
+      `mailto:${ENQUIRY_CONTACT.email}?subject=` +
+      `${encodeURIComponent("The Wedding Nest — Planning enquiry")}&body=${text}`,
+  };
 }

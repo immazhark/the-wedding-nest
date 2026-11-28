@@ -10,7 +10,7 @@ import {
   STYLES,
 } from "../../lib/enquiry/schema";
 import { LIMITS } from "../../lib/enquiry/validate";
-import { ENQUIRIES, SITE } from "../../lib/site/config";
+import { ENQUIRIES, ENQUIRY_CONTACT, SITE } from "../../lib/site/config";
 const sending = ENQUIRIES.enabled;
 
 // DRAFT COPY — labels, privacy wording and budget bands need owner approval.
@@ -404,12 +404,22 @@ const serviceOnlyFor = (s: (typeof SERVICES)[number]) => ("onlyFor" in s ? s.onl
               </a>
               .
             </p>
-            <button type="button" class="btn btn-solid mt-6" data-copy-choices>
+            <div class="mt-6 flex flex-wrap gap-3">
+              <a href={ENQUIRY_CONTACT.whatsapp} class="btn btn-solid" data-share-whatsapp>
+                Open WhatsApp with choices
+              </a>
+              <a href={`mailto:${ENQUIRY_CONTACT.email}`} class="btn" data-share-email>
+                Prepare email with choices
+              </a>
+            </div>
+            <p class="mt-3 text-sm text-muted">
+              Opens a draft in your chosen app. Review it there and choose whether to send. Only
+              planning choices are included — no name, phone, venue or private notes.
+            </p>
+            <button type="button" class="btn mt-6" data-copy-choices>
               Copy planning choices
             </button>
-            <p class="mt-3 text-sm text-muted">
-              Copies only your planning choices; no name, phone, venue or notes.
-            </p>
+            <p class="mt-3 text-sm text-muted">Or copy your planning choices to paste yourself.</p>
             <p
               class="mt-2 text-sm text-charcoal"
               role="status"
