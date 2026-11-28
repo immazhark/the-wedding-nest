@@ -1,9 +1,8 @@
 /** Decorative service films: preserve the poster unless current interaction permits playback. */
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
 const canHover = window.matchMedia("(hover: hover) and (pointer: fine)");
-const connection = (
-  navigator as Navigator & { connection?: EventTarget & { saveData?: boolean } }
-).connection;
+const connection = (navigator as Navigator & { connection?: EventTarget & { saveData?: boolean } })
+  .connection;
 
 document.querySelectorAll<HTMLElement>(".door:has([data-door-film])").forEach((door) => {
   const film = door.querySelector<HTMLVideoElement>("[data-door-film]");
