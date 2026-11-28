@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+type DustProbe = { draws: number; visible: boolean };
+
 test("decorative opening particles settle and do not restart", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.addInitScript(() => {
@@ -22,9 +24,11 @@ test("decorative opening particles settle and do not restart", async ({ page }) 
   await page.goto("/", { waitUntil: "domcontentloaded" });
 
   const state = () =>
-    page.evaluate(
-      () => (window as Window & { __dustProbe: { draws: number; visible: boolean } }).__dustProbe,
-    );
+    page.evaluate(() => {
+      const probe = (window as Window & { __dustProbe?: DustProbe }).__dustProbe;
+      if (!probe) throw new Error("Canvas lifecycle probe was not installed");
+      return probe;
+    });
   await expect.poll(async () => (await state()).draws).toBeGreaterThan(0);
   await expect.poll(async () => (await state()).visible, { timeout: 6000 }).toBe(false);
   const settled = await state();
