@@ -22,7 +22,7 @@ import {
 import { DRAFT_STORAGE_KEY, restoreDraft, toDraft } from "../lib/enquiry/draft";
 import { applyPlannerIntent, readPlannerIntent } from "../lib/enquiry/intent";
 import { summarise } from "../lib/enquiry/summary";
-import { previewPlanText } from "../lib/enquiry/share";
+import { previewPlanLinks, previewPlanText } from "../lib/enquiry/share";
 import { FIELD_STAGE, fieldMessage, submitEnquiry } from "../lib/enquiry/submit";
 import { createTurnstileLoader } from "../lib/enquiry/turnstile";
 import { validateEnquiry } from "../lib/enquiry/validate";
@@ -290,6 +290,13 @@ export function initPlanner(form: HTMLFormElement) {
 
   function renderSummary() {
     const state = readState(form);
+    if (!sending) {
+      const links = previewPlanLinks(state);
+      const whatsapp = form.querySelector<HTMLAnchorElement>("[data-share-whatsapp]");
+      const email = form.querySelector<HTMLAnchorElement>("[data-share-email]");
+      if (whatsapp) whatsapp.href = links.whatsapp;
+      if (email) email.href = links.email;
+    }
     const rows = summarise(state).filter(
       (row) =>
         sending ||

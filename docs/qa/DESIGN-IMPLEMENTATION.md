@@ -4,6 +4,8 @@
 
 Application measurements are deliberately deferred by the owner. This document does not mark them waived or substitute source presence for runtime evidence.
 
+**Enquiry draft hand-off phase:** explicit WhatsApp/email draft links now use the existing allow-listed summary; full370-unit/type checks pass, including URL encoding/private-field exclusion and public-business-number invariants. Contact roles remain distinct. Copy/generic contacts remain; no automatic sending, network request, consent persistence or receipt claim. Browser binding/edit/no-request assertions added, external-app and rendered acceptance UNVERIFIED. Main #181 is merged (`5d05fc7`); media's previously green content tree is unchanged at refreshed merge head `bf2a101`, whose required checks must pass.
+
 **Progress animation phase:** `perf/planner-progress-transform` replaces layout-width animation with a full-width `scaleX` indicator,220ms transition and explicit RTL origin. Progress ARIA and reduced motion stay unchanged. Browser navigation/layout regression added but locally UNVERIFIED; unit/type checks pass. No measured performance saving or D2 compliance claim. Hosted pointer/consent regressions and home kitchen controls have passed on predecessor trees; latest full GREEN awaits the corrected phone-help fixture (WhatsApp radio blur rather than Skip navigation), without removing assertions.
 
 **Hosted UI failure and repair:** initial #181 head `c061b5a` failed4 guest-focus browser cases (263 passed/37 skipped). Root cause: blur-induced error layout shifted Continue during a pointer press and cancelled its click. Repair queues pointer blur until click completion, skips action-button blur in favor of authoritative handlers, and cancels pending feedback on submit/navigation. Held-pointer Continue/consent regressions added. No assertions weakened. Current UI unit366/type checks pass; browser repair verification is PENDING, not a claimed pass. Propagate this fix into descendant motion PR #182 before integration.
@@ -91,7 +93,7 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | 11A | Amaana-specific donations/identity/financial rules | Other repository | P0 | N/A | Preserve original directive text; no Amaana changes in TWN |
 | 11B | Cakeopedia options/pricing/allergens/enquiries | Other repository | P0 | N/A | No Cakeopedia changes in TWN |
 | 11C | Moin commerce/cart/weight/strict speed | Other repository | P0 | N/A | No Moin changes in TWN |
-| 11D.1 | Guided enquiry as primary conversion, no invented instant quote | Planner/contact | P1 | Partial | Existing guided flow; intake intentionally off; hand-off friction |
+| 11D.1 | Guided enquiry as primary conversion, no invented instant quote | Planner/contact | P1 | Partial | Field-local validation merged; explicit nonpersonal WhatsApp/email drafts and copy fallback implemented in hand-off phase. Intake intentionally off; external-app/rendered acceptance pending |
 | 11D.2 | Elevate home/hero/services/portfolio/stories/testimonials/consultation/mobile | Public routes | P2 | Partial | Catering published; other gallery source exists but approvals pending |
 | 11D.3 | Authentic photos and approved positioning/routing/privacy/service facts | Content/config/policy | P0 | Partial | Owner decisions recorded; no synthetic substitutions |
 | 11D.4 | Ambitious original compositions/masks/spatial/media/scroll story within limits | DESIGN/Grand Entrance | P2 | Pending | Substantial creative changes require reviewable preview and approval |

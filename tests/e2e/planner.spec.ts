@@ -162,6 +162,15 @@ test("preview reviews a plan without contact details", async ({ page }) => {
 test("preview copies planning choices without contact, venue or private notes", async ({
   page,
 }) => {
+  const origin = new URL(page.url()).origin;
+  const unexpectedRequests: string[] = [];
+  page.on("request", (request) => {
+    if (
+      request.method() !== "GET" ||
+      (/^https?:/.test(request.url()) && new URL(request.url()).origin !== origin)
+    )
+      unexpectedRequests.push(`${request.method()} ${request.url()}`);
+  });
   await page.getByRole("checkbox", { name: "Nikah" }).check();
   await next(page);
   await page.getByRole("radio", { name: /End-to-end planning/ }).check();
@@ -191,6 +200,16 @@ test("preview copies planning choices without contact, venue or private notes", 
   for (const forbidden of ["PRIVATE", "9876543210", "Location:", "Notes:", "Contact:"]) {
     expect(copied).not.toContain(forbidden);
   }
+  const whatsapp = new URL((await page.locator("[data-share-whatsapp]").getAttribute("href"))!);
+  const email = new URL((await page.locator("[data-share-email]").getAttribute("href"))!);
+  expect(whatsapp.origin).toBe("https://wa.me");
+  expect(whatsapp.pathname).toBe("/918686773095");
+  expect(whatsapp.searchParams.get("text")).toBe(copied);
+  expect(email.protocol).toBe("mailto:");
+  expect(email.pathname).toBe("theweddingnest.events@gmail.com");
+  expect(email.searchParams.get("body")).toBe(copied);
+  await expect(page.getByText(/Opens a draft in your chosen app/)).toBeVisible();
+  expect(unexpectedRequests).toEqual([]);
 });
 
 test("editing a copied plan clears the previous clipboard-success message", async ({ page }) => {
@@ -210,11 +229,15 @@ test("editing a copied plan clears the previous clipboard-success message", asyn
 
   await page.getByRole("button", { name: "Copy planning choices" }).click();
   await expect(page.locator("[data-copy-status]")).toContainText("Planning choices copied");
+  const originalShare = await page.locator("[data-share-whatsapp]").getAttribute("href");
   await page.getByRole("button", { name: "Edit occasion" }).click();
   await page.getByRole("checkbox", { name: "Walima" }).check();
   await page.getByRole("button", { name: "Return to review" }).click();
   await expect(page.locator("[data-summary]")).toContainText("Walima");
   await expect(page.locator("[data-copy-status]")).toBeEmpty();
+  const editedShare = await page.locator("[data-share-whatsapp]").getAttribute("href");
+  expect(editedShare).not.toBe(originalShare);
+  expect(new URL(editedShare!).searchParams.get("text")).toContain("Walima");
 });
 
 test("clipboard denial exposes a selectable privacy-safe manual copy fallback", async ({

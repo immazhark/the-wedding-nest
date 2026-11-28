@@ -1,5 +1,13 @@
 # Current handoff — 28 November 2026
 
+## Latest enquiry hand-off phase
+
+`feat/planner-share-drafts` prepares WhatsApp/email draft links from the existing allow-listed `previewPlanText`, refreshed on each review render. Name, customer phone, venue, notes, channel and consent remain excluded. Destinations derive from trusted owner-approved config: enquiry WhatsApp8686773095 and configured email; registered business line9966973113/footer/schema remain unchanged. Existing generic contacts and manual clipboard fallback remain. Links only open a draft on explicit action; no automatic message, POST, accepted receipt or Sent state. Disclosure names the exclusions and requires the visitor to review/send in their app.
+
+New URL/privacy unit test failed before helper implementation; full370-unit suite and clean Astro/type check pass. Browser assertions cover decoded bodies, excluded private fixtures, no POST/external request merely preparing review, and refreshed links after edits. External WhatsApp/mail-client behavior, visual layout and latest hosted acceptance remain UNVERIFIED locally (Chromium absent). Independent privacy/routing review found no blocker; no dependency or production activation.
+
+Main now includes accessibility #181 as `5d05fc7` after all four hosted checks passed, in addition to #179/#180. Media #182 head `4a63028` passed all four checks; main had identical content to its tested enquiry predecessor. Added main as merge parent with unchanged media content tree to resolve squash-history documentation conflicts: current #182 head `bf2a101` requires refreshed checks. Progress #183 remains a separate pending phase. This hand-off phase is stacked on #183; reconcile live heads/checks before merging.
+
 ## Latest source phase — progress animation
 
 Review refinement: the progress browser regression now explicitly uses360x800, asserts visibility and positive layout width, so a hidden desktop bar cannot satisfy zero-size geometry assertions. Independent source review found no important transform/ARIA/reduced-motion/RTL blocker. Required hosted acceptance remains pending; no passing browser result is inferred from source review.

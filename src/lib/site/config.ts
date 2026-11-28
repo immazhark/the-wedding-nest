@@ -37,6 +37,12 @@ export const SITE = {
   },
 } as const;
 
+/** Owner-selected enquiry routing (24 Nov); the registered public business line stays separate. */
+export const ENQUIRY_CONTACT = {
+  whatsapp: `https://wa.me/${SITE.founder.phone.replace(/\D/g, "")}`,
+  email: SITE.email,
+} as const;
+
 /**
  * Indexing stays off for every build until an approved production launch sets
  * PUBLIC_ALLOW_INDEXING=true in the production build environment.
