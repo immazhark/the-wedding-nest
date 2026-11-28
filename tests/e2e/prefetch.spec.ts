@@ -18,8 +18,8 @@ test("intent prefetch respects changing connection hints and only warms public d
       navigator as Navigator & { connection: { saveData: boolean; effectiveType: string } }
     ).connection;
     const paths = () =>
-      [...document.querySelectorAll<HTMLLinkElement>('link[rel="prefetch"]')].map(
-        (link) => link.getAttribute("href"),
+      [...document.querySelectorAll<HTMLLinkElement>('link[rel="prefetch"]')].map((link) =>
+        link.getAttribute("href"),
       );
     const intent = (href: string, target = "", download = false) => {
       const link = document.createElement("a");
