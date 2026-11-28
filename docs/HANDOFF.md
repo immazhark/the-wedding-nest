@@ -1,5 +1,15 @@
 # Current handoff — 28 November 2026
 
+## Latest accessibility/enquiry phase — active checkpoint
+
+Owner explicitly authorized autonomous implementation after persistence. Do not repeat a plan-approval question for these fix passes; retain separate major creative-direction, publication and production gates. Branch `fix/planner-inline-validation` is the next isolated phase, stacked on security PR #180. Persistence #179 merged as `3fe1df6` after all four hosted checks succeeded and no review threads/reviews were outstanding. Security #180 is retargeted to main at head `2a565e5` (same content tree as its363-unit-tested candidate); required hosted verification is pending. No app merge/deployment acceptance is inferred.
+
+UI changes: field-local correction messages; after-blur validation without stealing focus; corrections clear independently of untouched required fields; existing aria-describedby help retained; first-invalid programmatic focus guarded against a second blur error replacing it; consent label44px minimum with padding. Existing server validation, nonpersonal drafts, preview disclosure and submit/idempotency behavior preserved. No new copy claims, assets, dependency or creative direction.
+
+Evidence: three field-validation unit tests were added first and failed before the helper existed; after implementation full suite366/366 passed and Astro/type check returned0 errors/warnings/hints. Existing standard/submission builds and formatter were exercised; final branch results are recorded in the PR. Source review caught the Enter-key focus/blur race; guard and browser regression added. Five new browser scenarios cover blur/location,360px visibility, preserved help/correction, Enter first-error focus and44px consent geometry. Browser tests/render/screenshots remain UNVERIFIED locally: installed Playwright's Chromium path does not exist. Do not install repeated blocked browser downloads or claim a visual PASS; hosted CI must execute the browser scenarios. Lighthouse/field/device measurements remain deferred.
+
+Verification commands: `npm test`; `npm run check`; `npm run format:check`; `npm run build`; `npm run build:submit`; on a browser-capable runner `npm run test:e2e -- tests/e2e/planner.spec.ts`, followed by existing full required CI. No live submission, messaging, provider configuration, intake/indexing/domain, deletion or unapproved publication is authorized by these fixes. Continue to the next scoped approved improvement while checks run, without merging a failing candidate.
+
 ## Latest implementation checkpoint — supersedes persistence-only scope below
 
 Owner's subsequent autonomous execution instruction authorizes the proposed source implementation passes; do not ask for the same plan approval again. Preserve separate creative/publication/production gates and one-phase/one-PR isolation. Phase 1 branch: `fix/enquiry-verification-response`, stacked on PR #179's remote head `6a33167`; local persistence-only commit `5b968bd` has the same tree but is not that remote commit. Main remains `f7848a8` at this reconciliation.

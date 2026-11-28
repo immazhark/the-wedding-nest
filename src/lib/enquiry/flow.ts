@@ -1,6 +1,30 @@
 import { STAGES, serviceOptionsFor, type EnquiryState, type StageId } from "./schema";
 import { isValidDate, isValidGuestCount, isValidPhone } from "./validate";
 
+export type PlannerField = "date" | "guestCount" | "name" | "phone" | "consent";
+
+/** Validate just the field a visitor has left, without announcing untouched answers. */
+export function fieldError(field: PlannerField, s: EnquiryState): string | null {
+  switch (field) {
+    case "date":
+      return s.date.kind === "date" && !isValidDate(s.date.value)
+        ? "Please enter a valid date."
+        : null;
+    case "guestCount":
+      return s.guestCount.trim() !== "" && !isValidGuestCount(s.guestCount)
+        ? "Please enter the number of guests as a whole number, or leave it blank."
+        : null;
+    case "name":
+      return s.name.trim() ? null : "Please enter your name.";
+    case "phone":
+      return isValidPhone(s.phone)
+        ? null
+        : "Please enter a phone or WhatsApp number we can reach you on.";
+    case "consent":
+      return s.consent ? null : "Please agree to us using your details to respond to this enquiry.";
+  }
+}
+
 export function isStageComplete(stage: StageId, s: EnquiryState): boolean {
   switch (stage) {
     case "occasion":
@@ -51,12 +75,8 @@ export function stageError(stage: StageId, s: EnquiryState): string | null {
     case "style":
       return null;
     case "logistics":
-      if (s.date.kind === "date" && !isValidDate(s.date.value)) return "Please enter a valid date.";
-      return "Please enter the number of guests as a whole number, or leave it blank.";
+      return fieldError("date", s) ?? fieldError("guestCount", s);
     case "contact":
-      if (s.name.trim().length === 0) return "Please enter your name.";
-      if (!isValidPhone(s.phone))
-        return "Please enter a phone or WhatsApp number we can reach you on.";
-      return "Please agree to us using your details to respond to this enquiry.";
+      return fieldError("name", s) ?? fieldError("phone", s) ?? fieldError("consent", s);
   }
 }
