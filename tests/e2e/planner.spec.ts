@@ -554,7 +554,8 @@ test("correcting phone feedback preserves help and ignores an untouched missing 
     input.setAttribute("aria-describedby", hint.id);
   });
   await phone.fill("12");
-  await page.getByRole("button", { name: "Skip contact — preview only" }).focus();
+  // Leave for another answer, not a navigation action whose handler owns validation.
+  await page.getByRole("radio", { name: "WhatsApp", exact: true }).focus();
   await expect(phone).toHaveAttribute("aria-describedby", "phone-help-fixture planner-error-msg");
   await phone.fill("9876543210");
   await expect(phone).toBeFocused();
