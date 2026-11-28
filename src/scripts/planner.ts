@@ -120,6 +120,8 @@ export function initPlanner(form: HTMLFormElement) {
   const feedbackFields = new Set<string>(["date", "guestCount", "name", "phone", "consent"]);
   let invalidField: string | null = null;
   let focusingValidation = false;
+  let pointerActive = false;
+  let pendingBlur: HTMLInputElement | null = null;
   const backBtn = form.querySelector<HTMLButtonElement>("[data-back]")!;
   const nextBtn = form.querySelector<HTMLButtonElement>("[data-next]")!;
   const nextLabel = form.querySelector<HTMLElement>("[data-next-label]")!;
@@ -317,6 +319,7 @@ export function initPlanner(form: HTMLFormElement) {
   const order: Panel[] = [...STAGES.map((s) => s.id), "review"];
 
   function show(panel: Panel, focus = true) {
+    pendingBlur = null;
     // A previous copy acknowledgement must not describe an edited plan.
     if (panel !== current) {
       copyAttempt++; // Invalidate pending clipboard results after navigation.
@@ -459,6 +462,7 @@ export function initPlanner(form: HTMLFormElement) {
 
   form.addEventListener("submit", (e) => {
     e.preventDefault(); // stages advance in place; sending (if enabled) has its own button
+    pendingBlur = null;
     if (current === "review" || current === "sent") return;
     const s = readState(form);
     const error = stageError(current, s);
@@ -555,10 +559,8 @@ export function initPlanner(form: HTMLFormElement) {
     }
   }
 
-  form.addEventListener("focusout", (event) => {
-    const input = event.target;
+  function validateBlur(input: HTMLInputElement) {
     if (
-      !(input instanceof HTMLInputElement) ||
       focusingValidation ||
       !feedbackFields.has(input.name) ||
       input.closest<HTMLElement>("[data-stage]")?.dataset["stage"] !== current ||
@@ -570,6 +572,36 @@ export function initPlanner(form: HTMLFormElement) {
     errorEl.textContent = error;
     // Blur validation must never pull focus back from the visitor's next control.
     focusInvalid(input, false);
+  }
+
+  // A correction can increase a field's height. Never move a clicked control
+  // between pointerdown and pointerup, or its click/checkbox activation can be lost.
+  form.addEventListener("pointerdown", () => {
+    pointerActive = true;
+    pendingBlur = null;
+  });
+  document.addEventListener("pointerup", () => (pointerActive = false));
+  document.addEventListener("pointercancel", () => {
+    pointerActive = false;
+    pendingBlur = null;
+  });
+  document.addEventListener("click", () => {
+    if (!pendingBlur) return;
+    setTimeout(() => {
+      if (pointerActive) return;
+      const input = pendingBlur;
+      pendingBlur = null;
+      if (input) validateBlur(input);
+    }, 0);
+  });
+  form.addEventListener("focusout", (event) => {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || focusingValidation) return;
+    // These actions validate, navigate or reset themselves. Their result takes
+    // precedence over feedback for the field being left.
+    if (event.relatedTarget instanceof HTMLElement && event.relatedTarget.closest("button")) return;
+    if (pointerActive) pendingBlur = input;
+    else validateBlur(input);
   });
 
   form.addEventListener("change", (event) => {

@@ -1,5 +1,11 @@
 # Current handoff — 28 November 2026
 
+## Hosted regression repair — accessibility PR #181
+
+Hosted verify at initial UI head `c061b5a` reported4 failures (desktop/mobile guest correction and360px blocked-step tests),263 passes/37 skips. The failures exposed a real interaction regression: focusout inserted inline feedback during Continue's pointerdown, moving its click target before pointerup, so submit/focus never ran. No test assertion was weakened and the candidate was not merged.
+
+Repair: action buttons defer to their own validate/navigation handlers; other pointer-triggered blur retains a pending input until after click completion. Submit/show clear pending blur, keyboard blur remains immediate, and current-stage/server/programmatic-focus guards remain. Added held-pointer Continue and consent-checkbox regressions. Full366-unit suite and clean type check pass locally after repair; browser GREEN is pending the new hosted head. New application head must satisfy all required checks; earlier failed/cancelled results are not a pass. Main already includes security #180 as `df0b0ea` and persistence #179 as `3fe1df6`.
+
 ## Latest accessibility/enquiry phase — active checkpoint
 
 Owner explicitly authorized autonomous implementation after persistence. Do not repeat a plan-approval question for these fix passes; retain separate major creative-direction, publication and production gates. Branch `fix/planner-inline-validation` is the next isolated phase, stacked on security PR #180. Persistence #179 merged as `3fe1df6` after all four hosted checks succeeded and no review threads/reviews were outstanding. Security #180 is retargeted to main at head `2a565e5` (same content tree as its363-unit-tested candidate); required hosted verification is pending. No app merge/deployment acceptance is inferred.
