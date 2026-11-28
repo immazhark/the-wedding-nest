@@ -217,6 +217,32 @@ describe("POST /api/enquiry", () => {
     expect(await res.json()).toEqual({ error: "invalid_body" });
   });
 
+  it("rejects rate-limited requests before Turnstile or database access without logging personal data", async () => {
+    const limit = vi.fn(async () => ({ success: false }));
+    env.ENQUIRY_RATE_LIMITER = { limit };
+    const prepare = vi.spyOn(db, "prepare");
+    const batch = vi.spyOn(db, "batch");
+    const log = vi.fn();
+    const response = await handleEnquiry(request(ok()), env, {
+      fetch: turnstile as unknown as typeof fetch,
+      log,
+    });
+
+    expect(limit).toHaveBeenCalledWith({ key: "203.0.113.7" });
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("60");
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(await response.json()).toEqual({ error: "rate_limited" });
+    expect(turnstile).not.toHaveBeenCalled();
+    expect(prepare).not.toHaveBeenCalled();
+    expect(batch).not.toHaveBeenCalled();
+    expect(log).toHaveBeenCalledExactlyOnceWith({
+      event: "enquiry",
+      outcome: "rate_limited",
+      status: 429,
+    });
+  });
+
   it("returns a retryable response when the rate limiter is unavailable", async () => {
     env.ENQUIRY_RATE_LIMITER = {
       limit: async () => {

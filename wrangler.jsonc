@@ -33,6 +33,15 @@
         "ENQUIRIES_ENABLED": "true",
         "ALLOWED_ORIGINS": "https://the-wedding-nest-staging.mazharkhan-it.workers.dev",
       },
+      // Staging-only, approximate per-IP protection before Turnstile and D1.
+      // Namespace reserved for TWN staging; never reuse it for live intake.
+      "ratelimits": [
+        {
+          "name": "ENQUIRY_RATE_LIMITER",
+          "namespace_id": "1457096587",
+          "simple": { "limit": 30, "period": 60 },
+        },
+      ],
       "d1_databases": [
         {
           "binding": "DB",
