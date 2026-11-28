@@ -1,0 +1,5 @@
+# Catering menu rail interaction — 28 November 2026
+
+Independent source phase from main `b41b42a`. Replace the layout-affecting padding transition on the home catering rail with transforms on its title and description. Preserve the original directional arrow and underline. When reduced motion is active the underline is immediate and both text and arrow remain still. No approved copy, asset, link, component structure or route changed.
+
+Real Chromium isolated markup/CSS reproduction at 360×600, with a 288px rail and local fallback fonts: original 4/8, candidate 8/8. Focus changed the original left padding from 0 to 12px and title-column width from 255 to 243px; candidate retained 0 and 255px respectively. Row height remained 104px. Live reduced motion removed candidate arrow and title movement; focused underline remained visible. These are fixture measurements, not application CWV or real-font acceptance. Added a full-page Playwright regression. Full hosted checks, site rendering and integration against the other open phases remain required. No new dependency or production gate change.

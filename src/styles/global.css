@@ -477,7 +477,6 @@
   padding: 1.15rem 0;
   border-bottom: 1px solid color-mix(in srgb, var(--color-ivory) 18%, transparent);
   color: var(--color-ivory);
-  transition: padding-left 0.5s var(--ease-editorial);
 }
 .menu-rail-name {
   font-family: var(--font-display);
@@ -496,7 +495,6 @@
   grid-column: 2;
   align-self: center;
   color: var(--color-saffron);
-  transition: transform 0.5s var(--ease-editorial);
 }
 .menu-rail-link::after {
   content: "";
@@ -508,19 +506,31 @@
   background: var(--color-saffron);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.6s var(--ease-editorial);
-}
-.menu-rail-link:hover,
-.menu-rail-link:focus-visible {
-  padding-left: 0.75rem;
 }
 .menu-rail-link:hover::after,
 .menu-rail-link:focus-visible::after {
   transform: none;
 }
-.menu-rail-link:hover .menu-rail-arrow,
-.menu-rail-link:focus-visible .menu-rail-arrow {
-  transform: translateX(6px);
+/* Keep the text column stable; reduced motion retains the underline without travel. */
+@media (prefers-reduced-motion: no-preference) {
+  .menu-rail-name,
+  .menu-rail-line,
+  .menu-rail-arrow {
+    transition: transform 0.5s var(--ease-editorial);
+  }
+  .menu-rail-link::after {
+    transition: transform 0.6s var(--ease-editorial);
+  }
+  .menu-rail-link:hover .menu-rail-name,
+  .menu-rail-link:focus-visible .menu-rail-name,
+  .menu-rail-link:hover .menu-rail-line,
+  .menu-rail-link:focus-visible .menu-rail-line {
+    transform: translateX(0.75rem);
+  }
+  .menu-rail-link:hover .menu-rail-arrow,
+  .menu-rail-link:focus-visible .menu-rail-arrow {
+    transform: translateX(6px);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
