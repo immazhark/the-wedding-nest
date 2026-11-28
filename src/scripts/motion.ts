@@ -9,8 +9,26 @@
 
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-/** A handful of slow gold motes in the hero light. Cheap 2D canvas; paused when off screen. */
+/** A brief, optional opening flourish; never an indefinite animation. */
 function startDust(): void {
+  const constrained = () => {
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }
+    ).connection;
+    return (
+      connection?.saveData ||
+      connection?.effectiveType === "slow-2g" ||
+      connection?.effectiveType === "2g"
+    );
+  };
+  if (
+    calm.matches ||
+    constrained() ||
+    typeof ResizeObserver === "undefined" ||
+    typeof IntersectionObserver === "undefined"
+  ) {
+    return;
+  }
   const canvas = document.querySelector<HTMLCanvasElement>("[data-dust]");
   const ctx = canvas?.getContext("2d");
   if (!canvas || !ctx) return;
@@ -29,7 +47,12 @@ function startDust(): void {
   let w = 0;
   let h = 0;
   let raf = 0;
-  let visible = true;
+  let visible = false;
+  let finished = false;
+  let lastFrame: number | undefined;
+  const duration = 4500;
+  const deadline = performance.now() + duration;
+  let expiry: ReturnType<typeof setTimeout>;
 
   const resize = () => {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -39,35 +62,63 @@ function startDust(): void {
     canvas.height = Math.round(h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   };
+  const stop = () => {
+    if (finished) return;
+    finished = true;
+    cancelAnimationFrame(raf);
+    clearTimeout(expiry);
+    resizeObserver.disconnect();
+    intersectionObserver.disconnect();
+    document.removeEventListener("visibilitychange", run);
+    calm.removeEventListener("change", run);
+    ctx.clearRect(0, 0, w, h);
+  };
   const frame = (t: number) => {
+    if (finished) return;
+    if (t >= deadline || calm.matches || constrained()) {
+      stop();
+      return;
+    }
+    const elapsed = lastFrame === undefined ? 0 : Math.min((t - lastFrame) / 1000, 0.05);
+    lastFrame = t;
+    const fade = Math.min(1, (deadline - t) / 700);
     ctx.clearRect(0, 0, w, h);
     for (const m of motes) {
-      m.y -= m.s / 60;
+      m.y -= m.s * elapsed;
       if (m.y < -0.02) {
         m.y = 1.02;
         m.x = Math.random();
       }
       const tw = 0.6 + 0.4 * Math.sin(t / 1400 + m.p);
       ctx.beginPath();
-      ctx.fillStyle = `rgba(219, 166, 70, ${(m.a * tw).toFixed(3)})`;
+      ctx.fillStyle = `rgba(219, 166, 70, ${(m.a * tw * fade).toFixed(3)})`;
       ctx.arc(m.x * w + Math.sin(t / 2600 + m.p) * 12, m.y * h, m.r, 0, Math.PI * 2);
       ctx.fill();
     }
     raf = requestAnimationFrame(frame);
   };
   const run = () => {
+    if (finished) return;
     cancelAnimationFrame(raf);
-    if (visible && !document.hidden && !calm.matches) raf = requestAnimationFrame(frame);
+    lastFrame = undefined;
+    if (performance.now() >= deadline || calm.matches || constrained()) {
+      stop();
+      return;
+    }
+    if (visible && !document.hidden) raf = requestAnimationFrame(frame);
   };
 
-  resize();
-  new ResizeObserver(resize).observe(stage);
-  new IntersectionObserver(([entry]) => {
+  const resizeObserver = new ResizeObserver(resize);
+  const intersectionObserver = new IntersectionObserver(([entry]) => {
     visible = entry?.isIntersecting ?? false;
     run();
-  }).observe(stage);
+  });
+  expiry = setTimeout(stop, duration);
+  resize();
+  resizeObserver.observe(stage);
   document.addEventListener("visibilitychange", run);
   calm.addEventListener("change", run);
+  intersectionObserver.observe(stage);
   run();
 }
 

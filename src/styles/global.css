@@ -628,8 +628,9 @@
   }
 }
 
-/* Room for the brief pinned push-in is reserved up front so scroll motion never shifts layout. */
-@media (min-width: 48rem) {
+/* Reserve the desktop pin space only while motion is permitted. A live reduced-motion
+   change removes the pin and must also remove its reserved space. */
+@media (min-width: 48rem) and (prefers-reduced-motion: no-preference) {
   html.motion-ok:not(.motion-failed) .grand {
     padding-bottom: 70vh;
   }
