@@ -206,11 +206,23 @@ const dark = true;
 
   let lockToken = 0;
 
+  function syncMenuTop() {
+    if (!header || !menu) return;
+    menu.style.setProperty("--menu-top", `${header.getBoundingClientRect().bottom}px`);
+  }
+
   function setOpen(open: boolean, restoreFocus = false, afterUnlock?: () => void) {
     if (!toggle || !menu) return;
-    // Header bottom moves with the preview notice / scroll position; CSSOM writes are CSP-safe.
-    if (open && header)
-      menu.style.setProperty("--menu-top", `${header.getBoundingClientRect().bottom}px`);
+    // Keep the overlay aligned if the preview notice reflows or the page scrolls.
+    // Listen only while open; CSSOM writes are CSP-safe.
+    if (open) {
+      syncMenuTop();
+      window.addEventListener("resize", syncMenuTop);
+      window.addEventListener("scroll", syncMenuTop, { passive: true });
+    } else {
+      window.removeEventListener("resize", syncMenuTop);
+      window.removeEventListener("scroll", syncMenuTop);
+    }
     toggle.setAttribute("aria-expanded", String(open));
     if (label) label.textContent = open ? "Close" : "Menu";
     menu.toggleAttribute("data-open", open);
