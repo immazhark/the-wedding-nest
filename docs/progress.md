@@ -1,5 +1,9 @@
 # Project progress — reconciled 27 November 2026
 
+## Mobile navigation fallback checkpoint — 28 November 2026
+
+#185's first hosted verify stopped at formatting; applied the exact hosted Prettier correction in `800c75e`, no assertions weakened. New isolated phase `fix/mobile-navigation-fallback` makes the mobile header overlay depend on its own successful initialization rather than the global inline JS marker. If the external module fails, primary links stay visible and the tall fallback header stays in document flow. Existing enhanced layout, artwork, navigation and keyboard handlers are retained. An isolated Chromium CSS/markup reproduction at 360×500 failed all three original fallback checks and passed all three with the revised gating; closed/open enhanced CSS states passed. This was not a built Astro page. Added a full-page Playwright regression that blocks external JS and verifies the inline marker, visible links, hidden dead toggle, static fallback and native anchor navigation. Full hosted verification, actual site render, CLS and physical-device measurements remain pending. No production gate changed.
+
 ## Latest checkpoint — 28 November 2026, public intent prefetch
 
 #182 squash-merged as `781560d` after all four exact-head checks passed and no unresolved reviews. #183 retargeted to main and ancestry repaired by a non-force merge preserving its previously tested tree; refreshed checks remain required. #184 had four green checks at `406c00d`, but integration awaits its predecessor. #64 remains held.

@@ -81,26 +81,26 @@ const dark = true;
     background: var(--color-kohl);
   }
   @media (max-width: 47.99rem) {
-    :global(html.js) .site-header--dark .site-menu {
+    .site-header--dark[data-menu-ready] .site-menu {
       background: var(--color-garnet-deep);
     }
     .site-header--dark .site-menu :global(.nav-link:not(.btn)) {
       color: var(--color-ivory);
       border-bottom-color: color-mix(in srgb, var(--color-ivory) 18%, transparent);
     }
-    :global(html.js) .site-header--dark .site-menu[data-open] :global(li) {
+    .site-header--dark[data-menu-ready] .site-menu[data-open] :global(li) {
       animation: menu-in 0.7s var(--ease-editorial) both;
     }
-    :global(html.js) .site-header--dark .site-menu[data-open] :global(li:nth-child(2)) {
+    .site-header--dark[data-menu-ready] .site-menu[data-open] :global(li:nth-child(2)) {
       animation-delay: 60ms;
     }
-    :global(html.js) .site-header--dark .site-menu[data-open] :global(li:nth-child(3)) {
+    .site-header--dark[data-menu-ready] .site-menu[data-open] :global(li:nth-child(3)) {
       animation-delay: 120ms;
     }
-    :global(html.js) .site-header--dark .site-menu[data-open] :global(li:nth-child(4)) {
+    .site-header--dark[data-menu-ready] .site-menu[data-open] :global(li:nth-child(4)) {
       animation-delay: 180ms;
     }
-    :global(html.js) .site-header--dark .site-menu[data-open] :global(li:nth-child(5)) {
+    .site-header--dark[data-menu-ready] .site-menu[data-open] :global(li:nth-child(5)) {
       animation-delay: 240ms;
     }
   }
@@ -111,14 +111,17 @@ const dark = true;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    :global(html.js) .site-header--dark .site-menu[data-open] :global(li) {
+    .site-header--dark[data-menu-ready] .site-menu[data-open] :global(li) {
       animation: none;
     }
   }
-  /* Without JS the menu is part of the header, not a fixed-height overflow
-     that covers the opening hero. Only the JS-enhanced menu uses an overlay. */
+  /* Keep native navigation visible until this component's own script is ready.
+     A global JS marker cannot prove the navigation module loaded successfully. */
   @media (max-width: 47.99rem) {
-    :global(html:not(.js)) .site-header > div {
+    .site-header:not([data-menu-ready]) {
+      position: static;
+    }
+    .site-header:not([data-menu-ready]) > div {
       height: auto;
       flex-wrap: wrap;
       padding-top: 1rem;
@@ -127,7 +130,7 @@ const dark = true;
       width: 100%;
       padding: 0 1rem 1rem;
     }
-    :global(html.js) .site-menu {
+    .site-header[data-menu-ready] .site-menu {
       position: fixed;
       inset: var(--menu-top, 4.5rem) 0 0 0;
       background: var(--color-ivory);
@@ -141,7 +144,7 @@ const dark = true;
         transform 0.4s var(--ease-editorial),
         visibility 0s linear 0.4s;
     }
-    :global(html.js) .site-menu[data-open] {
+    .site-header[data-menu-ready] .site-menu[data-open] {
       visibility: visible;
       opacity: 1;
       transform: none;
@@ -158,16 +161,16 @@ const dark = true;
     .site-menu :global(.btn) {
       margin-top: 1.75rem;
     }
-    :global(html:not(.js)) .site-menu :global(.nav-link:not(.btn)) {
+    .site-header:not([data-menu-ready]) .site-menu :global(.nav-link:not(.btn)) {
       font-size: 1.25rem;
       padding: 0.5rem 0;
     }
   }
-  :global(html.js) [data-menu-toggle] {
+  .site-header[data-menu-ready] [data-menu-toggle] {
     display: inline-flex;
   }
   @media (min-width: 48rem) {
-    :global(html.js) [data-menu-toggle] {
+    .site-header[data-menu-ready] [data-menu-toggle] {
       display: none;
     }
   }
@@ -182,13 +185,14 @@ const dark = true;
   }
   @media (prefers-reduced-motion: reduce) {
     .menu-bar,
-    :global(html.js) .site-menu {
+    .site-header[data-menu-ready] .site-menu {
       transition: none;
     }
   }
 </style>
 
 <script>
+  const header = document.querySelector<HTMLElement>("[data-site-header]");
   const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
   const menu = document.querySelector<HTMLElement>("[data-menu]");
   const label = toggle?.querySelector<HTMLElement>("[data-menu-label]");
@@ -205,7 +209,6 @@ const dark = true;
   function setOpen(open: boolean, restoreFocus = false, afterUnlock?: () => void) {
     if (!toggle || !menu) return;
     // Header bottom moves with the preview notice / scroll position; CSSOM writes are CSP-safe.
-    const header = document.querySelector<HTMLElement>("[data-site-header]");
     if (open && header)
       menu.style.setProperty("--menu-top", `${header.getBoundingClientRect().bottom}px`);
     toggle.setAttribute("aria-expanded", String(open));
@@ -232,8 +235,7 @@ const dark = true;
     else if (restoreFocus) toggle.focus();
   }
 
-  if (toggle && menu) {
-    setOpen(false);
+  if (header && toggle && menu) {
     toggle.addEventListener("click", () =>
       setOpen(toggle.getAttribute("aria-expanded") !== "true"),
     );
@@ -287,5 +289,7 @@ const dark = true;
       }
     });
     mobile.addEventListener("change", () => setOpen(false));
+    setOpen(false);
+    header.setAttribute("data-menu-ready", "");
   }
 </script>
