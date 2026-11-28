@@ -1,5 +1,13 @@
 # Project progress — reconciled 27 November 2026
 
+## Latest checkpoint — 28 November 2026
+
+Owner supplied a permanent design/engineering directive (attachment sections1–17 plus explicit sections18–19) and requested immediate repository persistence. Main was rechecked at `f7848a8` (#178); ff-only pull was already up to date. The old #177/current-candidate block below is retained as historical context, not a fresh branch/deployment assertion.
+
+Active writer: ChatGPT Work on `docs/master-design-directive`, documentation-only persistence phase. Canonical full directives, reconciliation/execution prompt, DESIGN index, entrypoint references and living requirement/technique matrix are prepared; prior audit/phase plan preserved. See [HANDOFF](HANDOFF.md) and [matrix](qa/DESIGN-IMPLEMENTATION.md) for current verification and phase boundary. No application source, dependency, database, notification, public-domain/indexing/intake or deployment change is included. Fresh Lighthouse/axe/runtime evidence stays owner-deferred and UNVERIFIED. Only draft #64 was returned in the open-PR reconciliation; its rate-limit entitlement/cost hold must not be duplicated or bypassed.
+
+Existing staged application/creative/release gates remain binding. This persistence request is not blanket approval of every application phase or the proposed signature refinement. Resume authorized work from the concrete latest PR/commit after reviewing its status, not from stale historical entries.
+
 ## Current state — read this first
 
 **Active writer: ChatGPT Work**, under the owner’s execution directive. Integrated main is `18209f8` (PR #177). PR #176 merged earlier as `f7bb851`. Held-event review head `9a65a5a` passed all four hosted checks before #177 squash merge. The earlier #176 final head `ad819c1` passed verify, cross-browser layout, editorial fixtures and Workers Builds before squash merge. The editorial job budget is now 15 minutes after a measured cold image build consumed 9m10s of the former 10-minute limit; no assertion was weakened. Superseded progress PR #161 is closed; #64 remains held for rate-limit account entitlement/cost evidence. This workspace has no unrelated changes or stashes; other machines’ local files remain inaccessible and untouched.

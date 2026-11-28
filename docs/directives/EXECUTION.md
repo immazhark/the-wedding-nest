@@ -1,0 +1,44 @@
+# Reconciliation and Master Execution Prompt
+
+Owner-authorized persistence phase · 28 November 2026
+
+## Authority and reconciliation
+
+1. Preserve the complete [new master directive](MASTER-DESIGN-ENGINEERING-DIRECTIVE.md), including the owner's added sections 18–19. Preserve the earlier [site rulebook](ELITE-SITE-DIRECTIVE-WEDDING-NEST.md); it is not replaced with a generic design brief. New requirements supplement stricter existing rules. A material amendment must name the affected rule, reason and owner authorization.
+2. This session explicitly authorizes immediate repository-level persistence and reconciliation. The previous Step 1/2 artifacts remain evidence/planning records. The original staged implementation/approval boundary and one-phase/one-branch/one-PR requirement remain in force; the new directive expressly preserves stage gates. Creating this persistence phase does not silently approve all eight application phases or the proposed signature redesign. Prepare reviewable work, stop at its phase boundary, then obtain any still-required approval.
+3. “Never idle” means pivot among independent authorized work. It does not mean merge with failing required checks, invent evidence, publish unapproved assets or bypass a release gate. Fresh Lighthouse/axe/runtime measurements were deferred by the owner; do not ask for them repeatedly or block unrelated authorized source work on their absence. Keep their statuses UNVERIFIED and retain the final evidence gate.
+4. The stricter TWN D2 targets in `DESIGN.md` prevail over the new generic good-CWV/Lighthouse95 targets. Preserve both original B3≥9/category and the nine-category 95/100 internal rubric, with evidence and no unsupported totals. Native/static-first Astro remains authoritative; no migrations to React/Next or stacks used by the other three projects.
+5. Preserve the approved Grand Entrance (#104 onward). The latest cinematic Hyderabadi direction extends it. Step 2's shorter invitation flourish is a proposal needing visual approval, not a reason to discard the current direction. Earlier “one arch per page” guidance conflicts with subsequently approved Grand Entrance history: do not bulk-remove approved arches; assess their purpose and rendered interference in a scoped proposal. Previously fixed hero/footer/catering defects must be reproduced before reimplementation.
+6. Prior owner facts: registered public business line +91 99669 73113 and founder/notification destination +91 86867 73095 serve distinct purposes; preserve each approved role. Email/privacy contact is theweddingnest.events@gmail.com. Unsuccessful-enquiry eligibility is 90 days after marking unsuccessful; active/booked and pending-delivery protections remain. No cleanup activation, notification sends, credentials, domain attachment, indexing, live intake, new business claims or unapproved service publication as a side effect.
+
+## Reconciled state
+
+GitHub/main and local history were rechecked on 28 November: `f7848a88d1c41f7eff6c5be3bb3258b793a3a98c` (#178). `git pull --ff-only origin main` reported already up to date. Local untracked `docs/HANDOFF.md` and `docs/qa/` are this conversation's prior artifacts and were preserved. Dedicated persistence branch: `docs/master-design-directive`. Do not claim other machines are clean or accessible.
+
+The only open PR returned by the current open-PR query is held draft #64, `codex/staging-limiter-draft`, head `86d886b7fbc1c915b4d9fc47c7d2b95eb0a5da40`. It is blocked on entitlement/cost evidence: inspect that work before recreating rate limiting. No existing branch is modified by this phase. `docs/progress.md`'s older current-state block at #177 is historical following this reconciliation; deployment provenance is not refreshed by a source pull.
+
+Already implemented: extensive semantic planner, nonpersonal drafts, bounded/validated submission with idempotency, Access-protected operator functionality, dormant outbox/retention helpers, category-specific galleries/fixtures, shared guarded film controller, responsive regression suites and intentional release guards. Runtime email receipt, full authenticated transaction acceptance, fresh budgets and real-device evidence are not established by those implementations. Service galleries are built but approval-gated; do not call them missing and rebuild them.
+
+## Copyable execution prompt
+
+> Take ownership of `immazhark/the-wedding-nest` as the integration writer. Read AGENTS.md, CLAUDE.md, this reconciliation, both linked permanent directives in full, DESIGN.md, the living requirement matrix, current progress/handoff and the scoped approved implementation plan. Read only task-relevant deeper documentation after that.
+>
+> Safely synchronize authorized main, inspect local changes/recent commits/open PRs, preserve other writers' work and create one branch/PR for the current authorized phase. Never reset, force-push or write directly to main. Resume from the actual evidenced milestone; no duplicate audit, scaffold, media/gallery rebuild or speculative dependency removal.
+>
+> Use the existing architecture, approved Grand Entrance identity, real approved media and truthful business information. Prioritize security and the enquiry journey, then accessibility/mobile/performance, SEO, privacy, proven cleanup and visual refinement in the approved phase order. Do not re-stack the site. Use native platform/existing dependencies first; justify cost, licensing, maintenance, security and bytes before an addition.
+>
+> Apply the complete requirements matrix, including every advanced-technique evaluation and justified exclusion. Prefer bounded independent specialists with one integration owner; do not let agents edit shared files concurrently. Research selectively from primary standards and relevant creative references before significant visual work. Record what was actually inspected; do not imply a reference or skill ran because it was listed.
+>
+> Implement the smallest coherent improvement with focused regression tests for changed behavior. Iterate Research → Design → Implement → Render → Critique → Refine → Optimize → Verify. Keep clear focus, mobile touch reach, low-bandwidth fallback, reduced motion, interruption/retry recovery, privacy-safe progress and server truth. Never optimistically confirm enquiry receipt, bookings or authoritative operator changes. Use isolated fictional fixtures for tests.
+>
+> Run feasible relevant checks and inspect actual output. Deferred diagnostics remain UNVERIFIED; do not repeatedly demand unavailable evidence, wait on CI without other authorized work, or fabricate pass/score/deployment claims. Record blocker → next independent authorized task. No gate can be bypassed. Final Part E evidence and creative approval remain required even if a build or merge succeeds.
+>
+> Update the living matrix, current handoff/progress and decision/evidence references at meaningful boundaries. State exact files/commit/PR, executed checks and limits, rendered evidence if available, release state and next scoped action. Stop at the required phase review boundary. Material directive amendments require explicit owner authorization and a recorded rationale.
+
+## Research record, 28 November
+
+Primary documentation inspected selectively for technique evaluation: [MDN corner-shape](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/corner-shape) identifies limited availability, so continuous corners are optional enhancement with ordinary radius fallback; [MDN Speculation Rules](https://developer.mozilla.org/en-US/docs/Web/API/Speculation_Rules_API) distinguishes prefetch/prerender and safe targets; [GOV.UK error guidance](https://design-system.service.gov.uk/components/error-message/) supports nearby meaningful corrections. Existing Grand Entrance records prior rendered competitor research; this session does not claim fresh rendered visits to Awwwards/Mobbin/etc. No external library was installed or copied.
+
+## Immediate next application work
+
+After the existing plan-approval gate is satisfied, reconcile Phase 1 against held #64 rather than duplicating it. If cost/entitlement remains blocked, log it and prepare the next independently authorized accessibility/enquiry fix on a separate phase branch. Candidate first UI defect is field-adjacent guest validation/focus, not a new hero or a full planner rewrite. Its real rendered validation and later measurement results must be recorded, not inferred from this document.
