@@ -502,6 +502,45 @@ test("blocked guest correction and focused input fit in the viewport", async ({ 
   expect(box!.y + box!.height).toBeLessThanOrEqual(640);
 });
 
+test("holding Continue through blur does not move its click target", async ({ page }) => {
+  await page.getByRole("checkbox", { name: "Nikah" }).check();
+  await next(page);
+  await page.getByRole("radio", { name: /End-to-end planning/ }).check();
+  await next(page);
+  await next(page);
+  const guests = page.getByLabel(/Approximate guests/);
+  await guests.fill("3.5");
+  const button = page.getByRole("button", { name: /^Continue/ });
+  await button.scrollIntoViewIfNeeded();
+  const before = await button.boundingBox();
+  expect(before).not.toBeNull();
+  await page.mouse.move(before!.x + before!.width / 2, before!.y + before!.height / 2);
+  await page.mouse.down();
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+  expect(await button.boundingBox()).toEqual(before);
+  await page.mouse.up();
+  await expect(guests).toBeFocused();
+  await expect(page.getByRole("alert")).toContainText("whole number");
+});
+
+test("blur feedback does not cancel a consent checkbox click", async ({ page }) => {
+  await completeToContact(page);
+  const phone = page.getByLabel("Phone or WhatsApp number");
+  await phone.fill("12");
+  const consent = page.getByRole("checkbox", { name: /I agree/ });
+  await consent.scrollIntoViewIfNeeded();
+  const before = await consent.boundingBox();
+  expect(before).not.toBeNull();
+  await page.mouse.move(before!.x + before!.width / 2, before!.y + before!.height / 2);
+  await page.mouse.down();
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+  expect(await consent.boundingBox()).toEqual(before);
+  await page.mouse.up();
+  await expect(consent).toBeChecked();
+  await expect(phone).toHaveAttribute("aria-invalid", "true");
+  await expect(page.getByRole("alert")).toContainText("phone or WhatsApp");
+});
+
 test("correcting phone feedback preserves help and ignores an untouched missing name", async ({
   page,
 }) => {
