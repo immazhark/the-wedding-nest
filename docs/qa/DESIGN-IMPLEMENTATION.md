@@ -25,8 +25,8 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | ID | Actionable requirement | Applicability / location | Priority | Status | Evidence / next verification |
 |---|---|---|---|---|---|
 | 01.1 | Brownfield preservation: functionality, business rules, security, accessibility, maintainability | All | P0 | Partial | Existing Astro/Worker architecture; per-change regression proof required |
-| 01.2 | Execute reconciled authorized work rather than repeat planning | Current persistence phase | P1 | Implemented—UNVERIFIED | Directive/entrypoint changes prepared; commit and remote PR pending |
-| 02.1 | Inspect branch/main/tree/commits/open PRs and synchronize safely | Git/GitHub | P0 | Verified | main f7848a8; ff-only pull up to date; only held draft #64 returned; prior untracked docs preserved |
+| 01.2 | Execute reconciled authorized work rather than repeat planning | Source implementation passes | P1 | Partial | Persistence/security #179/#180 merged; enquiry/media #181/#182 and progress #183 implemented on isolated branches, required current checks pending |
+| 02.1 | Inspect branch/main/tree/commits/open PRs and synchronize safely | Git/GitHub | P0 | Verified | Latest reconciliation main df0b0ea; #181/#182/#183 open, #64 held; local/remote content trees checked and all concurrent work preserved |
 | 02.2 | Read agent, README, product/design, tooling, QA and handoff context | Agent files; docs/directives/EXECUTION.md | P0 | Verified | Attachment1–17, owner18–19, prior rulebook/audit/plan, entrypoints, README, decisions, product/tooling, current progress, creative/Grand Entrance/launch docs inspected |
 | 02.3 | Classify requirements and preserve stricter instructions | This matrix; EXECUTION.md | P0 | Partial | Initial matrix established; application acceptance remains pending |
 | 02.4 | Preserve completed work, approved facts and concurrent changes | All diffs | P0 | Partial | No application changes in this phase; no resets/overwrites |
@@ -112,7 +112,7 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | 14.4 | Evidence and release under authorization | Release gates | P0 | Blocked | Fresh acceptance and separate owner release approvals outstanding |
 | 15.1 | Actual rendered before/after mobile/desktop captures | Browser QA | P1 | Pending | Prior audit desktop before captures only; no new visual change to capture here |
 | 15.2 | Primary/edge/duplicate/network/keyboard/motion/recovery tests | Unit/e2e/manual | P0 | Pending | Fresh application runtime execution deferred |
-| 15.3 | Build/lint/types/unit/integration/Playwright/axe/audit/Lighthouse | Existing checks/QA | P1 | Pending | Run applicable commands per phase; no inferred pass |
+| 15.3 | Build/lint/types/unit/integration/Playwright/axe/audit/Lighthouse | Existing checks/QA | P1 | Partial | Local369-unit/type/format/two-build checks pass; hosted browser findings/passes recorded per head; latest full acceptance pending. Fresh Lighthouse/audit/device metrics remain unrun/deferred |
 | 15.4 | Nine-category weighted95 target and originalB3≥9/category | QA critique | P2 | Pending | No unsupported score; stricter thresholds preserved |
 | 15.5 | Security/functional/a11y blockers trump visual score | Release gate | P0 | Implemented—UNVERIFIED | Explicit permanent rule; execution enforcement remains procedural |
 | 15.6 | Critique/refine first render | Each visual phase | P1 | Pending | No public visual implementation this phase |
@@ -126,11 +126,11 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | 18.4 | Research→design→implement→render→critique→refine→optimize→verify | Each visual phase | P1 | Pending | Mandatory workflow; not all steps performed for application yet |
 | 18.5 | Creative director/UX/architect/mobile critique | QA evidence | P1 | Pending | Specialist matrix review only; not rendered creative approval |
 | 18.6 | Preserve approved rules/work; no bypass/fake completion | Entire programme | P0 | Partial | Precedence and evidence boundaries explicit |
-| 19.1 | Persist complete directive1–19 | docs/directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md | P0 | Partial | Local exact source preservation and ordered1–19 assertions passed; remote integration pending |
+| 19.1 | Persist complete directive1–19 | docs/directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md | P0 | Verified | Exact source/ordered1–19 assertions passed; #179 merged as3fe1df6 after four hosted checks passed |
 | 19.2 | Both agent entrypoints mandate full session-start read | AGENTS.md; CLAUDE.md | P0 | Verified | Both entrypoint reference/link assertions passed; future agent adherence remains procedural |
-| 19.3 | Integrate design/engineering/architecture/QA without duplication | DESIGN; tooling; decisions; matrix | P1 | Implemented—UNVERIFIED | Additive pointers and scoped decision; no app architecture replaced |
+| 19.3 | Integrate design/engineering/architecture/QA without duplication | DESIGN; tooling; decisions; matrix | P1 | Verified | Additive pointers/decision/design index/matrix integrated in #179; document link/source checks passed; no claim of full application compliance |
 | 19.4 | Session sync/progress/verified milestone/standards/no regressions | Entry files; HANDOFF | P0 | Partial | Current session reconciled; future session compliance procedural |
-| 19.5 | All agents share canonical truth | Directive; matrix; progress | P0 | Implemented—UNVERIFIED | Shared paths; remote persistence pending |
+| 19.5 | All agents share canonical truth | Directive; matrix; progress | P0 | Verified | Shared source paths and mandatory entrypoints on main through #179; future agent adherence is procedural, not mechanically guaranteed |
 | 19.6 | Protect directive; authorize/log material amendments; controlled nonweakening improvements | EXECUTION; decisions | P0 | Implemented—UNVERIFIED | Amendment policy explicit; owner-controlled process |
 | 19.7 | Living statuses and institutional knowledge without repeated owner pasting | Matrix; HANDOFF; progress | P1 | Partial | Initial checkpoint; future meaningful updates required |
 

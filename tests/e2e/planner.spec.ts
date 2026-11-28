@@ -97,9 +97,12 @@ test("walks through all five stages to a review, without sending anything", asyn
 test("progress keeps a stable layout box while its visual fraction follows navigation", async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
   const bar = page.locator("[data-progress-bar]");
   const track = page.locator("[data-progress-track]");
+  await expect(bar).toBeVisible();
   const layoutWidth = await bar.evaluate((element) => (element as HTMLElement).offsetWidth);
+  expect(layoutWidth).toBeGreaterThan(0);
   const check = async (step: number) => {
     await expect(track).toHaveAttribute("aria-valuenow", String(step));
     const size = await bar.evaluate((element) => ({
