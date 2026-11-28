@@ -177,7 +177,7 @@ const thresholdPhoto =
   <section class="kitchen arch-over on-dark" aria-labelledby="kitchen-title">
     <div class="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12 py-24 md:py-36 grid gap-14 md:grid-cols-12 md:items-center">
       <div class="md:col-span-5">
-        <div class="kitchen-arch" data-kitchen>
+        <div class="kitchen-arch" data-kitchen data-loop>
           <img
             src="/media/kitchen-loop-poster.jpg"
             alt=""
@@ -196,9 +196,14 @@ const thresholdPhoto =
             poster="/media/kitchen-loop-poster.jpg"
             aria-label="A cook in a Wedding Nest apron ladles a rich curry from a large pot and plates it with salad"
             data-kitchen-video
+            data-loop-video
           >
             <source src="/media/kitchen-loop.mp4" type="video/mp4" />
           </video>
+          <button type="button" class="loop-toggle" data-loop-toggle hidden>
+            <span data-loop-toggle-label>Pause</span>
+            <span class="sr-only"> the kitchen film</span>
+          </button>
         </div>
       </div>
       <div class="md:col-span-6 md:col-start-7">
@@ -787,6 +792,7 @@ const thresholdPhoto =
 
 <script>
   import "../scripts/motion";
+  import "../scripts/loop";
   // Films: nothing downloads until play. The native controls stay for no-JS and keyboard users;
   // with JS a single large play button leads, then hands over to the native controls.
   const players = document.querySelectorAll<HTMLElement>("[data-film]");
@@ -831,25 +837,5 @@ const thresholdPhoto =
       door.addEventListener("focusin", wake);
       door.addEventListener("focusout", rest);
     });
-  }
-  // The kitchen loop plays only while visible, never with reduced motion, and has no audio track.
-  const arch = document.querySelector<HTMLElement>("[data-kitchen]");
-  const video = document.querySelector<HTMLVideoElement>("[data-kitchen-video]");
-  const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
-  if (arch && video && !calm.matches && "IntersectionObserver" in window) {
-    new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        if (entry.isIntersecting && !calm.matches) {
-          video
-            .play()
-            .then(() => arch.setAttribute("data-playing", ""))
-            .catch(() => arch.removeAttribute("data-playing"));
-        } else {
-          video.pause();
-        }
-      },
-      { threshold: 0.35 },
-    ).observe(arch);
   }
 </script>

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-async function setup(reducedMotion = false) {
+async function setup(reducedMotion = false, saveData = false) {
   vi.resetModules();
   const motion = new EventTarget() as EventTarget & { matches: boolean };
   motion.matches = reducedMotion;
@@ -43,7 +43,13 @@ async function setup(reducedMotion = false) {
   }
   vi.stubGlobal("window", { matchMedia: () => motion, IntersectionObserver: Observer });
   vi.stubGlobal("IntersectionObserver", Observer);
-  vi.stubGlobal("document", { querySelectorAll: () => [frame] });
+  const documentState = Object.assign(new EventTarget(), {
+    querySelectorAll: () => [frame],
+    visibilityState: "visible",
+  });
+  const connection = Object.assign(new EventTarget(), { saveData });
+  vi.stubGlobal("document", documentState);
+  vi.stubGlobal("navigator", { connection });
   await import("../../src/scripts/loop");
   return {
     video,
@@ -56,6 +62,14 @@ async function setup(reducedMotion = false) {
       motion.matches = matches;
       motion.dispatchEvent(new Event("change"));
     },
+    visibility: (state: string) => {
+      documentState.visibilityState = state;
+      documentState.dispatchEvent(new Event("visibilitychange"));
+    },
+    saveData: (enabled: boolean) => {
+      connection.saveData = enabled;
+      connection.dispatchEvent(new Event("change"));
+    },
     settle: async () => {
       await Promise.resolve();
       await Promise.resolve();
@@ -66,6 +80,45 @@ async function setup(reducedMotion = false) {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("silent service films", () => {
+  it("pauses when the document hides and ignores its late play completion", async () => {
+    const film = await setup();
+    film.intersect(0.8);
+    film.visibility("hidden");
+    film.pending[0]!.resolve();
+    await film.settle();
+    expect(film.video.paused).toBe(true);
+    expect(film.attributes.has("data-playing")).toBe(false);
+    film.visibility("visible");
+    expect(film.video.play).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps the poster under Save-Data and responds to changes", async () => {
+    const film = await setup(false, true);
+    film.intersect(0.8);
+    expect(film.video.play).not.toHaveBeenCalled();
+    expect(film.toggle.hidden).toBe(true);
+    film.saveData(false);
+    expect(film.video.play).toHaveBeenCalledTimes(1);
+    film.pending[0]!.resolve();
+    await film.settle();
+    film.saveData(true);
+    expect(film.video.paused).toBe(true);
+    expect(film.attributes.has("data-playing")).toBe(false);
+    expect(film.toggle.hidden).toBe(true);
+  });
+
+  it("does not undo a visitor's pause when returning to a visible document", async () => {
+    const film = await setup();
+    film.intersect(0.8);
+    film.pending[0]!.resolve();
+    await film.settle();
+    film.toggle.dispatchEvent(new Event("click"));
+    film.visibility("hidden");
+    film.visibility("visible");
+    expect(film.video.play).toHaveBeenCalledTimes(1);
+    expect(film.video.paused).toBe(true);
+  });
+
   it("waits until at least 40 percent is visible, and pauses below that threshold", async () => {
     const film = await setup();
     film.intersect(0.1);

@@ -1,8 +1,11 @@
 /**
  * Silent looping films: play only while at least 40% visible, never with reduced motion, and the
- * visitor can always pause them. Without JavaScript or with reduced motion the poster stays.
+ * visitor can pause them. Hidden documents stop playback; reduced motion or Save-Data keeps the
+ * poster. Without JavaScript the poster stays.
  */
 const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+const connection = (navigator as Navigator & { connection?: EventTarget & { saveData?: boolean } })
+  .connection;
 
 document.querySelectorAll<HTMLElement>("[data-loop]").forEach((frame) => {
   const video = frame.querySelector<HTMLVideoElement>("[data-loop-video]");
@@ -13,7 +16,12 @@ document.querySelectorAll<HTMLElement>("[data-loop]").forEach((frame) => {
   let visible = false;
   let pending = false;
   let generation = 0;
-  const allowed = () => visible && !calm.matches && !userPaused;
+  const allowed = () =>
+    visible &&
+    document.visibilityState === "visible" &&
+    !calm.matches &&
+    !connection?.saveData &&
+    !userPaused;
   const show = (playing: boolean) => {
     frame.toggleAttribute("data-playing", playing);
     label.textContent = playing ? "Pause" : "Play";
@@ -52,17 +60,19 @@ document.querySelectorAll<HTMLElement>("[data-loop]").forEach((frame) => {
     );
   };
   const sync = () => {
-    toggle.hidden = calm.matches;
+    toggle.hidden = calm.matches || connection?.saveData === true;
     if (allowed()) start();
     else stop();
   };
   show(false);
-  toggle.hidden = calm.matches;
+  toggle.hidden = calm.matches || connection?.saveData === true;
   toggle.addEventListener("click", () => {
     userPaused = !video.paused;
     sync();
   });
   calm.addEventListener("change", sync);
+  document.addEventListener("visibilitychange", sync);
+  connection?.addEventListener("change", sync);
   new IntersectionObserver(
     ([entry]) => {
       if (!entry) return;

@@ -1,5 +1,15 @@
 # Current handoff — 28 November 2026
 
+## Latest motion/resource phase — active checkpoint
+
+Branch `fix/home-loop-lifecycle` follows accessibility PR #181 (`c061b5a`) and security PR #180 (`2a565e5`); each is a separate phase/PR. Persistence #179 is merged on main as `3fe1df6`. Security/UI hosted verify/cross-browser checks are pending at the last inspection; their Workers Builds/editorial-fixture checks succeeded. Do not treat preview build success as application acceptance or a public release.
+
+Home kitchen now uses the existing shared `[data-loop]` controller with a native44px Pause/Play control, preserving its poster, real footage and arch. Removed its weaker duplicate observer. Shared loop playback now stops on hidden documents and respects Save-Data where the optional Network Information API exists, including preference changes; user pause and generation guards remain. No new library, asset, hero or creative direction. Service films gain the same resource guards.
+
+Evidence: two new tests reproduced hidden-document playback and ignored Save-Data before the fix; a third preserves user pause on document return. Focused10-loop tests and full369-unit suite pass; Astro/type check0 errors/warnings/hints. Independent source review found no important blockers. Two home-film browser scenarios added; actual rendering/playback/control focus and fresh performance/axe/device acceptance remain UNVERIFIED locally because Chromium is absent. Build/format results are recorded in this phase's PR after execution. Optional APIs fall back to existing visibility/reduced-motion behavior; no fabricated battery/bandwidth measurement.
+
+Primary references researched: MDN Page Visibility API and NetworkInformation/saveData/change. No active scan, real submission, notification, secret, migration, deletion, domain/indexing/intake or content-publication gate changed. Next source work should reconcile actual open-PR/CI state and the matrix before choosing another scoped slice; do not duplicate #64's held rate-limit work or reimplement these loop fixes.
+
 ## Latest accessibility/enquiry phase — active checkpoint
 
 Owner explicitly authorized autonomous implementation after persistence. Do not repeat a plan-approval question for these fix passes; retain separate major creative-direction, publication and production gates. Branch `fix/planner-inline-validation` is the next isolated phase, stacked on security PR #180. Persistence #179 merged as `3fe1df6` after all four hosted checks succeeded and no review threads/reviews were outstanding. Security #180 is retargeted to main at head `2a565e5` (same content tree as its363-unit-tested candidate); required hosted verification is pending. No app merge/deployment acceptance is inferred.

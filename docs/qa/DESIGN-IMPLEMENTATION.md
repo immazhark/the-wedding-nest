@@ -4,6 +4,8 @@
 
 Application measurements are deliberately deferred by the owner. This document does not mark them waived or substitute source presence for runtime evidence.
 
+**Motion/resource phase checkpoint:** `fix/home-loop-lifecycle` reuses the shared controller for the home kitchen and adds a native Pause/Play control. Shared loops stop for hidden documents and Save-Data where supported; reduced-motion/live preference and stale-play guards remain. Two regression failures reproduced before implementation;10 focused loop tests and full369-unit suite now pass with clean type check. Browser/rendered playback, byte/CWV savings and device acceptance remain UNVERIFIED. No measured performance benefit or final programme completion is claimed.
+
 **Accessibility/enquiry phase checkpoint:** branch `fix/planner-inline-validation` follows security PR #180; persistence #179 is merged (`3fe1df6`, four hosted checks green). Field-local errors, independent after-blur validation/correction, preserved help IDs, guarded first-error focus and44px consent-label sizing are implemented. Three new unit cases failed before helper implementation; full366-unit suite and clean Astro/type check now pass. Five browser regressions were added but not executed locally because Chromium binary is absent. Inline rendered visibility/focus announcements/touch geometry remain Implemented—UNVERIFIED until those tests/manual checks run. No new overall design/a11y/performance score is assigned.
 
 **Latest authorization/checkpoint:** owner's subsequent “Continue autonomous execution” instruction authorizes source implementation passes; earlier pending plan-approval entries describe the persistence checkpoint. Phase1 `fix/enquiry-verification-response` adds a Siteverify HTTP-success guard. Four new regressions reproduced201 instead of503 on upstream400/429/500/503; full unit suite now363/363 passes, type check clean, format and standard build pass. This is unit/build evidence only; real provider/runtime/measurement acceptance remains UNVERIFIED. No change to held limiter #64 or production gates. Update affected row09.4/13.4 evidence by this checkpoint without asserting all security requirements are verified.
@@ -43,7 +45,7 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | 05.5 | Iconography, borders, shadows, radii | Shared components; DESIGN | P2 | Pending | Per-component inventory and render critique required |
 | 05.6 | Real photography/illustration direction | photography-brief; media inventory | P1 | Partial | Approved assets and permission gates exist; new material requires approval |
 | 05.7 | Component variants and all applicable states | Planner/nav/gallery/operator components | P1 | Partial | Existing states; comprehensive inventory pending |
-| 05.8 | Motion durations/easings/reduced-motion rules | global.css; motion.ts; loop.ts | P1 | Partial | Existing guards; bespoke home handlers need verification |
+| 05.8 | Motion durations/easings/reduced-motion rules | global.css; motion.ts; loop.ts | P1 | Partial | Home kitchen now shares guarded loops/pause control; hidden/Save-Data lifecycle unit-verified; service-door handlers and rendered acceptance remain pending |
 | 05.9 | Mobile/tablet/desktop behavior and content tone | DESIGN; product direction | P1 | Partial | Documented; fresh responsive acceptance UNVERIFIED |
 | 05.10 | Persist brand language without same visual skin across four sites | DESIGN | P1 | Implemented—UNVERIFIED | Index and constraints written; future rendering not established |
 | 06.1 | Audit public and administrative surfaces for generic patterns | AUDIT-0; public/operator routes | P2 | Partial | Current manual sample home/catering/planner desktop; admin visual audit pending |
@@ -75,12 +77,12 @@ Read [the full directive](../directives/MASTER-DESIGN-ENGINEERING-DIRECTIVE.md),
 | 09.6 | Appropriate SWR/static rendering/cache/prefetch | Astro/headers/navigation | P1 | Partial | Static-first exists; never cache private enquiry/operator responses |
 | 09.7 | Evaluate shortcuts/palette/undo/sheets/advanced menu interactions | Technique register | P2 | Verified | Applicability decisions recorded, not implementation claims |
 | 10.1 | Motion explains state/hierarchy/causality/story | Motion inventory | P2 | Partial | Existing choreography; fresh critique pending |
-| 10.2 | Shared durations/easings; interruptible/reversible motion | Global tokens/controllers | P1 | Partial | Existing shared and bespoke paths; no universal guarantee |
+| 10.2 | Shared durations/easings; interruptible/reversible motion | Global tokens/controllers | P1 | Partial | Home kitchen consolidated onto shared generation guards; hidden/Save-Data regressions pass; no universal or rendered guarantee |
 | 10.3 | Opacity/transform; avoid thrash/loops/excess layers | global.css/motion handlers | P1 | Partial | Progress width animation and home loops need targeted work |
 | 10.4 | CSS/native transitions with support/static fallback | Global/motion/gallery | P1 | Partial | Existing progressive transitions; current browser acceptance UNVERIFIED |
 | 10.5 | GSAP only justified; no redundant animation stack | motion.ts; dependency policy | P1 | Partial | Existing GSAP use; current byte and interaction budget unmeasured |
 | 10.6 | Evaluate Motion for React only when architecture warrants | Dependency decision | P2 | N/A | No new React island need established |
-| 10.7 | Reduced motion throughout CSS/JS, all content usable | Home/shared media/styles | P0 | Partial | Source guards; preference-toggle playback acceptance pending |
+| 10.7 | Reduced motion throughout CSS/JS, all content usable | Home/shared media/styles | P0 | Partial | Home kitchen uses shared live reduced-motion guard and poster; loop unit cases pass; browser/SR and other home media acceptance pending |
 | 10.8 | No scroll hijack/forced splash/hidden content/navigation delay/transaction spectacle | Home/nav/planner | P0 | Partial | Hero authored visibility delay is a finding; do not introduce more |
 | 11A | Amaana-specific donations/identity/financial rules | Other repository | P0 | N/A | Preserve original directive text; no Amaana changes in TWN |
 | 11B | Cakeopedia options/pricing/allergens/enquiries | Other repository | P0 | N/A | No Cakeopedia changes in TWN |
