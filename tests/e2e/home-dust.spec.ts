@@ -23,8 +23,7 @@ test("decorative opening particles settle and do not restart", async ({ page }) 
 
   const state = () =>
     page.evaluate(
-      () =>
-        (window as Window & { __dustProbe: { draws: number; visible: boolean } }).__dustProbe,
+      () => (window as Window & { __dustProbe: { draws: number; visible: boolean } }).__dustProbe,
     );
   await expect.poll(async () => (await state()).draws).toBeGreaterThan(0);
   await expect.poll(async () => (await state()).visible, { timeout: 6000 }).toBe(false);

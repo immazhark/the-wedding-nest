@@ -12,10 +12,13 @@ test("mobile navigation remains usable when page modules fail", async ({ page })
     const html = await response.text();
     // Astro can inline small modules at build time. Disable both forms of module execution,
     // without disabling the separate inline layout marker or the rest of the document.
-    const body = html.replace(/<script\b[^>]*\btype=["']module["'][^>]*>[\s\S]*?<\/script>/gi, () => {
-      removedModules++;
-      return "";
-    });
+    const body = html.replace(
+      /<script\b[^>]*\btype=["']module["'][^>]*>[\s\S]*?<\/script>/gi,
+      () => {
+        removedModules++;
+        return "";
+      },
+    );
     await route.fulfill({ response, body });
   });
   await page.goto("/");
